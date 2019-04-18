@@ -13,6 +13,15 @@ NULL
 #' @title
 #'   Data frame with metadata
 #'
+#' @section Methods:
+#'   Static:\cr
+#'   \code{$constructFromCSV} -
+#'     See \code{\link{DataFrame_constructFromCSV}}
+#'
+#'   \code{$new}\cr
+#'   \code{$copyMetaData} -
+#'     See \code{\link{DataFrame_copyMetaData}}
+#'
 DataFrame <- R6Class(
    classname = "DataFrame",
    public = list(
@@ -29,9 +38,12 @@ DataFrame <- R6Class(
 #' @title
 #'   Static method for creating a DataFrame object from CSV files
 #'
-DataFrame$constructFromCSV <- function(dataFrame, fileName)
+#' @section Method of class:
+#'   \code{\link{DataFrame}}
+DataFrame$constructFromCSV <- function(fileName)
 {
 
+   dataFrame <- DataFrame$new();
    dataFrame$data <- read.csv(
       file = paste(
          fileName,
@@ -64,3 +76,22 @@ DataFrame$constructFromCSV <- function(dataFrame, fileName)
    return(dataFrame);
 
 };
+
+# Method DataFrame$copyMetaData ####
+
+#' @name DataFrame_copyMetaData
+#'
+#' @title
+#'   Copy metadata from another DataFrame object
+#'
+#' @section Method of class:
+#'   \code{\link{DataFrame}}
+DataFrame$set(
+   which = "public",
+   name = "copyMetaData",
+   value = function(dataFrame)
+      {
+         self$meta <- dataFrame$meta;
+         self$metaColumns <- dataFrame$metaColumns;
+      }
+);

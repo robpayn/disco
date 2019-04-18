@@ -20,42 +20,42 @@ for (name in c("upstream", "downstream")) {
          )
    );
 
-   pdf(file = sprintf("./output/summary_%s.pdf", name));
+   pdf(file = sprintf("./output/fit_%s.pdf", name));
    par(
-      mfrow = c(3,2),
-      mar = c(4, 4, 2, 4) + 0.1,
+      mfrow = c(3, 2),
+      mar = c(2, 4, 4, 4) + 0.1,
       oma = c(0, 0, 2, 0)
       );
 
    ld <- rbind.data.frame(
       doObs = list(
-         name = "DO Obs",
-         lty = NA,
-         pch = 1,
-         col = "black",
-         lwd = 1
-      ),
+            name = "DO Obs",
+            lty = NA,
+            pch = 1,
+            col = "black",
+            lwd = 1
+         ),
+      doMod = list(
+            name = "DO Mod",
+            lty = "solid",
+            pch = NA,
+            col = "black",
+            lwd = 2
+         ),
       doSat = list(
-         name = "DO Sat",
-         lty = "dotted",
-         pch = NA,
-         col = "black",
-         lwd = 2
-      ),
-      par = list(
-         name = "PAR",
-         lty = "dashed",
-         pch = NA,
-         col = "red",
-         lwd = 2
-      ),
+            name = "DO Sat",
+            lty = "dotted",
+            pch = NA,
+            col = "black",
+            lwd = 2
+         ),
       parExt = list(
-         name = "Ext. Insol.",
-         lty = "dotted",
-         pch = NA,
-         col = "red",
-         lwd = 2
-      ),
+            name = "Ext. Insol.",
+            lty = "dashed",
+            pch = NA,
+            col = "red",
+            lwd = 2
+         ),
       stringsAsFactors = FALSE
    );
 
@@ -77,28 +77,67 @@ for (name in c("upstream", "downstream")) {
          maxTime = maxTime
       );
 
+      time <- daySignal$time - 6 * 3600;
+
+      solarRadiation <- SolarRadiation$new(
+         latitude = 46.59566,
+         longitude = -112.94713,
+         differenceFromGMT = -7,
+         adjustDST = 1
+      );
+      parExt <- solarRadiation$getExtraterrestrialInsolation(time);
+
       model <- ModelOneStationMetabDo$new(
          dailyGPP = 50,
          dailyER = -50,
          k600 = 3,
          airPressure = 0.84,
-         time = daySignal$time,
+         time = time,
          initialDO = daySignal$dataFrame$data$do,
          temp = daySignal$dataFrame$data$temp,
-         par = daySignal$dataFrame$data$par,
+         par = parExt,
          stdAirPressure = 1
       );
-      model$run();
 
-      timeAxis <- daySignal$time - 6 * 3600;
+      objFunc <- LogLikelihood$new(
+         model = model,
+         parameterTranslator = ParameterTranslatorMetab$new(model),
+         predictionExtractor = PredictionExtractorMetabDo$new(model),
+         observation = data.frame(do = daySignal$dataFrame$data$do),
+         sd = 0.05,
+         negate = TRUE
+      );
+
+      optimr <- optim(
+         par = c(
+            50,
+            -50,
+            3
+         ),
+         fn = objFunc$propose
+      );
+
+      objFunc$propose(optimr$par);
 
       daySignal$plot(
          header = "do",
-         x = timeAxis,
+         x = time,
          xaxt = "n",
+         xlab = "n",
+         ylim = c(
+               min(objFunc$model$output$do, daySignal$dataFrame$data$do),
+               max(objFunc$model$output$do, daySignal$dataFrame$data$do)
+            ),
          pch = ld["doObs", "pch"],
          col = ld["doObs", "col"],
          lwd = ld["doObs", "lwd"]
+      );
+      lines(
+         x = time,
+         y = objFunc$model$output$do,
+         lty = ld["doMod", "lty"],
+         col = ld["doMod", "col"],
+         lwd = ld["doMod", "lwd"]
       );
 
       if (plotCount == 6) {
@@ -110,7 +149,7 @@ for (name in c("upstream", "downstream")) {
             cex = 0.8
          );
          legend(
-            x = min(timeAxis),
+            x = min(time),
             y = max(daySignal$dataFrame$data$do),
             bty = "n",
             legend = ld$name,
@@ -129,8 +168,19 @@ for (name in c("upstream", "downstream")) {
 
       mtext(
          side = 3,
-         line = 0.5,
+         line = 2,
          text = substr(minTime, 1, 10),
+         cex = 0.7
+      );
+      mtext(
+         side = 3,
+         line = 1,
+         text = sprintf(
+               fmt = "GPP = %.3e, ER = %.3e, k600 = %.3e",
+               signif(optimr$par[1], 4),
+               signif(optimr$par[2], 4),
+               signif(optimr$par[3], 4)
+            ),
          cex = 0.7
       );
       axis.POSIXct(
@@ -143,32 +193,15 @@ for (name in c("upstream", "downstream")) {
       );
       # lines(daySignal$time, model$output$do);
       lines(
-         timeAxis,
+         time,
          model$output$doSat,
          lty = ld["doSat", "lty"],
          col = ld["doSat", "col"],
          lwd = ld["doSat", "lwd"]
       );
       par(new = TRUE);
-      daySignal$plot(
-         header = "par",
-         x = timeAxis,
-         type = "l",
-         lty = ld["par", "lty"],
-         col = ld["par", "col"],
-         lwd = ld["par", "lwd"],
-         yaxt = "n",
-         ylab = "",
-         xaxt = "n",
-         xlab = ""
-      );
-      axis(
-         side = 4
-      );
-      par(new = TRUE);
-      parExt <- solarRadiation$getExtraterrestrialInsolation(timeAxis);
       plot(
-         x = timeAxis,
+         x = time,
          y = parExt,
          type = "l",
          lty = ld["parExt", "lty"],
@@ -176,17 +209,24 @@ for (name in c("upstream", "downstream")) {
          lwd = ld["parExt", "lwd"],
          yaxt = "n",
          ylab = "",
+         ylim = c(0, 1400),
          xaxt = "n",
          xlab = ""
       );
+      axis(
+         side = 4,
+         col.axis = ld["parExt", "col"]
+      );
       mtext(
-         text = sprintf(
-            "par (%s)",
-            daySignal$dataFrame$metaColumns["par",]$units
-            ),
+         text = bquote(paste(
+               "Ext. Insol. (W ",
+               m^-2,
+               ")"
+            )),
          side = 4,
          line = 2.5,
-         cex = 0.7
+         cex = 0.7,
+         col = ld["parExt", "col"]
       );
    }
 

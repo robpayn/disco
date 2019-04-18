@@ -6,6 +6,42 @@
 #'
 NULL
 
+# Signal R6 Interface ####
+
+#' @export
+#'
+#' @title
+#'   Manages time series data
+#'
+#' @section Methods:
+#'   \code{$new}\cr
+#'   \code{$getWindow} (abstract) - See \code{\link{Signal_getWindow}}
+#'
+Signal <- R6Class(
+   classname = "Signal"
+);
+
+#' @name Signal_getWindow
+#'
+#' @title
+#'   Gets a subset of a signal based on a time window
+#'
+#' @description
+#'   Abstract method defining the interface for getting a subset
+#'   of a signal.
+#'
+#' @section Abstract method of class:
+#'   \code{\link{Signal}}
+#'
+Signal$set(
+   which = "public",
+   name = "getWindow",
+   value = function(...)
+      {
+         stop("Abstract method 'getWindow' has not been implemented.");
+      }
+);
+
 # SignalDataFrame R6 Class ####
 
 #' @export
@@ -13,40 +49,38 @@ NULL
 #' @title
 #'   Signal based on a time series DataFrame object
 #'
+#' @section Methods:
+#'   Static:\cr
+#'   \code{$constructFromCSV} -
+#'     See \code{\link{SignalDataFrame_constructFromCSV}}
+#'
+#'   \code{$new}\cr
+#'   \code{$getWindow} -
+#'     See \code{\link{SignalDataFrame_getWindow}}
+#'
 SignalDataFrame <- R6Class(
    classname = "SignalDataFrame",
-   inherit = DataFrame,
+   inherit = Signal,
    public = list(
+      dataFrame = NULL,
       timeHeader = NULL,
       time = NULL,
-      initialize = function(timeHeader = "time")
+      initialize = function(
+            dataFrame = DataFrame$new(),
+            timeHeader = "time",
+            ...
+         )
          {
+            self$dataFrame <- dataFrame;
             self$timeHeader <- timeHeader;
-         },
-      setTimeFromData = function(...)
-         {
-            self$time <-
-               as.POSIXct(self$data[[self$timeHeader]], ...);
-         },
-      getWindow = function(minTime, maxTime)
-         {
-            indices <-
-               self$time > as.POSIXct(minTime) &
-               self$time < as.POSIXct(maxTime);
-            signal <- SignalDataFrame$new();
-            signal$time <- self$time[indices];
-            signal$data <- self$data[indices,];
-            signal$copyMetaData(self);
-            return(signal);
-         },
-      copyMetaData = function(signal)
-         {
-            self$meta <- signal$meta;
-            self$metaColumns <- signal$metaColumns;
+            if (!is.null(self$dataFrame$data[[self$timeHeader]])) {
+               self$time <-
+                  as.POSIXct(self$dataFrame$data[[self$timeHeader]], ...);
+            }
          },
       plotSummary = function(
          x = NULL,
-         mfrow = c(length(self$data) - 1, 1),
+         mfrow = c(length(self$dataFrame$data) - 1, 1),
          mar = c(4, 4, 1, 1) + 0.1
          )
          {
@@ -54,7 +88,7 @@ SignalDataFrame <- R6Class(
                mfrow = mfrow,
                mar = mar
             );
-            for(header in names(self$data)) {
+            for(header in names(self$dataFrame$data)) {
                if (header != self$timeHeader) {
                   if (is.null(x)) {
                      self$plot(
@@ -72,12 +106,12 @@ SignalDataFrame <- R6Class(
       plot = function(
          header,
          x = self$time,
-         y = self$data[[header]],
+         y = self$dataFrame$data[[header]],
          xlab = self$timeHeader,
          ylab = sprintf(
             "%s (%s)",
             header,
-            self$metaColumns[header,]$units
+            self$dataFrame$metaColumns[header,]$units
             ),
          ...
          )
@@ -93,20 +127,61 @@ SignalDataFrame <- R6Class(
    )
 );
 
+# Static method SignalDataFrame$constructFromCSV ####
+
 #' @name SignalDataFrame_constructFromCSV
 #'
 #' @title
 #'   Static method to construct a DataFrame signal from csv files
 #'
+#' @section Static method of class:
+#'   \code{\link{SignalDataFrame}}
+#'
 SignalDataFrame$constructFromCSV <- function(
-   signal,
    fileName,
+   timeHeader = "time",
    ...
 )
 {
 
-   signal <- DataFrame$constructFromCSV(signal, fileName);
-   signal$setTimeFromData(...);
-   return(signal);
+   return(
+      SignalDataFrame$new(
+         DataFrame$constructFromCSV(fileName),
+         timeHeader,
+         ...
+      )
+   );
 
 };
+
+# Method SignalDataFrame$getWindow ####
+
+#' @name SignalDataFrame_getWindow
+#'
+#' @title
+#'   Gets a subset of a signal based on a time window
+#'
+#' @description
+#'   Method for getting a subset of a signal.
+#'
+#' @return
+#'   A subset of the signal as a SignalDataFrame object
+#'
+#' @section Abstract method of class:
+#'   \code{\link{SignalDataFrame}}
+#'
+SignalDataFrame$set(
+   which = "public",
+   name = "getWindow",
+   value = function(minTime, maxTime)
+      {
+         indices <-
+            self$time > as.POSIXct(minTime) &
+            self$time < as.POSIXct(maxTime);
+         subSignal <- SignalDataFrame$new();
+         subSignal$time <- self$time[indices];
+         subSignal$dataFrame$data <- self$dataFrame$data[indices,];
+         subSignal$dataFrame$copyMetaData(self$dataFrame);
+         return(subSignal);
+      }
+);

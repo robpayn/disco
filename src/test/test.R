@@ -1,8 +1,8 @@
 rm(list = ls());
 library(R6);
-library(infmod);
+library(inferno);
 library(metab);
-library(workflow);
+library(disco);
 
 name <- "upstream";
 

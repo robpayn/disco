@@ -1,10 +1,10 @@
-Package: workflow
+Package: disco
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Workflow for scientific discovery
 Version: 0.0.1
 Author: Robert A. Payn
 Maintainer: Robert Payn <rpayn@montana.edu>
-Description: Tools for managing scientific workflow
+Description: Tools for managing scientific workflow.
 License: GNU General Public License v3.0
 Encoding: UTF-8
 LazyData: true

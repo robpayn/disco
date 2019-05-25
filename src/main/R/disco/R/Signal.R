@@ -42,21 +42,81 @@ Signal$set(
       }
 );
 
+Signal$set(
+   which = "public",
+   name = "getVariable",
+   value = function(variableName) 
+      {
+         stop(paste(
+            "Abstract method 'getVariable' has not been implemented"
+         ));
+      }
+);
+
+Signal$set(
+   which = "public",
+   name = "plotSummary",
+   value = function(x, mfrow, mar)
+   {
+      stop(paste(
+         "Abstract method 'plotSummary' has not been implemented"
+      ));
+   }
+);
+
+Signal$set(
+   which = "public",
+   name = "plot",
+   value = function
+      (
+         header,
+         x,
+         y,
+         xlab,
+         ylab,
+         ...
+      )
+      {
+         stop(paste(
+            "Abstract method 'plot' has not been implemented"
+         ));
+      }
+);
+
 # SignalDataFrame R6 Class ####
 
 #' @export
 #'
 #' @title
 #'   Signal based on a time series DataFrame object
+#'   
+#' @usage 
+#'   SignalDataFrame$new()
+#' @param dataFrame
+#'   The dataframe providing the basis of the signal.
+#'   Defaults to a new DataFrame object.
+#' @param timeHeader
+#'   The header in the DataFrame data for the column with
+#'   time data.
+#'   Defaults to "time".
+#' @param ...
+#'   Arguments passed to as.POSIXct in coverting the time
+#'   data to a POSIXct vector.
 #'
 #' @section Methods:
 #'   Static:\cr
-#'   \code{$constructFromCSV} -
-#'     See \code{\link{SignalDataFrame_constructFromCSV}}
+#'   \code{$constructFromCSV} - see
+#'      \code{\link{SignalDataFrame_constructFromCSV}} \cr
 #'
-#'   \code{$new}\cr
-#'   \code{$getWindow} -
-#'     See \code{\link{SignalDataFrame_getWindow}}
+#'   \code{$new} - see above\cr
+#'   \code{$getWindow} - see
+#'     \code{\link{SignalDataFrame_getWindow}} \cr
+#'   \code{$plotSummary} - see
+#'     \code{\link{SignalDataFrame_plotSummary}} \cr
+#'   \code{$plot} - see
+#'     \code{\link{SignalDataFrame_plot}} \cr
+#'    
+#'     
 #'
 SignalDataFrame <- R6Class(
    classname = "SignalDataFrame",
@@ -77,52 +137,6 @@ SignalDataFrame <- R6Class(
                self$time <-
                   as.POSIXct(self$dataFrame$data[[self$timeHeader]], ...);
             }
-         },
-      plotSummary = function(
-         x = NULL,
-         mfrow = c(length(self$dataFrame$data) - 1, 1),
-         mar = c(4, 4, 1, 1) + 0.1
-         )
-         {
-            par(
-               mfrow = mfrow,
-               mar = mar
-            );
-            for(header in names(self$dataFrame$data)) {
-               if (header != self$timeHeader) {
-                  if (is.null(x)) {
-                     self$plot(
-                        header = header
-                     );
-                  } else {
-                     self$plot(
-                        header = header,
-                        x = x
-                     )
-                  }
-               }
-            }
-         },
-      plot = function(
-         header,
-         x = self$time,
-         y = self$dataFrame$data[[header]],
-         xlab = self$timeHeader,
-         ylab = sprintf(
-            "%s (%s)",
-            header,
-            self$dataFrame$metaColumns[header,]$units
-            ),
-         ...
-         )
-         {
-            plot(
-               x = x,
-               y = y,
-               xlab = xlab,
-               ylab = ylab,
-               ...
-            );
          }
    )
 );
@@ -154,6 +168,15 @@ SignalDataFrame$constructFromCSV <- function(
 
 };
 
+SignalDataFrame$set(
+   which = "public",
+   name = "getVariable",
+   value = function(variableName) 
+   {
+      return(self$dataFrame$data[[variableName]]);
+   }
+);
+
 # Method SignalDataFrame$getWindow ####
 
 #' @name SignalDataFrame_getWindow
@@ -183,5 +206,83 @@ SignalDataFrame$set(
          subSignal$dataFrame$data <- self$dataFrame$data[indices,];
          subSignal$dataFrame$copyMetaData(self$dataFrame);
          return(subSignal);
+      }
+);
+
+# Method SignalDataFrame$plotSummary ####
+
+#' @name SignalDataFrame_plotSummary
+#' 
+#' @title 
+#'   Plot a summary of the multivariate signal
+#'   
+#' @section Method of class:
+#'   \code{\link{SignalDataFrame}}
+#'
+SignalDataFrame$set(
+   which = "public",
+   name = "plotSummary",
+   value = function
+      (
+         x = NULL,
+         mfrow = c(length(self$dataFrame$data) - 1, 1),
+         mar = c(4, 4, 1, 1) + 0.1
+      )
+      {
+         par(
+            mfrow = mfrow,
+            mar = mar
+         );
+         for(header in names(self$dataFrame$data)) {
+            if (header != self$timeHeader) {
+               if (is.null(x)) {
+                  self$plot(
+                     header = header
+                  );
+               } else {
+                  self$plot(
+                     header = header,
+                     x = x
+                  )
+               }
+            }
+         }
+      }
+);
+
+# Method SignalDataFrame$plot ####
+
+#' @name SignalDataFrame_plot
+#' 
+#' @title 
+#'   Plot a single variable in the signal
+#'   
+#' @section Method of class:
+#'   \code{\link{SignalDataFrame}}
+#'
+SignalDataFrame$set(
+   which = "public",
+   name = "plot",
+   value = function
+      (
+         header,
+         x = self$time,
+         y = self$dataFrame$data[[header]],
+         xlab = self$timeHeader,
+         ylab = sprintf(
+            "%s (%s)",
+            header,
+            self$dataFrame$metaColumns[header,]$units
+         ),
+         ...
+      )
+      {
+         plot(
+            x = x,
+            y = y,
+            xlab = xlab,
+            ylab = ylab,
+            ...
+         );
       }
 );

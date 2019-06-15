@@ -11,15 +11,33 @@ NULL
 #' @export
 #'
 #' @title
-#'   Manages time series data
+#'   Interface for a signal
+#' 
+#' @description 
+#'   Defines an abstract interface for an R6 class that manages
+#'   a multivariate time series data set. Full functional implementations
+#'   of this interface must implement the functions described below.
 #'
-#' @section Methods:
-#'   \code{$new}\cr
-#'   \code{$getWindow} (abstract) - See \code{\link{Signal_getWindow}}
+#' @section Abstract Methods:
+#'   \itemize{
+#'     \item \code{$getWindow} - See \code{\link{Signal_getWindow}}
+#'     \item \code{$getVariable} - See \code{\link{Signal_getVariable}}
+#'     \item \code{$addVariable} - See \code{\link{Signal_addVariable}}
+#'     \item \code{$writeCSV} - See \code{\link{Signal_writeCSV}}
+#'     \item \code{$interpolate} - See \code{\link{Signal_interpolate}}
+#'     \item \code{$plotSummary} - See \code{\link{Signal_plotSummary}}
+#'     \item \code{$plot} - See \code{\link{Signal_plot}}
+#'   }
 #'
 Signal <- R6Class(
-   classname = "Signal"
+   classname = "Signal",
+   public = list(
+      time = NULL
+      )
 );
+
+
+# Abstract method Signal$getWindow ####
 
 #' @name Signal_getWindow
 #'
@@ -27,262 +45,138 @@ Signal <- R6Class(
 #'   Gets a subset of a signal based on a time window
 #'
 #' @description
-#'   Abstract method defining the interface for getting a subset
-#'   of a signal.
-#'
-#' @section Abstract method of class:
-#'   \code{\link{Signal}}
-#'
-Signal$set(
-   which = "public",
-   name = "getWindow",
-   value = function(...)
-      {
-         stop("Abstract method 'getWindow' has not been implemented.");
-      }
-);
-
-Signal$set(
-   which = "public",
-   name = "getVariable",
-   value = function(variableName) 
-      {
-         stop(paste(
-            "Abstract method 'getVariable' has not been implemented"
-         ));
-      }
-);
-
-Signal$set(
-   which = "public",
-   name = "plotSummary",
-   value = function(x, mfrow, mar)
-   {
-      stop(paste(
-         "Abstract method 'plotSummary' has not been implemented"
-      ));
-   }
-);
-
-Signal$set(
-   which = "public",
-   name = "plot",
-   value = function
-      (
-         header,
-         x,
-         y,
-         xlab,
-         ylab,
-         ...
-      )
-      {
-         stop(paste(
-            "Abstract method 'plot' has not been implemented"
-         ));
-      }
-);
-
-# SignalDataFrame R6 Class ####
-
-#' @export
-#'
-#' @title
-#'   Signal based on a time series DataFrame object
-#'   
-#' @usage 
-#'   SignalDataFrame$new()
-#' @param dataFrame
-#'   The dataframe providing the basis of the signal.
-#'   Defaults to a new DataFrame object.
-#' @param timeHeader
-#'   The header in the DataFrame data for the column with
-#'   time data.
-#'   Defaults to "time".
-#' @param ...
-#'   Arguments passed to as.POSIXct in coverting the time
-#'   data to a POSIXct vector.
-#'
-#' @section Methods:
-#'   Static:\cr
-#'   \code{$constructFromCSV} - see
-#'      \code{\link{SignalDataFrame_constructFromCSV}} \cr
-#'
-#'   \code{$new} - see above\cr
-#'   \code{$getWindow} - see
-#'     \code{\link{SignalDataFrame_getWindow}} \cr
-#'   \code{$plotSummary} - see
-#'     \code{\link{SignalDataFrame_plotSummary}} \cr
-#'   \code{$plot} - see
-#'     \code{\link{SignalDataFrame_plot}} \cr
-#'    
-#'     
-#'
-SignalDataFrame <- R6Class(
-   classname = "SignalDataFrame",
-   inherit = Signal,
-   public = list(
-      dataFrame = NULL,
-      timeHeader = NULL,
-      time = NULL,
-      initialize = function(
-            dataFrame = DataFrame$new(),
-            timeHeader = "time",
-            ...
-         )
-         {
-            self$dataFrame <- dataFrame;
-            self$timeHeader <- timeHeader;
-            if (!is.null(self$dataFrame$data[[self$timeHeader]])) {
-               self$time <-
-                  as.POSIXct(self$dataFrame$data[[self$timeHeader]], ...);
-            }
-         }
-   )
-);
-
-# Static method SignalDataFrame$constructFromCSV ####
-
-#' @name SignalDataFrame_constructFromCSV
-#'
-#' @title
-#'   Static method to construct a DataFrame signal from csv files
-#'
-#' @section Static method of class:
-#'   \code{\link{SignalDataFrame}}
-#'
-SignalDataFrame$constructFromCSV <- function(
-   fileName,
-   timeHeader = "time",
-   ...
-)
-{
-
-   return(
-      SignalDataFrame$new(
-         DataFrame$constructFromCSV(fileName),
-         timeHeader,
-         ...
-      )
-   );
-
-};
-
-SignalDataFrame$set(
-   which = "public",
-   name = "getVariable",
-   value = function(variableName) 
-   {
-      return(self$dataFrame$data[[variableName]]);
-   }
-);
-
-# Method SignalDataFrame$getWindow ####
-
-#' @name SignalDataFrame_getWindow
-#'
-#' @title
-#'   Gets a subset of a signal based on a time window
-#'
-#' @description
-#'   Method for getting a subset of a signal.
+#'   Method for getting a subset of a signal. The time
+#'   stamps included in the window should start on or after
+#'   the minimum time and before or on the maximum time.
+#' 
+#' @param minTime
+#'   Time defining the beginning of the window
+#' @param maxTime
+#'   Time defining the end of the window
 #'
 #' @return
 #'   A subset of the signal as a SignalDataFrame object
 #'
-#' @section Abstract method of class:
-#'   \code{\link{SignalDataFrame}}
+#' @section Abstract method of interface:
+#'   \code{\link{Signal}}
 #'
-SignalDataFrame$set(
-   which = "public",
-   name = "getWindow",
-   value = function(minTime, maxTime)
-      {
-         indices <-
-            self$time > as.POSIXct(minTime) &
-            self$time < as.POSIXct(maxTime);
-         subSignal <- SignalDataFrame$new();
-         subSignal$time <- self$time[indices];
-         subSignal$dataFrame$data <- self$dataFrame$data[indices,];
-         subSignal$dataFrame$copyMetaData(self$dataFrame);
-         return(subSignal);
-      }
-);
+NULL
 
-# Method SignalDataFrame$plotSummary ####
+# Abstract method Signal$getVariable ####
 
-#' @name SignalDataFrame_plotSummary
+#' @name Signal_getVariable
+#'
+#' @title
+#'   Gets a variable vector
 #' 
-#' @title 
-#'   Plot a summary of the multivariate signal
-#'   
-#' @section Method of class:
-#'   \code{\link{SignalDataFrame}}
+#' @description
+#'   Gets the vector of values for a given variable
+#'   in the multivariate signal
+#' 
+#' @param variableName
+#'   The name of the variable
 #'
-SignalDataFrame$set(
-   which = "public",
-   name = "plotSummary",
-   value = function
-      (
-         x = NULL,
-         mfrow = c(length(self$dataFrame$data) - 1, 1),
-         mar = c(4, 4, 1, 1) + 0.1
-      )
-      {
-         par(
-            mfrow = mfrow,
-            mar = mar
-         );
-         for(header in names(self$dataFrame$data)) {
-            if (header != self$timeHeader) {
-               if (is.null(x)) {
-                  self$plot(
-                     header = header
-                  );
-               } else {
-                  self$plot(
-                     header = header,
-                     x = x
-                  )
-               }
-            }
-         }
-      }
-);
+#' @section Method of class:
+#'   \code{\link{Signal}}
+#'
+NULL
 
-# Method SignalDataFrame$plot ####
+# Abstract method Signal$plotSummary ####
 
-#' @name SignalDataFrame_plot
+#' @name Signal_plotSummary
+#'
+#' @title
+#'   Plots a signal summary
+#' 
+#' @description
+#'   Plot a summary of the variables in the signal
+#' 
+#' @param x
+#'   X-axis variable
+#' @param mfrow
+#'   Plot layout (see \code{\link{par}})
+#' @param mar
+#'   Plot margins (see \code{\link{par}})
+#'
+#' @section Method of class:
+#'   \code{\link{Signal}}
+#'
+NULL
+
+# Abstract method Signal$plot ####
+
+#' @name Signal_plot
 #' 
 #' @title 
 #'   Plot a single variable in the signal
 #'   
+#' @param variableName
+#'   The variable header to plot
+#' @param ...
+#'   Parameters to be passed on to the plot function
+#'   See \code{\link{plot.default}}
+#'     
 #' @section Method of class:
-#'   \code{\link{SignalDataFrame}}
+#'   \code{\link{Signal}}
 #'
-SignalDataFrame$set(
-   which = "public",
-   name = "plot",
-   value = function
-      (
-         header,
-         x = self$time,
-         y = self$dataFrame$data[[header]],
-         xlab = self$timeHeader,
-         ylab = sprintf(
-            "%s (%s)",
-            header,
-            self$dataFrame$metaColumns[header,]$units
-         ),
-         ...
-      )
-      {
-         plot(
-            x = x,
-            y = y,
-            xlab = xlab,
-            ylab = ylab,
-            ...
-         );
-      }
-);
+NULL
+
+# Abstract method Signal$addVariable ####
+
+#' @name Signal_addVariable
+#' 
+#' @title 
+#'   Add a variable to a signal
+#'   
+#' @param property
+#'   The property of the variable (will be used as the header)
+#' @param value
+#'   The vector of values for the vector.
+#'   Must match the length of the signal
+#' @param units
+#'   The units of the values.
+#' @param dimensions
+#'   The dimensions of the property
+#' 
+#' @section Method of class:
+#'   \code{\link{Signal}}
+#'
+NULL
+
+# Abstract method Signal$writeCSV ####
+
+#' @name Signal_writeCSV
+#' 
+#' @title 
+#'   Write the signal in csv format
+#'   
+#' @param path
+#'   Path to the CSV files that will be created
+#' @param name
+#'   Name base for the files
+#' @param timeVariableName
+#'   Header to use for the time column
+#'   
+#' @section Method of class:
+#'   \code{\link{Signal}}
+#'
+NULL
+
+# Abstract method Signal$interpolate ####
+
+#' @name Signal_interpolate
+#' 
+#' @title 
+#'   Interpolates a signal
+#'   
+#' @description 
+#'   Creates a new signal by interpolating between points of
+#'   this signal based on a provided vector of times
+#'   
+#' @param time
+#'   Vector of times at which the signal should be interpolated
+#'   
+#' @section Method of class:
+#'   \code{\link{Signal}}
+#'
+NULL

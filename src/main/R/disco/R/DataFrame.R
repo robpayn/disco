@@ -95,3 +95,23 @@ DataFrame$set(
          self$metaColumns <- dataFrame$metaColumns;
       }
 );
+
+# Method DataFrame$addColumn ####
+
+DataFrame$set(
+   which = "public",
+   name = "addColumn",
+   value = function
+      (
+         property,
+         value,
+         units,
+         dimensions
+      )
+      {
+         self$data[, property] <- value;
+         self$metaColumns[property, "property"] <- property;
+         self$metaColumns[property, "units"] <- units;
+         self$metaColumns[property, "dimensions"] <- dimensions;
+      }
+);

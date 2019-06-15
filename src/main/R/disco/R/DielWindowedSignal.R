@@ -252,6 +252,7 @@ DielWindowedSignal$set(
       signalPlotter,
       fileName = "windowSummary.pdf",
       outputDir = NULL,
+      summaryPath = "summary",
       mfrow = c(3,2),
       mar = c(4, 4, 2, 4) + 0.1
    )
@@ -268,8 +269,9 @@ DielWindowedSignal$set(
          );
       }
       path <- sprintf(
-         fmt = "%s/summary",
-         self$path
+         fmt = "%s/%s",
+         self$path,
+         summaryPath
       );
       dir.create(
          path = path, 
@@ -312,6 +314,8 @@ DielWindowedSignal$set(
       dev.off();
    }
 );
+
+# Method DielWindowedSignal$tabulateWindowSummary ####
 
 DielWindowedSignal$set(
    which = "public",

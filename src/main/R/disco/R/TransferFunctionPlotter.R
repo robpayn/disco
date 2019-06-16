@@ -11,94 +11,140 @@ NULL
 #' @export
 #' 
 #' @title 
-#'   Plots a multivariate signal
+#'   Plots a transfer function analysis summary
 #'
 #' @description 
-#'   Abstract class for providing visualizations of a multivariate
-#'   signal.
+#'   Abstract class for providing visualizations of the 
+#'   results of a tranfer function analysis.
 #'   This class provides the definition of an interface to a
 #'   TransferFunctionPlotter object and is not intended to be instantiated
 #'   directly.
 #' 
-#' @usage 
-#'   TransferFunctionPlotter$new()
 #' @param signalIn
 #'   Optional input signal associated with the plotter a priori.
 #'   Defaults to NULL.
 #' @param signalOut
-#'   Optional output signal associated with the plotter a priori.
+#'   Optional input signal associated with the plotter a priori.
 #'   Defaults to NULL.
 #' @param outputPath
 #'   Optional path to results from a dignal analysis.
 #'   Defaults to NULL.
+#' @param fileName
+#'   The file name for the pdf file generated
+#'   Defaults to "windowSummary.pdf"
+#' @param mfrow
+#'   The dimension of panels for the figure (see \code{\link{par}})
+#'   Defaults to c(3,2), or 3 rows and 2 columns of panels per figure.
+#' @param mar
+#'   The margins of each panel in the figure (see \code{\link{par}})
+#'   Defaults to c(4, 4, 2, 4) + 0.1
 #' 
-#' @return 
-#'   An instantiation of a TransferFunctionPlotter object
+#' @section Implements interface \code{\link{TransferFunctionSummarizer}}:
+#'   \code{$open}
+#'   \itemize{
+#'     \item see \code{\link{TransferFunctionSummarizer_open}}
+#'     \item see \code{\link{TransferFunctionPlotter_open}}
+#'   }
+#'   \code{$summarize}
+#'   \itemize{
+#'     \item see \code{\link{TransferFunctionSummarizer_summarize}}
+#'     \item see \code{\link{TransferFunctionPlotter_summarize}}
+#'   }
+#'   \code{$close}
+#'   \itemize{
+#'     \item see \code{\link{TransferFunctionSummarizer_close}}
+#'     \item see \code{\link{TransferFunctionPlotter_close}}
+#'   }
 #' 
-#' @section Methods:
-#'   $new
-#'   $plot - see \code{\link{TransferFunctionPlotter_plot}}  
 TransferFunctionPlotter <- R6Class(
    classname = "TransferFunctionPlotter",
+   inherit = TransferFunctionSummarizer,
    public = list(
       signalIn = NULL,
       signalOut = NULL,
       outputPath = NULL,
+      fileName = NULL,
+      mfrow = NULL,
+      mar = NULL,
       initialize = function
          (
             signalIn = NULL,
             signalOut = NULL,
-            outputPath = NULL
+            outputPath = NULL,
+            fileName = "windowSummary.pdf",
+            mfrow = c(3,2),
+            mar = c(4, 4, 2, 4) + 0.1
          )
          {
             self$signalIn <- signalIn;
             self$signalOut <- signalOut;
             self$outputPath <- outputPath;
+            self$fileName <- fileName;
+            self$mfrow <- mfrow;
+            self$mar <- mar;
          }
       )
 );
 
-# Method TransferFunctionPlotter$plot ####
+# Method TransferFunctionPlotter$open ####
 
-#' @name TransferFunctionPlotter_plot
+#' @name TransferFunctionPlotter_open
 #' 
 #' @title 
-#'   Plots a multivariate signal
-#' 
-#' @description 
-#'   Provides a default visualization of a multivariate signal
-#' 
-#' @param signalIn
-#'   A multivariate input signal of type \code{\link{Signal}}
-#' @param signalOut
-#'   A multivariate output signal of type \code{\link{Signal}}
-#' @param outputPath
-#'   A path to results from a signal analysis
-#' @param label
-#'   A label for the plot
-#' @param timeBounds  
-#'   The bounds to use for the time axis on the plot
+#'   Opens the tranfer function plotter
 #'   
-#' @return 
-#'   No designed return value
+#' @description 
+#'   Opens the PDF graphics device on the provided path
 #' 
-#' @section Abstract method of class:
-#'   \code{\link{TransferFunctionPlotter}}  
+#' @section Method of class:
+#'   \code{\link{TransferFunctionPlotter}}
+#'
+#' @section Implementation of abstract method:
+#'   \code{\link{TransferFunctionSummarizer_open}} -
+#'     See interface for further usage documentation
+#'   
 TransferFunctionPlotter$set(
    which = "public",
-   name = "plot",
+   name = "open",
    value = function
-      (
-         signalIn = NULL,
-         signalOut = NULL,
-         outputPath = NULL, 
-         label, 
-         timeBounds
-      )
-      {
-         stop(paste(
-            "Abstract method TransferFunctionPlotter$plot has not been", 
-            "implemented by inheriting class."
-         ));
-      }
+   (
+      path
+   )
+   {
+      pdf(file = sprintf(
+         fmt = "%s/%s",
+         path,
+         self$fileName
+      ));
+      par(
+         mfrow = self$mfrow,
+         mar = self$mar
+      );      
+   }
+);
+
+# Method TransferFunctionPlotter$close ####
+
+#' @name TransferFunctionPlotter_close
+#' 
+#' @title 
+#'   Closes the transfer function plotter
+#'   
+#' @description 
+#'   Closes the graphics device to write the PDF file
+#' 
+#' @section Method of class:
+#'   \code{\link{TransferFunctionPlotter}}
+#'
+#' @section Implementation of abstract method:
+#'   \code{\link{TransferFunctionSummarizer_close}} -
+#'     See interface for further usage documentation
+#'   
+TransferFunctionPlotter$set(
+   which = "public",
+   name = "close",
+   value = function()
+   {
+      dev.off();      
+   }
 );

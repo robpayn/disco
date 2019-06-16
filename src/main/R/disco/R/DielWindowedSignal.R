@@ -38,9 +38,6 @@ NULL
 #' @param inputDir
 #'   Optional name of the directory for the input for each window
 #'   Defaults to "input".
-#' @param outputDir
-#'   Optional name of the directory for the output for each window.
-#'   Defaults to "output".
 #' @param slideDays
 #'   The number of days to slide the window for generating each
 #'   window for analysis.
@@ -50,13 +47,14 @@ NULL
 #'   No defined return value.
 #' 
 #' @section Methods:
-#'   $new - see above \cr
-#'   $generateWindowInput - see
-#'     \code{\link{DielWindowedSignal_generateWindowInput}} \cr
-#'   $analyze - see
-#'     \code{\link{DielWindowedSignal_analyze}} \cr
-#'   $plotWindowSummary - see
-#'     \code{\link{DielWindowedSignal_plotWindowSummary}} \cr
+#'   \itemize{
+#'     \item $generateWindowInput - 
+#'       see \code{\link{DielWindowedSignal_generateWindowInput}}
+#'     \item $analyze -
+#'       see \code{\link{DielWindowedSignal_analyze}}
+#'     \item $summarizeWindows - 
+#'       see \code{\link{DielWindowedSignal_summarizeWindows}}
+#'   }
 #'     
 DielWindowedSignal <- R6Class(
    classname = "DielWindowedSignal",
@@ -175,6 +173,8 @@ DielWindowedSignal$set(
 #' @param signalDerivation
 #'   A SignalDerivation object that will perform the analysis
 #'   for each window
+#' @param outputDir
+#'   Name of subdirectory where output is located
 #'   
 #' @section Method of class:
 #'   \code{\link{DielWindowedSignal}}
@@ -217,137 +217,92 @@ DielWindowedSignal$set(
       }
 );
 
-# Method DielWindowedSignal$plotWindowSummary ####
+# Method DielWindowedSignal$summarizeWindows ####
 
-#' @name DielWindowedSignal_plotWindowSummary
+#' @name DielWindowedSignal_summarizeWindows
 #' 
 #' @title 
 #'   Summarize the output of the analyses of windows
 #' 
 #' @description 
-#'   Uses the provided SignalPlotter to generate a visual summary
+#'   Uses the provided SignalSummarizer to generate a summary
 #'   of the analysis of each window.
 #'   
-#' @param signalPlotter
-#'   A signal plotter that will generate the summary plot for each
+#' @param signalSummarizer
+#'   A signal summarizer that will generate the summary output for each
 #'   window
-#' @param fileName
-#'   The file name for the pdf file generated
-#'   Defaults to "windowSummary.pdf"
-#' @param mfrow
-#'   The dimension of panels for the figure (see \code{\link{par}})
-#'   Defaults to c(3,2), or 3 rows and 2 columns of panels per figure.
-#' @param mar
-#'   The margins of each panel in the figure (see \code{\link{par}})
-#'   Defaults to c(4, 4, 2, 4) + 0.1
+#' @param outputDir
+#'   Subdirectory where output is located.
+#'   Not necessary if the summarizer does not need output.
+#' @param summaryPath
+#'   The path to where the summary should be written
 #' 
 #' @section Method of class:
 #'   \code{\link{DielWindowedSignal}}
 #'   
 DielWindowedSignal$set(
    which = "public",
-   name = "plotWindowSummary",
-   value = function
-   (
-      signalPlotter,
-      fileName = "windowSummary.pdf",
-      outputDir = NULL,
-      summaryPath = "summary",
-      mfrow = c(3,2),
-      mar = c(4, 4, 2, 4) + 0.1
-   )
-   {
-      if(is.null(outputDir))
-      {
-         outputPaths <- NULL
-      } else {
-         outputPaths <- sprintf(
-            fmt = "%s/dates/%s/%s", 
-            self$path, 
-            self$windows,
-            outputDir
-         );
-      }
-      path <- sprintf(
-         fmt = "%s/%s",
-         self$path,
-         summaryPath
-      );
-      dir.create(
-         path = path, 
-         recursive = TRUE, 
-         showWarnings = FALSE
-      );
-      pdf(file = sprintf(
-         fmt = "%s/%s",
-         path,
-         fileName
-      ));
-      par(
-         mfrow = mfrow,
-         mar = mar
-      );
-      for(index in 1:length(self$windows)) {
-         load(file = self$inputFilePaths[index]);
-         minTime = sprintf(
-            fmt = "%s %s",
-            self$windows[index],
-            self$windowStart
-         );
-         maxTime = sprintf(
-            fmt = "%s %s",
-            self$windows[index] + self$windowDays,
-            self$windowEnd
-         );
-         if (is.null(outputPaths)) {
-            outputPath <- NULL;
-         } else {
-            outputPath <- outputPaths[index];
-         }
-         signalPlotter$plot(
-            signal = signal,
-            outputPath = outputPath,
-            label = self$windows[index], 
-            timeBounds = c(as.POSIXct(minTime), as.POSIXct(maxTime))
-         );
-      }
-      dev.off();
-   }
-);
-
-# Method DielWindowedSignal$tabulateWindowSummary ####
-
-DielWindowedSignal$set(
-   which = "public",
-   name = "tabulateWindowSummary",
+   name = "summarizeWindows",
    value = function
       (
-         resultExtractor,
-         outputDir = "output"
+         signalSummarizer,
+         outputDir = NULL,
+         summaryPath = "summary"
       )
       {
-         outputPaths <- sprintf(
-            fmt = "%s/dates/%s/%s", 
-            self$path, 
-            self$windows,
-            outputDir
-         );
-         for(index in 1:length(self$windows)) {
-            load(file = self$inputFilePaths[index]);
-            resultExtractor$extract(
-               signal = signal,
-               outputPath = outputPaths[index]
+         # Set up output paths if output is part of summary
+         if(is.null(outputDir))
+         {
+            outputPaths <- NULL
+         } else {
+            outputPaths <- sprintf(
+               fmt = "%s/dates/%s/%s", 
+               self$path, 
+               self$windows,
+               outputDir
             );
          }
+         
+         # Set up the summary output location and open the summarizer
          path <- sprintf(
-            fmt = "%s/summary",
-            self$path
+            fmt = "%s/%s",
+            self$path,
+            summaryPath
          );
          dir.create(
             path = path, 
             recursive = TRUE, 
             showWarnings = FALSE
          );
-         resultExtractor$write(path);
-      }     
+         signalSummarizer$open(path = path);
+         
+         # Iterate the summary through the windows
+         for(index in 1:length(self$windows)) {
+            load(file = self$inputFilePaths[index]);
+            minTime = sprintf(
+               fmt = "%s %s",
+               self$windows[index],
+               self$windowStart
+            );
+            maxTime = sprintf(
+               fmt = "%s %s",
+               self$windows[index] + self$windowDays,
+               self$windowEnd
+            );
+            if (is.null(outputPaths)) {
+               outputPath <- NULL;
+            } else {
+               outputPath <- outputPaths[index];
+            }
+            signalSummarizer$summarize(
+               signal = signal,
+               outputPath = outputPath,
+               label = self$windows[index], 
+               timeBounds = c(as.POSIXct(minTime), as.POSIXct(maxTime))
+            );
+         }
+         
+         # Close the summarizer
+         signalSummarizer$close();
+      }
 );

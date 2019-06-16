@@ -6,8 +6,55 @@
 #'
 NULL
 
+# Class DielWindowedTransferFunction (R6) ####
+
 #' @export
 #'
+#' @title 
+#'   Windowed transfer function analysis delimited by times of day
+#'   
+#' @description 
+#'   Manages a windowed transfer function analysis based on an input
+#'   and output signal, where the windows are 
+#'   described by a shifting period of time starting at a given
+#'   time of day, ending at a given time of day, and with a duration
+#'   of a defined number of days apart. Parameters listed here are
+#'   for the R6 class constructor method ($new).
+#' 
+#' @param signalIn
+#'   The input signal object from which the windows are extracted
+#' @param signalOut
+#'   The output signal object from which the windows are extracted
+#' @param path
+#'   The path to the analysis input/output on the file system
+#' @param dateStart
+#'   The date to start the first window
+#' @param dateEnd
+#'   The date on which to end the last window
+#' @param windowStart
+#'   The time of day to start a given window
+#' @param windowEnd
+#'   The time of day to end a given window
+#' @param windowDays
+#'   The number of days for a given window
+#' @param inputDir
+#'   Optional name of the directory for the input for each window
+#'   Defaults to "input".
+#' @param slideDays
+#'   The number of days to slide the window for generating each
+#'   window for analysis.
+#'   Defaults to 1.
+#' 
+#' @section Methods:
+#'   \itemize{
+#'     \item $generateWindowInput - 
+#'       see \code{\link{DielWindowedTransferFunction_generateWindowInputOffset}}
+#'     \item $analyze -
+#'       see \code{\link{DielWindowedTransferFunction_analyze}}
+#'     \item $summarizeWindows - 
+#'       see \code{\link{DielWindowedTransferFunction_summarizeWindows}}
+#'   }
+#'     
 DielWindowedTransferFunction <- R6Class(
    classname = "DielWindowedTransferFunction",
    public = list(
@@ -66,6 +113,25 @@ DielWindowedTransferFunction <- R6Class(
       )
 );
 
+# Method DielWindowedTransferFunction$generateWindowInputOffset ####
+
+#' @name DielWindowedTransferFunction_generateWindowInputOffset
+#' 
+#' @title 
+#'   Generate the input for windows
+#' 
+#' @description 
+#'   Parses the signal into windows based on the window definitions
+#'   and a temporal offset between the output signal and the input signal.
+#'   The input signal is interpolated to be a constant offset time from
+#'   the output signal.
+#'   
+#' @param offsetTime
+#'   The offset time between the input signal and output signal in seconds
+#' 
+#' @section Method of class:
+#'   \code{\link{DielWindowedTransferFunction}}
+#'   
 DielWindowedTransferFunction$set(
    which = "public",
    name = "generateWindowInputOffset",
@@ -122,6 +188,23 @@ DielWindowedTransferFunction$set(
 
 # Method DielWindowedTransferFunction$analyze ####
 
+#' @name DielWindowedTransferFunction_analyze
+#' 
+#' @title 
+#'   Analyze each window
+#' 
+#' @description 
+#'   Runs the provided analyzer object for all windows
+#'   
+#' @param transferFunctionDerivation
+#'   A TransferFunctionDerivation object that will perform the analysis
+#'   for each window
+#' @param outputDir
+#'   Name of subdirectory where output is located
+#'   
+#' @section Method of class:
+#'   \code{\link{DielWindowedTransferFunction}}
+#'   
 DielWindowedTransferFunction$set(
    which = "public",
    name = "analyze",
@@ -162,19 +245,37 @@ DielWindowedTransferFunction$set(
    }
 );
 
-# Method DielWindowedTransferFunction$plotWindowSummary ####
+# Method DielWindowedTransferFunction$summarizeWindows ####
 
+#' @name DielWindowedTransferFunction_summarizeWindows
+#' 
+#' @title 
+#'   Summarize the output of the analyses of windows
+#' 
+#' @description 
+#'   Uses the provided TransferFunctionSummarizer to generate a summary
+#'   of the analysis of each window.
+#'   
+#' @param signalSummarizer
+#'   A signal summarizer that will generate the summary output for each
+#'   window
+#' @param outputDir
+#'   Subdirectory where output is located.
+#'   Not necessary if the summarizer does not need output.
+#' @param summaryPath
+#'   The path to where the summary should be written
+#' 
+#' @section Method of class:
+#'   \code{\link{DielWindowedTransferFunction}}
+#'   
 DielWindowedTransferFunction$set(
    which = "public",
-   name = "plotWindowSummary",
+   name = "summarizeWindows",
    value = function
    (
-      transferFunctionPlotter,
-      fileName = "windowSummary.pdf",
+      transferFunctionSummarizer,
       outputDir = NULL,
-      summaryPath = "summary",
-      mfrow = c(3,2),
-      mar = c(2, 4, 2, 4) + 0.1
+      summaryPath = "summary"
    )
    {
       if(is.null(outputDir))
@@ -188,6 +289,7 @@ DielWindowedTransferFunction$set(
             outputDir
          );
       }
+      
       path <- sprintf(
          fmt = "%s/%s",
          self$path,
@@ -198,15 +300,8 @@ DielWindowedTransferFunction$set(
          recursive = TRUE, 
          showWarnings = FALSE
       );
-      pdf(file = sprintf(
-         fmt = "%s/%s",
-         path,
-         fileName
-      ));
-      par(
-         mfrow = mfrow,
-         mar = mar
-      );
+      transferFunctionSummarizer$open(path = path);
+      
       for(index in 1:length(self$windows)) {
          load(file = self$inputFilePaths[index]);
          minTime = sprintf(
@@ -224,7 +319,7 @@ DielWindowedTransferFunction$set(
          } else {
             outputPath <- outputPaths[index];
          }
-         transferFunctionPlotter$plot(
+         transferFunctionSummarizer$summarize(
             signalIn = signalIn,
             signalOut = signalOut,
             outputPath = outputPath,
@@ -232,6 +327,7 @@ DielWindowedTransferFunction$set(
             timeBounds = c(as.POSIXct(minTime), as.POSIXct(maxTime))
          );
       }
-      dev.off();
+      
+      transferFunctionSummarizer$close();
    }
 );

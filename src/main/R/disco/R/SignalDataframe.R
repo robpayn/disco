@@ -26,7 +26,7 @@ NULL
 #'   Arguments passed to as.POSIXct in coverting the time
 #'   data to a POSIXct vector.
 #'
-#' @section Implements interface Signal:
+#' @section Implements interface \code{\link{Signal}}:
 #'   \code{$getWindow}
 #'   \itemize{
 #'     \item see \code{\link{Signal_getWindow}}

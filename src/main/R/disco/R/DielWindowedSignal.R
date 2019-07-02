@@ -35,9 +35,6 @@ NULL
 #'   The time of day to end a given window
 #' @param windowDays
 #'   The number of days for a given window
-#' @param inputDir
-#'   Optional name of the directory for the input for each window
-#'   Defaults to "input".
 #' @param slideDays
 #'   The number of days to slide the window for generating each
 #'   window for analysis.
@@ -70,6 +67,7 @@ DielWindowedSignal <- R6Class(
       slideDays = NULL,
       inputPaths = NULL,
       inputFilePaths = NULL,
+      outputPaths = NULL,
       initialize = function
          (
             signal,
@@ -79,7 +77,6 @@ DielWindowedSignal <- R6Class(
             windowStart,
             windowEnd,
             windowDays,
-            inputDir = "input",
             slideDays = 1
          )
          {
@@ -96,17 +93,6 @@ DielWindowedSignal <- R6Class(
             );
             self$windowStart <- windowStart;
             self$windowEnd <- windowEnd;
-
-            self$inputPaths <- sprintf(
-               fmt = "%s/dates/%s/%s", 
-               self$path, 
-               self$windows,
-               inputDir
-            );
-            self$inputFilePaths <- sprintf(
-               fmt = "%s/signal.RData",
-               self$inputPaths
-            );
          }
    )
 );
@@ -120,15 +106,40 @@ DielWindowedSignal <- R6Class(
 #' 
 #' @description 
 #'   Parses the signal into windows based on the window definitions
-#' 
+#'   
+#' @param pipelineDir
+#'   Optional directory structure from the base path where the folders corresponding
+#'   to analysis windows should be placed.
+#'   Default value is "dates".
+#' @param inputDir
+#'   Optional name of the directory within each window folder where the 
+#'   input data for that window should be placed.
+#'   Default value is "input".
+#'   
 #' @section Method of class:
 #'   \code{\link{DielWindowedSignal}}
 #'   
 DielWindowedSignal$set(
    which = "public",
    name = "generateWindowInput",
-   value = function()
+   value = function
+      (
+         pipelineDir = "dates",
+         inputDir = "input"
+      )
       {
+         self$inputPaths <- sprintf(
+            fmt = "%s/%s/%s/%s", 
+            self$path, 
+            pipelineDir,
+            self$windows,
+            inputDir
+         );
+         self$inputFilePaths <- sprintf(
+            fmt = "%s/signal.RData",
+            self$inputPaths
+         );
+         
          dir.create(
             path = self$path, 
             recursive = TRUE, 
@@ -173,8 +184,14 @@ DielWindowedSignal$set(
 #' @param signalDerivation
 #'   A SignalDerivation object that will perform the analysis
 #'   for each window
+#' @param pipelineDir
+#'   Optional directory structure from the base path where the folders corresponding
+#'   to analysis windows should be placed.
+#'   Default value is "dates".
 #' @param outputDir
-#'   Name of subdirectory where output is located
+#'   Optional name of the directory within each window folder where the 
+#'   output data for that window should be placed.
+#'   Default value is "output".
 #'   
 #' @section Method of class:
 #'   \code{\link{DielWindowedSignal}}
@@ -185,33 +202,36 @@ DielWindowedSignal$set(
    value = function
       (
          signalDerivation,
+         pipelineDir = "dates",
          outputDir = "output"
       )
       {
-         outputPaths <- sprintf(
-            fmt = "%s/dates/%s/%s", 
-            self$path, 
+         self$outputPaths <- sprintf(
+            fmt = "%s/%s/%s/%s", 
+            self$path,
+            pipelineDir,
             self$windows,
             outputDir
          );
          sapply(
-            X = outputPaths,
+            X = self$outputPaths,
             FUN = dir.create,
             recursive = TRUE,
             showWarnings = FALSE
          );
+         
          load(file = self$inputFilePaths[1]);
          results <- signalDerivation$derive(
             signal = signal, 
             prevResults = NULL,
-            path = outputPaths[1]
+            path = self$outputPaths[1]
          );
          for(index in 2:length(self$windows)) {
             load(file = self$inputFilePaths[index]);
             results <- signalDerivation$derive(
                signal = signal, 
                prevResults = results,
-               path = outputPaths[index]
+               path = self$outputPaths[index]
             );
          }
       }
@@ -231,11 +251,12 @@ DielWindowedSignal$set(
 #' @param signalSummarizer
 #'   A signal summarizer that will generate the summary output for each
 #'   window
-#' @param outputDir
-#'   Subdirectory where output is located.
-#'   Not necessary if the summarizer does not need output.
-#' @param summaryPath
-#'   The path to where the summary should be written
+#' @param summaryDir
+#'   Optional path from the base path where the summary output will be written.
+#'   Default value is "summary".
+#' @param useResults
+#'   Optional switch to turn of summarization of results.
+#'   Default value is TRUE (results will be sumarized).
 #' 
 #' @section Method of class:
 #'   \code{\link{DielWindowedSignal}}
@@ -246,28 +267,15 @@ DielWindowedSignal$set(
    value = function
       (
          signalSummarizer,
-         outputDir = NULL,
-         summaryPath = "summary"
+         summaryDir = "summary",
+         useResults = TRUE
       )
       {
-         # Set up output paths if output is part of summary
-         if(is.null(outputDir))
-         {
-            outputPaths <- NULL
-         } else {
-            outputPaths <- sprintf(
-               fmt = "%s/dates/%s/%s", 
-               self$path, 
-               self$windows,
-               outputDir
-            );
-         }
-         
          # Set up the summary output location and open the summarizer
          path <- sprintf(
             fmt = "%s/%s",
             self$path,
-            summaryPath
+            summaryDir
          );
          dir.create(
             path = path, 
@@ -289,10 +297,10 @@ DielWindowedSignal$set(
                self$windows[index] + self$windowDays,
                self$windowEnd
             );
-            if (is.null(outputPaths)) {
+            if (!useResults | is.null(self$outputPaths)) {
                outputPath <- NULL;
             } else {
-               outputPath <- outputPaths[index];
+               outputPath <- self$outputPaths[index];
             }
             signalSummarizer$summarize(
                signal = signal,

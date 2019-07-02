@@ -37,9 +37,6 @@ NULL
 #'   The time of day to end a given window
 #' @param windowDays
 #'   The number of days for a given window
-#' @param inputDir
-#'   Optional name of the directory for the input for each window
-#'   Defaults to "input".
 #' @param slideDays
 #'   The number of days to slide the window for generating each
 #'   window for analysis.
@@ -70,6 +67,7 @@ DielWindowedTransferFunction <- R6Class(
       slideDays = NULL,
       inputPaths = NULL,
       inputFilePaths = NULL,
+      outputPaths = NULL,
       initialize = function
          (
             signalIn,
@@ -98,17 +96,6 @@ DielWindowedTransferFunction <- R6Class(
             );
             self$windowStart <- windowStart;
             self$windowEnd <- windowEnd;
-            
-            self$inputPaths <- sprintf(
-               fmt = "%s/dates/%s/%s", 
-               self$path, 
-               self$windows,
-               inputDir
-            );
-            self$inputFilePaths <- sprintf(
-               fmt = "%s/signal.RData",
-               self$inputPaths
-            );
          }
       )
 );
@@ -128,6 +115,14 @@ DielWindowedTransferFunction <- R6Class(
 #'   
 #' @param offsetTime
 #'   The offset time between the input signal and output signal in seconds
+#' @param pipelineDir
+#'   Optional directory structure from the base path where the folders corresponding
+#'   to analysis windows should be placed.
+#'   Default value is "dates".
+#' @param inputDir
+#'   Optional name of the directory within each window folder where the 
+#'   input data for that window should be placed.
+#'   Default value is "input".
 #' 
 #' @section Method of class:
 #'   \code{\link{DielWindowedTransferFunction}}
@@ -137,10 +132,24 @@ DielWindowedTransferFunction$set(
    name = "generateWindowInputOffset",
    value = function
       (
-         offsetTime
+         offsetTime,
+         pipelineDir = "dates",
+         inputDir = "input"
       )
       {
          # Create the input directories
+         
+         self$inputPaths <- sprintf(
+            fmt = "%s/%s/%s/%s", 
+            self$path, 
+            pipelineDir,
+            self$windows,
+            inputDir
+         );
+         self$inputFilePaths <- sprintf(
+            fmt = "%s/signal.RData",
+            self$inputPaths
+         );
          
          dir.create(
             path = self$path, 
@@ -199,8 +208,14 @@ DielWindowedTransferFunction$set(
 #' @param transferFunctionDerivation
 #'   A TransferFunctionDerivation object that will perform the analysis
 #'   for each window
+#' @param pipelineDir
+#'   Optional directory structure from the base path where the folders corresponding
+#'   to analysis windows should be placed.
+#'   Default value is "dates".
 #' @param outputDir
-#'   Name of subdirectory where output is located
+#'   Optional name of the directory within each window folder where the 
+#'   output data for that window should be placed.
+#'   Default value is "output".
 #'   
 #' @section Method of class:
 #'   \code{\link{DielWindowedTransferFunction}}
@@ -209,40 +224,42 @@ DielWindowedTransferFunction$set(
    which = "public",
    name = "analyze",
    value = function
-   (
-      transferFunctionDerivation,
-      outputDir = "output"
-   )
-   {
-      outputPaths <- sprintf(
-         fmt = "%s/dates/%s/%s", 
-         self$path, 
-         self$windows,
-         outputDir
-      );
-      sapply(
-         X = outputPaths,
-         FUN = dir.create,
-         recursive = TRUE,
-         showWarnings = FALSE
-      );
-      load(file = self$inputFilePaths[1]);
-      results <- transferFunctionDerivation$derive(
-         signalIn = signalIn,
-         signalOut = signalOut,
-         prevResults = NULL,
-         path = outputPaths[1]
-      );
-      for(index in 2:length(self$windows)) {
-         load(file = self$inputFilePaths[index]);
+      (
+         transferFunctionDerivation,
+         pipelineDir = "dates",
+         outputDir = "output"
+      )
+      {
+         self$outputPaths <- sprintf(
+            fmt = "%s/%s/%s/%s", 
+            self$path, 
+            pipelineDir,
+            self$windows,
+            outputDir
+         );
+         sapply(
+            X = self$outputPaths,
+            FUN = dir.create,
+            recursive = TRUE,
+            showWarnings = FALSE
+         );
+         load(file = self$inputFilePaths[1]);
          results <- transferFunctionDerivation$derive(
             signalIn = signalIn,
             signalOut = signalOut,
-            prevResults = results,
-            path = outputPaths[index]
+            prevResults = NULL,
+            path = self$outputPaths[1]
          );
+         for(index in 2:length(self$windows)) {
+            load(file = self$inputFilePaths[index]);
+            results <- transferFunctionDerivation$derive(
+               signalIn = signalIn,
+               signalOut = signalOut,
+               prevResults = results,
+               path = self$outputPaths[index]
+            );
+         }
       }
-   }
 );
 
 # Method DielWindowedTransferFunction$summarizeWindows ####
@@ -259,11 +276,12 @@ DielWindowedTransferFunction$set(
 #' @param signalSummarizer
 #'   A signal summarizer that will generate the summary output for each
 #'   window
-#' @param outputDir
-#'   Subdirectory where output is located.
-#'   Not necessary if the summarizer does not need output.
-#' @param summaryPath
-#'   The path to where the summary should be written
+#' @param summaryDir
+#'   Optional path from the base path where the summary output will be written.
+#'   Default value is "summary".
+#' @param useResults
+#'   Optional switch to turn of summarization of results.
+#'   Default value is TRUE (results will be sumarized).
 #' 
 #' @section Method of class:
 #'   \code{\link{DielWindowedTransferFunction}}
@@ -274,26 +292,14 @@ DielWindowedTransferFunction$set(
    value = function
    (
       transferFunctionSummarizer,
-      outputDir = NULL,
-      summaryPath = "summary"
+      summaryDir = "summary",
+      useResults = TRUE
    )
    {
-      if(is.null(outputDir))
-      {
-         outputPaths <- NULL
-      } else {
-         outputPaths <- sprintf(
-            fmt = "%s/dates/%s/%s", 
-            self$path, 
-            self$windows,
-            outputDir
-         );
-      }
-      
       path <- sprintf(
          fmt = "%s/%s",
          self$path,
-         summaryPath
+         summaryDir
       );
       dir.create(
          path = path, 
@@ -314,10 +320,10 @@ DielWindowedTransferFunction$set(
             self$windows[index] + self$windowDays,
             self$windowEnd
          );
-         if (is.null(outputPaths)) {
+         if (!useResults | is.null(self$outputPaths)) {
             outputPath <- NULL;
          } else {
-            outputPath <- outputPaths[index];
+            outputPath <- self$outputPaths[index];
          }
          transferFunctionSummarizer$summarize(
             signalIn = signalIn,

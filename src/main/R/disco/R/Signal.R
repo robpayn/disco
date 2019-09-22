@@ -113,7 +113,8 @@ NULL
 #' @param variableName
 #'   The variable header to plot
 #' @param ...
-#'   Parameters to be passed on to the plot function
+#'   Parameters to be passed on to the plot function.
+#'   Implementing classes may specify more arguments.
 #'   See \code{\link{plot.default}}
 #'     
 #' @section Method of class:

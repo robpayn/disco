@@ -243,16 +243,50 @@ SignalDataFrame$set(
 #' @description 
 #'   Plots a single variable in the signal based on the provided header
 #'   for the variable
-#'   
+#' 
+#' @param variableName
+#'   Name of the variable to plot on the y axis.  
 #' @param x
-#'   Default value is the time
+#'   Variable plotted on x axis. 
+#'   Default value is the time.
+#' @param timeZone
+#'   If specified, the time zone for the datetime scale.
+#'   Defult value is NA (no change in time zone).
 #' @param y
-#'   Default value is the values in the provided header
+#'   Variable plotted on y axis. 
+#'   Default value is the values in the provided variableName argument.
+#' @param xlim
+#'   Vector of 2 values for the min and max of x axis scale.
+#'   Default is min and max of x variable
 #' @param xlab
-#'   Default value is the header for time data
+#'   Label for x axis.
+#'   Default value is the header for time data.
+#' @param ylim
+#'   Vector of 2 values for the min and max of y axis scale.
+#'   Default value is min and max of y variable.
 #' @param ylab
+#'   Label for y axis.
 #'   Default value is the header selected and the units
 #'   for that variable
+#' @param compareWith
+#'   Vector of signals to plot on the same axes.
+#'   Specifying signals for comparison will adjust the xlim
+#'   and ylim values to be sure all values will be visible on
+#'   plot.
+#'   Default value is an empty list (no additional plots).
+#' @param colors
+#'   A vector of character strings specifying colors for additional
+#'   plots.
+#'   Defaults to a color blind friendly palette of purple, orange,
+#'   and green.
+#' @param pchs
+#'   A vector of integers specifying the point symbol to use for 
+#'   additional plots.
+#'   Defaults to square, triangle, and diamond.
+#' @param ...
+#'   Any remaining arguments provided will be passed to the call to
+#'   the plot.default method, allowing for further customization of
+#'   the plot.
 #'   
 #' @section Method of class:
 #'   \code{\link{SignalDataFrame}}
@@ -268,23 +302,95 @@ SignalDataFrame$set(
       (
          variableName,
          x = self$time,
+         timeZone = NA,
          y = self$dataFrame$data[[variableName]],
+         xlim = c(min(x), max(x)),
          xlab = self$timeVariableName,
+         ylim = c(min(y), max(y)),
          ylab = sprintf(
             "%s (%s)",
             variableName,
             self$dataFrame$metaColumns[variableName,]$units
+            ),
+         compareWith = list(),
+         colors = c(
+            "purple",
+            "orange",
+            "green"
+            ),
+         pchs = c(
+           0,
+           2,
+           5
          ),
          ...
       )
       {
+         if(!is.na(timeZone)) {
+            attributes(x)$tzone <- timeZone;
+         }
+         if(length(compareWith) > 0) {
+            xlims <- sapply(
+               compareWith, 
+               FUN = function(x) 
+               {
+                  time <- x$time;
+                  if(!is.na(timeZone)) {
+                     attributes(time)$tzone <- timeZone;
+                  } 
+                  return(
+                     c(
+                        min(time),
+                        max(time)
+                     )
+                  );
+               }
+            );
+            xlim <- c(
+               min(xlim[1], xlims[1,]),
+               max(xlim[2], xlims[2,])
+            );
+            
+            ylims <- sapply(
+               compareWith, 
+               FUN = function(x) 
+                  {
+                     return(
+                        c(
+                           min(x$getVariable(variableName)),
+                           max(x$getVariable(variableName))
+                        )
+                     );
+                  }
+            );
+            ylim <- c(
+               min(ylim[1], ylims[1,]),
+               max(ylim[2], ylims[2,])
+            );
+         }
          plot(
             x = x,
             y = y,
+            xlim = xlim,
             xlab = xlab,
+            ylim = ylim,
             ylab = ylab,
             ...
          );
+         if(length(compareWith) > 0) {
+            for(plotCount in 1:length(compareWith)) {
+               time <- compareWith[[plotCount]]$time;
+               if(!is.na(timeZone)) {
+                  attributes(time)$tzone <- timeZone;
+               }
+               points(
+                  x = time, 
+                  y = compareWith[[plotCount]]$getVariable(variableName),
+                  col = colors[plotCount],
+                  pch = pchs[plotCount]
+               );
+            }
+         }
       }
 );
 

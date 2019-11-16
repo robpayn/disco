@@ -452,13 +452,36 @@ SignalDataFrame$set(
       (
          path, 
          name,
-         timeVariableName = self$timeVariableName
+         timeVariableName = self$timeVariableName,
+         variables = NULL
       )
       {
-         self$dataFrame$data[, timeVariableName] <- 
-            as.character(self$time);
+         # Create the metacolumns dataframe for writing
+         metaColumns <- self$dataFrame$metaColumns;
+         metaColumns <- rbind(
+            metaColumns,
+            data.frame(
+               property = timeVariableName,
+               units = "text",
+               dimensions = "Time",
+               stringsAsFactors = FALSE
+               )
+         );
+         row.names(metaColumns)[nrow(metaColumns)] <- timeVariableName;
+         
+         # Create the data dataframe for writing
+         dataOut <- self$dataFrame$data;
+         dataOut[, timeVariableName] <- as.character(self$time);
+         
+         # Adjust the output if variables argument is provided
+         if(!is.null(variables)) {
+            variables <- c(variables, timeVariableName);
+            dataOut <- dataOut[,variables];
+            metaColumns <- metaColumns[variables,];
+         }
+         
          write.csv(
-            x = self$dataFrame$data,
+            x = dataOut,
             file = sprintf(
                fmt = "%s/%s.csv",
                path,
@@ -467,7 +490,7 @@ SignalDataFrame$set(
             row.names = FALSE
          );
          write.csv(
-            x = self$dataFrame$metaColumns,
+            x = metaColumns,
             file = sprintf(
                fmt = "%s/%s_meta_columns.csv",
                path,

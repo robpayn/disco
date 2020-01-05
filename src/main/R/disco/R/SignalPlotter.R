@@ -11,93 +11,85 @@ NULL
 #' @export
 #' 
 #' @title 
-#'   Plots a signal analysis summary
+#'   R6 class defining a signal plotter
 #'
 #' @description 
 #'   Abstract class for providing visualizations of a signal analysis.
-#'   The parameters listed below are for the constructor method ($new).
 #' 
-#' @param signal
-#'   Optional signal associated with the plotter a priori.
-#'   Defaults to NULL.
-#' @param outputPath
-#'   Optional path to results from a dignal analysis.
-#'   Defaults to NULL.
-#' @param fileName
-#'   The file name for the pdf file generated
-#'   Defaults to "windowSummary.pdf"
-#' @param mfrow
-#'   The dimension of panels for the figure (see \code{\link{par}})
-#'   Defaults to c(3,2), or 3 rows and 2 columns of panels per figure.
-#' @param mar
-#'   The margins of each panel in the figure (see \code{\link{par}})
-#'   Defaults to c(4, 4, 2, 4) + 0.1
-#' 
-#' @section Implements interface \code{\link{SignalSummarizer}}:
-#'   \code{$open}
-#'   \itemize{
-#'     \item see \code{\link{SignalSummarizer_open}}
-#'     \item see \code{\link{SignalPlotter_open}}
-#'   }
-#'   \code{$summarize}
-#'   \itemize{
-#'     \item see \code{\link{SignalSummarizer_summarize}}
-#'     \item see \code{\link{SignalPlotter_summarize}}
-#'   }
-#'   \code{$close}
-#'   \itemize{
-#'     \item see \code{\link{SignalSummarizer_close}}
-#'     \item see \code{\link{SignalPlotter_close}}
-#'   }
-#'   
 SignalPlotter <- R6Class(
    classname = "SignalPlotter",
    inherit = SignalSummarizer,
    public = list(
+      
+      #' @field signal
+      #'   The signal to be plotted
       signal = NULL,
+      
+      #' @field outputPath
+      #'   The path containing the output
       outputPath = NULL,
+      
+      #' @field fileName
+      #'   The name of the pdf file to be generated
       fileName = NULL,
+      
+      #' @field mfrow
+      #'   The structure of the multipanel plot
       mfrow = NULL,
+      
+      #' @field mar
+      #'   The margins for the plot
       mar = NULL,
+      
+      # Method SignalPlotter$new ####
+      #
+      #' @description 
+      #'   Constructs a new instance of the class SignalPlotter
+      #'   
+      #' @param signal
+      #'   Optional signal associated with the plotter a priori.
+      #'   Defaults to NULL.
+      #' @param outputPath
+      #'   Optional path to results from a signal analysis.
+      #'   Defaults to NULL.
+      #' @param fileName
+      #'   The file name for the pdf file generated
+      #'   Defaults to "windowSummary.pdf"
+      #' @param mfrow
+      #'   The dimension of panels for the figure (see \code{\link{par}})
+      #'   Defaults to c(3,2), or 3 rows and 2 columns of panels per figure.
+      #' @param mar
+      #'   The margins of each panel in the figure (see \code{\link{par}})
+      #'   Defaults to c(4, 4, 2, 4) + 0.1
+      #'   
       initialize = function
-         (
-            signal = NULL, 
-            outputPath = NULL,
-            fileName = "windowSummary.pdf",
-            mfrow = c(3,2),
-            mar = c(4, 4, 2, 4) + 0.1
-         )
-         {
-            self$signal <- signal;
-            self$outputPath <- outputPath;
-            self$fileName <- fileName;
-            self$mfrow <- mfrow;
-            self$mar <- mar;
-         }
+      (
+         signal = NULL, 
+         outputPath = NULL,
+         fileName = "windowSummary.pdf",
+         mfrow = c(3,2),
+         mar = c(4, 4, 2, 4) + 0.1
       )
-);
-
-# Method SignalPlotter$open ####
-
-#' @name SignalPlotter_open
-#' 
-#' @title 
-#'   Opens the signal plotter
-#'   
-#' @description 
-#'   Opens the PDF graphics device on the provided path
-#' 
-#' @section Method of class:
-#'   \code{\link{SignalPlotter}}
-#'
-#' @section Implementation of abstract method:
-#'   \code{\link{SignalSummarizer_open}} -
-#'     See interface for further usage documentation
-#'   
-SignalPlotter$set(
-   which = "public",
-   name = "open",
-   value = function
+      {
+         self$signal <- signal;
+         self$outputPath <- outputPath;
+         self$fileName <- fileName;
+         self$mfrow <- mfrow;
+         self$mar <- mar;
+      },
+      
+      # Method SignalPlotter$open ####
+      #
+      #' @description 
+      #'   Opens the PDF graphics device on the provided path
+      #' 
+      #' @param path
+      #'   the path to which pdf files should be written
+      #' 
+      #' @return 
+      #'   No defined return value.
+      #' 
+      open = function
       (
          path
       )
@@ -111,31 +103,20 @@ SignalPlotter$set(
             mfrow = self$mfrow,
             mar = self$mar
          );      
+      },
+
+      # Method SignalPlotter$close ####
+      #
+      #' @description 
+      #'   Closes the graphics device to write the PDF file
+      #' 
+      #' @return 
+      #'   No defined return value.
+      #'   
+      close = function()
+      {
+         dev.off();      
       }
-);
-
-# Method SignalPlotter$close ####
-
-#' @name SignalPlotter_close
-#' 
-#' @title 
-#'   Closes the signal plotter
-#'   
-#' @description 
-#'   Closes the graphics device to write the PDF file
-#' 
-#' @section Method of class:
-#'   \code{\link{SignalPlotter}}
-#'
-#' @section Implementation of abstract method:
-#'   \code{\link{SignalSummarizer_close}} -
-#'     See interface for further usage documentation
-#'   
-SignalPlotter$set(
-   which = "public",
-   name = "close",
-   value = function()
-   {
-      dev.off();      
-   }
-);
+      
+   )
+)

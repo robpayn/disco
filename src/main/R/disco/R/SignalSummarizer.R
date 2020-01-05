@@ -11,79 +11,80 @@ NULL
 #' @export
 #' 
 #' @title 
-#'   A summarizer for a signal analysis
-#'   
-#' @section Abstract Methods:
-#'   \itemize{
-#'     \item \code{$open} - 
-#'       See \code{\link{SignalSummarizer_open}}
-#'     \item \code{$summarize} - 
-#'       See \code{\link{SignalSummarizer_summarize}}
-#'     \item \code{$close} - 
-#'       See \code{\link{SignalSummarizer_close}}
-#'   }
+#'   R6 class defining a signal summarizer
+#' 
+#' @description 
+#'   Summarizes a signal and possibly its analysis
 #'   
 SignalSummarizer <- R6Class(
-   classname = "SignalSummarizer"
-);
-
-# Abstract method SignalSummarizer$open ####
-
-#' @name SignalSummarizer_open
-#' 
-#' @title 
-#'   Open the summarizer
-#' 
-#' @description 
-#'   Performs an initial operations necessary to get the summarizer
-#'   ready for multiple calls to method summarize.
-#'   
-#' @param path
-#'   The path to the summarizer output
-#'   
-#' @section Method of class:
-#'   \code{\link{SignalSummarizer}}
-#'   
-NULL
-
-
-# Abstract method SignalSummarizer$summarize ####
-
-#' @name SignalSummarizer_summarize
-#' 
-#' @title 
-#'   Summarizes a signal analysis
-#' 
-#' @description 
-#'   Perform the summary on a provided signal
-#' 
-#' @param signal
-#'   The signal object to be analyzed
-#' @param outputPath
-#'   A path to results from a signal analysis.
-#'   Not necessary if summarizer does not need output.
-#' @param label
-#'   A label for the summary
-#' @param timeBounds  
-#'   The temporal bounds on the summary
-#'   
-#' @section Method of class:
-#'   \code{\link{SignalSummarizer}}
-#'   
-NULL
-
-# Abstract method SignalSummarizer$close ####
-
-#' @name SignalSummarizer_close
-#' 
-#' @title 
-#'   Closes the summarizer
-#'   
-#' @description 
-#'   Perform any operations necesary to close the summarizer
-#'   and write any final output.
-#' 
-#' @section Method of class:
-#'   \code{\link{SignalSummarizer}}
-#'   
-NULL
+   classname = "SignalSummarizer",
+   public = list(
+      # Abstract method SignalSummarizer$open ####
+      #
+      #' @description 
+      #'   This is an abstract declaration and the method
+      #'   must be implemented by extending classes.
+      #'   
+      #'   Performs an initial operations necessary to get the summarizer
+      #'   ready for multiple calls to method summarize.
+      #'   
+      #' @param path
+      #'   The path to the summarizer output
+      #' @param ...
+      #'   
+      #' @return 
+      #'   Return value not required.
+      #'   
+      open = function(...)
+      {
+         stop("SignalSummarizer$open has not been implemented.")
+      },
+      
+      # Abstract method SignalSummarizer$summarize ####
+      #
+      #' @description 
+      #'   This is an abstract declaration and the method
+      #'   must be implemented by extending classes.
+      #'   
+      #'   Perform the summary on a provided signal
+      #' 
+      #' @param signal
+      #'   The signal object to be analyzed
+      #' @param outputPath
+      #'   A path to results from a signal analysis.
+      #'   Not necessary if summarizer does not need output.
+      #' @param label
+      #'   A label for the summary
+      #' @param timeBounds  
+      #'   The temporal bounds on the summary
+      #' @param ...
+      #'   
+      #' @return 
+      #'   Return value not required.
+      #'   
+      summarize = function(...)
+      {
+         stop("SignalSummarizer$summarize has not been implemented.")
+      },
+      
+      # Abstract method SignalSummarizer$close ####
+      #
+      #' @description 
+      #'   This is an abstract declaration and the method
+      #'   must be implemented by extending classes.
+      #'   
+      #'   Perform any operations necesary to close the summarizer
+      #'   and write any final output.
+      #' 
+      #' @param ...
+      #' 
+      #' @return 
+      #'   Return value not required.
+      #'   
+      close = function(...)
+      {
+         stop("SignalSummarizer$close has not been implemented.")
+      }
+      
+   )
+)

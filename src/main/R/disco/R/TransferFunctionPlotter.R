@@ -11,7 +11,7 @@ NULL
 #' @export
 #' 
 #' @title 
-#'   Plots a transfer function analysis summary
+#'   R6 class defining a transfer function plotter
 #'
 #' @description 
 #'   Abstract class for providing visualizations of the 
@@ -20,131 +20,116 @@ NULL
 #'   TransferFunctionPlotter object and is not intended to be instantiated
 #'   directly.
 #' 
-#' @param signalIn
-#'   Optional input signal associated with the plotter a priori.
-#'   Defaults to NULL.
-#' @param signalOut
-#'   Optional input signal associated with the plotter a priori.
-#'   Defaults to NULL.
-#' @param outputPath
-#'   Optional path to results from a dignal analysis.
-#'   Defaults to NULL.
-#' @param fileName
-#'   The file name for the pdf file generated
-#'   Defaults to "windowSummary.pdf"
-#' @param mfrow
-#'   The dimension of panels for the figure (see \code{\link{par}})
-#'   Defaults to c(3,2), or 3 rows and 2 columns of panels per figure.
-#' @param mar
-#'   The margins of each panel in the figure (see \code{\link{par}})
-#'   Defaults to c(4, 4, 2, 4) + 0.1
-#' 
-#' @section Implements interface \code{\link{TransferFunctionSummarizer}}:
-#'   \code{$open}
-#'   \itemize{
-#'     \item see \code{\link{TransferFunctionSummarizer_open}}
-#'     \item see \code{\link{TransferFunctionPlotter_open}}
-#'   }
-#'   \code{$summarize}
-#'   \itemize{
-#'     \item see \code{\link{TransferFunctionSummarizer_summarize}}
-#'     \item see \code{\link{TransferFunctionPlotter_summarize}}
-#'   }
-#'   \code{$close}
-#'   \itemize{
-#'     \item see \code{\link{TransferFunctionSummarizer_close}}
-#'     \item see \code{\link{TransferFunctionPlotter_close}}
-#'   }
-#' 
 TransferFunctionPlotter <- R6Class(
    classname = "TransferFunctionPlotter",
    inherit = TransferFunctionSummarizer,
    public = list(
+      
+      #' @field signalIn
+      #'   The input signal to be plotted
       signalIn = NULL,
+      
+      #' @field signalOut
+      #'   The output signal to be plotted
       signalOut = NULL,
+      
+      #' @field outputPath
+      #'   The path containing the output
       outputPath = NULL,
+      
+      #' @field fileName
+      #'   The name of the pdf file to be generated
       fileName = NULL,
+      
+      #' @field mfrow
+      #'   The structure of the multipanel plot
       mfrow = NULL,
+      
+      #' @field mar
+      #'   The margins for the plot
       mar = NULL,
+      
+      # Method TransferFunctionPlotter$new ####
+      #
+      #' @description 
+      #'   Constructs a new instance of the class
+      #'   
+      #' @param signalIn
+      #'   Optional input signal associated with the plotter a priori.
+      #'   Defaults to NULL.
+      #' @param signalOut
+      #'   Optional input signal associated with the plotter a priori.
+      #'   Defaults to NULL.
+      #' @param outputPath
+      #'   Optional path to results from a dignal analysis.
+      #'   Defaults to NULL.
+      #' @param fileName
+      #'   The file name for the pdf file generated
+      #'   Defaults to "windowSummary.pdf"
+      #' @param mfrow
+      #'   The dimension of panels for the figure (see \code{\link{par}})
+      #'   Defaults to c(3,2), or 3 rows and 2 columns of panels per figure.
+      #' @param mar
+      #'   The margins of each panel in the figure (see \code{\link{par}})
+      #'   Defaults to c(4, 4, 2, 4) + 0.1
+      #'   
       initialize = function
-         (
-            signalIn = NULL,
-            signalOut = NULL,
-            outputPath = NULL,
-            fileName = "windowSummary.pdf",
-            mfrow = c(3,2),
-            mar = c(4, 4, 2, 4) + 0.1
-         )
-         {
-            self$signalIn <- signalIn;
-            self$signalOut <- signalOut;
-            self$outputPath <- outputPath;
-            self$fileName <- fileName;
-            self$mfrow <- mfrow;
-            self$mar <- mar;
-         }
+      (
+         signalIn = NULL,
+         signalOut = NULL,
+         outputPath = NULL,
+         fileName = "windowSummary.pdf",
+         mfrow = c(3,2),
+         mar = c(4, 4, 2, 4) + 0.1
       )
-);
+      {
+         self$signalIn <- signalIn;
+         self$signalOut <- signalOut;
+         self$outputPath <- outputPath;
+         self$fileName <- fileName;
+         self$mfrow <- mfrow;
+         self$mar <- mar;
+      },
+      
+      # Method TransferFunctionPlotter$open ####
+      #
+      #' @description 
+      #'   Opens the PDF graphics device on the provided path
+      #' 
+      #' @param path
+      #'   the path to which pdf files should be written
+      #' 
+      #' @return 
+      #'   No defined return value.
+      #' 
+      open = function
+      (
+         path
+      )
+      {
+         pdf(file = sprintf(
+            fmt = "%s/%s",
+            path,
+            self$fileName
+         ));
+         par(
+            mfrow = self$mfrow,
+            mar = self$mar
+         );      
+      },
 
-# Method TransferFunctionPlotter$open ####
-
-#' @name TransferFunctionPlotter_open
-#' 
-#' @title 
-#'   Opens the tranfer function plotter
-#'   
-#' @description 
-#'   Opens the PDF graphics device on the provided path
-#' 
-#' @section Method of class:
-#'   \code{\link{TransferFunctionPlotter}}
-#'
-#' @section Implementation of abstract method:
-#'   \code{\link{TransferFunctionSummarizer_open}} -
-#'     See interface for further usage documentation
-#'   
-TransferFunctionPlotter$set(
-   which = "public",
-   name = "open",
-   value = function
-   (
-      path
+      # Method TransferFunctionPlotter$close ####
+      #
+      #' @description  
+      #'   Closes the graphics device to write the PDF file
+      #'   
+      #' @return 
+      #'   No defined return value.
+      #'   
+      close = function()
+      {
+         dev.off();      
+      }
+      
    )
-   {
-      pdf(file = sprintf(
-         fmt = "%s/%s",
-         path,
-         self$fileName
-      ));
-      par(
-         mfrow = self$mfrow,
-         mar = self$mar
-      );      
-   }
-);
-
-# Method TransferFunctionPlotter$close ####
-
-#' @name TransferFunctionPlotter_close
-#' 
-#' @title 
-#'   Closes the transfer function plotter
-#'   
-#' @description 
-#'   Closes the graphics device to write the PDF file
-#' 
-#' @section Method of class:
-#'   \code{\link{TransferFunctionPlotter}}
-#'
-#' @section Implementation of abstract method:
-#'   \code{\link{TransferFunctionSummarizer_close}} -
-#'     See interface for further usage documentation
-#'   
-TransferFunctionPlotter$set(
-   which = "public",
-   name = "close",
-   value = function()
-   {
-      dev.off();      
-   }
-);
+)

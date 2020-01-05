@@ -11,164 +11,124 @@ NULL
 #' @export
 #'
 #' @title
-#'   Signal based on a time series DataFrame object
+#'   R6 Class representing a signal data frame
 #'   
-#' @usage 
-#'   SignalDataFrame$new()
-#' @param dataFrame
-#'   The dataframe providing the basis of the signal.
-#'   Defaults to a new DataFrame object.
-#' @param timeVariableName
-#'   The header in the DataFrame data for the column with
-#'   time data.
-#'   Defaults to "time".
-#' @param ...
-#'   Arguments passed to as.POSIXct in coverting the time
-#'   data to a POSIXct vector.
-#'
-#' @section Implements interface \code{\link{Signal}}:
-#'   \code{$getWindow}
-#'   \itemize{
-#'     \item see \code{\link{Signal_getWindow}}
-#'     \item see \code{\link{SignalDataFrame_getWindow}}
-#'   }
-#'   \code{$getVariable}
-#'   \itemize{
-#'     \item see \code{\link{Signal_getVariable}}
-#'     \item see \code{\link{SignalDataFrame_getVariable}}
-#'   }
-#'   \code{$getVariable}
-#'   \itemize{
-#'     \item see \code{\link{Signal_addVariable}}
-#'     \item see \code{\link{SignalDataFrame_addVariable}}
-#'   }
-#'   \code{$writeCSV}
-#'   \itemize{
-#'     \item see \code{\link{Signal_writeCSV}}
-#'     \item see \code{\link{SignalDataFrame_writeCSV}}
-#'   }
-#'   \code{$interpolate}
-#'   \itemize{
-#'     \item see \code{\link{Signal_interpolate}}
-#'     \item see \code{\link{SignalDataFrame_interpolate}}
-#'   }
-#'   \code{$plotSummary}
-#'   \itemize{
-#'     \item see \code{\link{Signal_plotSummary}}
-#'     \item see \code{\link{SignalDataFrame_plotSummary}}
-#'   }
-#'   \code{$plot}
-#'   \itemize{
-#'     \item see \code{\link{Signal_plot}}
-#'     \item see \code{\link{SignalDataFrame_plot}}
-#'   }
-#'     
-#' @section Static Methods:
-#'   \code{$constructFromCSV} -
-#'     see \code{\link{SignalDataFrame_constructFromCSV}}
-#'
+#' @description 
+#'   This is an implementation of the Signal interface that is
+#'   backed by a DataFrame object for the time series data
+#'   
 SignalDataFrame <- R6Class(
    classname = "SignalDataFrame",
    inherit = Signal,
    public = list(
+      
+      #' @field dataFrame
+      #'   The data frame object containing the time series data
       dataFrame = NULL,
+      
+      #' @field timeVariableName
+      #'   The name of the column in the data frame with the time data
       timeVariableName = NULL,
+      
+      # Method SignalDataFrame$new ####
+      #
+      #' @description 
+      #'   Create an instance of class SignalDataframe
+      #' 
+      #' @param dataFrame
+      #'   The dataframe providing the basis of the signal.
+      #'   Defaults to a new DataFrame object.
+      #' @param timeVariableName
+      #'   The header in the DataFrame data for the column with
+      #'   time data.
+      #'   Defaults to "time".
+      #' @param ...
+      #'   Arguments passed to as.POSIXct in coverting the time
+      #'   data to a POSIXct vector.
+      #'
       initialize = function(
-            dataFrame = DataFrame$new(),
-            timeVariableName = "time",
-            ...
-         )
-         {
-            self$dataFrame <- dataFrame;
-            self$timeVariableName <- timeVariableName;
-            if (!is.null(self$dataFrame$data[[self$timeVariableName]])) {
-               self$time <-
-                  as.POSIXct(self$dataFrame$data[[self$timeVariableName]], ...);
-            }
-         }
-   )
-);
-
-# Static method SignalDataFrame$constructFromCSV ####
-
-#' @name SignalDataFrame_constructFromCSV
-#'
-#' @title
-#'   Static method to construct a DataFrame signal from csv files
-#' 
-#' @description
-#'   Constructs a signal based on a series of csv files providing
-#'   data and metadata bout the signal
-#'   
-#' @param fileName
-#'   The filename basis for the import. See \code{\link{DataFrame_constructFromCSV}}
-#' @param timeVariableName
-#'   The header in the csv data for the column with
-#'   time data.
-#'   Defaults to "time".
-#'
-#' @section Static method of class:
-#'   \code{\link{SignalDataFrame}}
-#'
-SignalDataFrame$constructFromCSV <- function(
-   fileName,
-   timeVariableName = "time",
-   ...
-)
-{
-
-   return(
-      SignalDataFrame$new(
-         dataFrame = DataFrame$constructFromCSV(fileName),
-         timeVariableName = timeVariableName,
+         dataFrame = DataFrame$new(),
+         timeVariableName = "time",
          ...
       )
-   );
-
-};
-
-
-# Method SignalDataFrame$getVariable ####
-
-#' @name SignalDataFrame_getVariable
-#'
-#' @title
-#'   Gets a variable vector
-#'
-#' @section Method of class:
-#'   \code{\link{SignalDataFrame}}
-#'
-#' @section Implementation of abstract method:
-#'   \code{\link{Signal_getVariable}} -
-#'     See interface for documentation
-#'   
-SignalDataFrame$set(
-   which = "public",
-   name = "getVariable",
-   value = function(variableName) 
-   {
-      return(self$dataFrame$data[[variableName]]);
-   }
-);
-
-# Method SignalDataFrame$getWindow ####
-
-#' @name SignalDataFrame_getWindow
-#'
-#' @title
-#'   Gets a subset of a signal based on a time window
-#'
-#' @section Method of class:
-#'   \code{\link{SignalDataFrame}}
-#'
-#' @section Implementation of abstract method:
-#'   \code{\link{Signal_getWindow}} -
-#'     See interface for documentation
-#'   
-SignalDataFrame$set(
-   which = "public",
-   name = "getWindow",
-   value = function(minTime, maxTime)
+      {
+         self$dataFrame <- dataFrame;
+         self$timeVariableName <- timeVariableName;
+         if (!is.null(self$dataFrame$data[[self$timeVariableName]])) {
+            self$time <-
+               as.POSIXct(
+                  self$dataFrame$data[[self$timeVariableName]], 
+                  ...
+               );
+         }
+      },
+      
+      # Static method SignalDataFrame$constructFromCSV ####
+      #
+      #' @description
+      #'   Static method that constructs a signal based on a series of csv files providing
+      #'   data and metadata bout the signal
+      #'   
+      #' @param fileName
+      #'   The filename basis for the import.
+      #' @param timeVariableName
+      #'   The header in the csv data for the column with
+      #'   time data.
+      #'   Defaults to "time".
+      #' @param ...
+      #'   Abstract parameters that are passed to the class constructor
+      #' 
+      #' @return 
+      #'   A new SignalDataframe object based on the provided csv files
+      #' 
+      constructFromCSV = function
+      (
+         fileName,
+         timeVariableName = "time",
+         ...
+      )
+      {
+         
+         return(
+            SignalDataFrame$new(
+               dataFrame = DataFrame$public_methods$constructFromCSV(fileName),
+               timeVariableName = timeVariableName,
+               ...
+            )
+         );
+         
+      },
+      
+      # Method SignalDataFrame$getVariable ####
+      #
+      #' @description 
+      #'   Get the time series vector for the variable with the provided name
+      #'   
+      #' @param variableName
+      #'   Name of the variable for which the data will be provided
+      #'   
+      #' @return 
+      #'   The vector of values for the requested variable
+      #'   
+      getVariable = function(variableName) 
+      {
+         return(self$dataFrame$data[[variableName]]);
+      },
+      
+      # Method SignalDataFrame$getWindow ####
+      #
+      #' @description 
+      #'   Get a subset of the signal based on a provided window of time
+      #' 
+      #' @param minTime
+      #'   The starting time of the window
+      #' @param maxTime
+      #'   The ending time of the window
+      #'
+      #' @return 
+      #'   A new signal representing the subset of the current signal
+      #'   
+      getWindow = function(minTime, maxTime)
       {
          indices <-
             self$time > as.POSIXct(minTime) &
@@ -178,34 +138,27 @@ SignalDataFrame$set(
          subSignal$dataFrame$data <- self$dataFrame$data[indices,];
          subSignal$dataFrame$copyMetaData(self$dataFrame);
          return(subSignal);
-      }
-);
-
-# Method SignalDataFrame$plotSummary ####
-
-#' @name SignalDataFrame_plotSummary
-#' 
-#' @title 
-#'   Plot a summary of the multivariate signal
-#'   
-#' @param x
-#'   Defaults to signal time variable
-#' @param mfrow
-#'   Defaults to \code{c(length(self$dataFrame$data) - 1, 1)}
-#' @param mar
-#'   Defaults to \code{c(4, 4, 1, 1) + 0.1}
-#'   
-#' @section Method of class:
-#'   \code{\link{SignalDataFrame}}
-#'
-#' @section Implementation of abstract method:
-#'   \code{\link{Signal_plotSummary}} -
-#'     See interface for documentation
-#'   
-SignalDataFrame$set(
-   which = "public",
-   name = "plotSummary",
-   value = function
+      },
+      
+      # Method SignalDataFrame$plotSummary ####
+      #
+      #' @description 
+      #'   Plot a summary of the multivariate signal
+      #'   
+      #' @param x
+      #'   Vector to plot on the x axis
+      #'   Defaults to signal time variable
+      #' @param mfrow
+      #'   Value for graphing parameter controlling multipanel plots
+      #'   Defaults to \code{c(length(self$dataFrame$data) - 1, 1)}
+      #' @param mar
+      #'   Value for the graphing parameter controling margins
+      #'   Defaults to \code{c(4, 4, 1, 1) + 0.1}
+      #' 
+      #' @return 
+      #'   No defined return value.
+      #'   
+      plotSummary = function
       (
          x = NULL,
          mfrow = c(length(self$dataFrame$data) - 1, 1),
@@ -230,75 +183,63 @@ SignalDataFrame$set(
                }
             }
          }
-      }
-);
-
-# Method SignalDataFrame$plot ####
-
-#' @name SignalDataFrame_plot
-#' 
-#' @title 
-#'   Plot a single variable in the signal
-#'   
-#' @description 
-#'   Plots a single variable in the signal based on the provided header
-#'   for the variable
-#' 
-#' @param variableName
-#'   Name of the variable to plot on the y axis.  
-#' @param x
-#'   Variable plotted on x axis. 
-#'   Default value is the time.
-#' @param timeZone
-#'   If specified, the time zone for the datetime scale.
-#'   Defult value is NA (no change in time zone).
-#' @param y
-#'   Variable plotted on y axis. 
-#'   Default value is the values in the provided variableName argument.
-#' @param xlim
-#'   Vector of 2 values for the min and max of x axis scale.
-#'   Default is min and max of x variable
-#' @param xlab
-#'   Label for x axis.
-#'   Default value is the header for time data.
-#' @param ylim
-#'   Vector of 2 values for the min and max of y axis scale.
-#'   Default value is min and max of y variable.
-#' @param ylab
-#'   Label for y axis.
-#'   Default value is the header selected and the units
-#'   for that variable
-#' @param compareWith
-#'   Vector of signals to plot on the same axes.
-#'   Specifying signals for comparison will adjust the xlim
-#'   and ylim values to be sure all values will be visible on
-#'   plot.
-#'   Default value is an empty list (no additional plots).
-#' @param colors
-#'   A vector of character strings specifying colors for additional
-#'   plots.
-#'   Defaults to a color blind friendly palette of purple, orange,
-#'   and green.
-#' @param pchs
-#'   A vector of integers specifying the point symbol to use for 
-#'   additional plots.
-#'   Defaults to square, triangle, and diamond.
-#' @param ...
-#'   Any remaining arguments provided will be passed to the call to
-#'   the plot.default method, allowing for further customization of
-#'   the plot.
-#'   
-#' @section Method of class:
-#'   \code{\link{SignalDataFrame}}
-#'
-#' @section Implementation of abstract method:
-#'   \code{\link{Signal_plot}} -
-#'     See interface for documentation
-#'   
-SignalDataFrame$set(
-   which = "public",
-   name = "plot",
-   value = function
+      },
+      
+      
+      # Method SignalDataFrame$plot ####
+      #
+      #' @description 
+      #'   Plots a single variable in the signal based on the provided header
+      #'   for the variable
+      #' 
+      #' @param variableName
+      #'   Name of the variable to plot on the y axis.  
+      #' @param x
+      #'   Variable plotted on x axis. 
+      #'   Default value is the time.
+      #' @param timeZone
+      #'   If specified, the time zone for the datetime scale.
+      #'   Defult value is NA (no change in time zone).
+      #' @param y
+      #'   Variable plotted on y axis. 
+      #'   Default value is the values in the provided variableName argument.
+      #' @param xlim
+      #'   Vector of 2 values for the min and max of x axis scale.
+      #'   Default is min and max of x variable
+      #' @param xlab
+      #'   Label for x axis.
+      #'   Default value is the header for time data.
+      #' @param ylim
+      #'   Vector of 2 values for the min and max of y axis scale.
+      #'   Default value is min and max of y variable.
+      #' @param ylab
+      #'   Label for y axis.
+      #'   Default value is the header selected and the units
+      #'   for that variable
+      #' @param compareWith
+      #'   Vector of signals to plot on the same axes.
+      #'   Specifying signals for comparison will adjust the xlim
+      #'   and ylim values to be sure all values will be visible on
+      #'   plot.
+      #'   Default value is an empty list (no additional plots).
+      #' @param comp.colors
+      #'   A vector of character strings specifying colors for additional
+      #'   plots.
+      #'   Defaults to a color blind friendly palette of purple, orange,
+      #'   and green.
+      #' @param comp.pchs
+      #'   A vector of integers specifying the point symbol to use for 
+      #'   additional plots.
+      #'   Defaults to square, triangle, and diamond.
+      #' @param ...
+      #'   Any remaining arguments provided will be passed to the call to
+      #'   the plot.default method, allowing for further customization of
+      #'   the plot.
+      #' 
+      #' @return 
+      #'   No defined return value.
+      #'   
+      plot = function
       (
          variableName,
          x = self$time,
@@ -306,28 +247,32 @@ SignalDataFrame$set(
          y = self$dataFrame$data[[variableName]],
          xlim = c(min(x), max(x)),
          xlab = self$timeVariableName,
-         ylim = c(min(y), max(y)),
+         ylim = c(
+            min(y, na.rm = TRUE), 
+            max(y, na.rm = TRUE)
+         ),
          ylab = sprintf(
             "%s (%s)",
             variableName,
             self$dataFrame$metaColumns[variableName,]$units
-            ),
+         ),
          compareWith = list(),
-         colors = c(
+         comp.colors = c(
             "purple",
             "orange",
             "green"
-            ),
-         pchs = c(
-           0,
-           2,
-           5
+         ),
+         comp.pchs = c(
+            0,
+            2,
+            5
          ),
          ...
       )
       {
          if(!is.na(timeZone)) {
             attributes(x)$tzone <- timeZone;
+            attributes(xlim)$tzone <- timeZone;
          }
          if(length(compareWith) > 0) {
             xlims <- sapply(
@@ -354,14 +299,14 @@ SignalDataFrame$set(
             ylims <- sapply(
                compareWith, 
                FUN = function(x) 
-                  {
-                     return(
-                        c(
-                           min(x$getVariable(variableName)),
-                           max(x$getVariable(variableName))
-                        )
-                     );
-                  }
+               {
+                  return(
+                     c(
+                        min(x$getVariable(variableName)),
+                        max(x$getVariable(variableName))
+                     )
+                  );
+               }
             );
             ylim <- c(
                min(ylim[1], ylims[1,]),
@@ -386,32 +331,32 @@ SignalDataFrame$set(
                points(
                   x = time, 
                   y = compareWith[[plotCount]]$getVariable(variableName),
-                  col = colors[plotCount],
-                  pch = pchs[plotCount]
+                  col = comp.colors[plotCount],
+                  pch = comp.pchs[plotCount]
                );
             }
          }
-      }
-);
-
-# Method SignalDataFrame$addVariable ####
-
-#' @name SignalDataFrame_addVariable
-#' 
-#' @title 
-#'   Add a variable to a signal
-#'   
-#' @section Method of class:
-#'   \code{\link{SignalDataFrame}}
-#'
-#' @section Implementation of abstract method:
-#'   \code{\link{Signal_addVariable}} -
-#'     See interface for documentation
-#'   
-SignalDataFrame$set(
-   which = "public",
-   name = "addVariable",
-   value = function
+      },
+      
+      # Method SignalDataFrame$addVariable ####
+      #
+      #' @description 
+      #'   Add a variable to a signal
+      #'   
+      #' @param variableName
+      #'   Name of the variable
+      #' @param value
+      #'   Vector of values for the variable
+      #'   (must be the same length as the time series)
+      #' @param units
+      #'   Units of the variable
+      #' @param dimensions
+      #'   Dimensions of the variable
+      #'   
+      #' @return 
+      #'   No defined return value
+      #' 
+      addVariable = function
       (
          variableName,
          value,
@@ -425,30 +370,27 @@ SignalDataFrame$set(
             units = units,
             dimensions = dimensions
          );
-      }
-);
-
-# Method SignalDataFrame$writeCSV ####
-
-#' @name SignalDataFrame_writeCSV
-#' 
-#' @title 
-#'   Write the signal in csv format
-#'   
-#' @param timeVariableName
-#'   Defaults to the time header attribute of the signal
-#'   
-#' @section Method of class:
-#'   \code{\link{SignalDataFrame}}
-#'
-#' @section Implementation of abstract method:
-#'   \code{\link{Signal_writeCSV}} -
-#'     See interface for documentation
-#'   
-SignalDataFrame$set(
-   which = "public",
-   name = "writeCSV",
-   value = function
+      },
+      
+      # Method SignalDataFrame$writeCSV ####
+      #
+      #' @description 
+      #'   Write the signal in csv format
+      #'   
+      #' @param path
+      #'   The path to the written files
+      #' @param name
+      #'   The base name of the written files
+      #' @param timeVariableName
+      #'   Defaults to the time header attribute of the signal
+      #' @param variables
+      #'   A vector of variable names to specify the columns to be output.
+      #'   Defaults to NULL which will output all columns.
+      #' 
+      #' @return 
+      #'   No defined return value.
+      #'   
+      writeCSV = function
       (
          path, 
          name,
@@ -465,7 +407,7 @@ SignalDataFrame$set(
                units = "text",
                dimensions = "Time",
                stringsAsFactors = FALSE
-               )
+            )
          );
          row.names(metaColumns)[nrow(metaColumns)] <- timeVariableName;
          
@@ -486,7 +428,7 @@ SignalDataFrame$set(
                fmt = "%s/%s.csv",
                path,
                name
-               ),
+            ),
             row.names = FALSE
          );
          write.csv(
@@ -507,27 +449,21 @@ SignalDataFrame$set(
             ),
             row.names = FALSE
          );
-      }
-);
+      },
 
-# Method SignalDataFrame$interpolate ####
-
-#' @name SignalDataFrame_interpolate
-#' 
-#' @title 
-#'   Interpolates a signal
-#'   
-#' @section Method of class:
-#'   \code{\link{SignalDataFrame}}
-#'
-#' @section Implementation of abstract method:
-#'   \code{\link{Signal_interpolate}} -
-#'     See interface for documentation
-#'   
-SignalDataFrame$set(
-   which = "public",
-   name = "interpolate",
-   value = function(time)
+      # Method SignalDataFrame$interpolate ####
+      #      
+      #' @description 
+      #'   Interpolates a signal based on the provided time vector
+      #' 
+      #' @param time
+      #'   Time vector providing the basis for the interpolation
+      #'   
+      #' @return 
+      #'   A new signal with values interpolated from the current
+      #'   signal based on the provided time vector
+      #'   
+      interpolate = function(time)
       {
          interpSignal <- SignalDataFrame$new();
          interpSignal$time <- time;
@@ -552,4 +488,6 @@ SignalDataFrame$set(
          
          return(interpSignal);
       }
-);
+
+   )
+)

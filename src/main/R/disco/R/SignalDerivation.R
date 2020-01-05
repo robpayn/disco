@@ -11,50 +11,59 @@ NULL
 #' @export
 #' 
 #' @title 
-#'   Derives data from a multivariate signal
+#'   R6 class defining a signal derivation
 #'
 #' @description 
 #'   This defines an abstract interface to a signal derivation. A signal derivation
-#'   is an analysis of a signal at a single location. Parameters listed are for the
-#'   constructor method ($new()).
+#'   is an analysis of a signal at a single location.
 #'   
-#' @param signal
-#'   An optional argument allowing the derivation to be tied to a specific signal,
-#'   if desired.
-#' 
-#' @section Abstract Methods:
-#'   \itemize{
-#'     \item \code{$derive} - See \code{\link{SignalDerivation_derive}}
-#'   }
-#'     
 SignalDerivation <- R6Class(
    classname = "SignalDerivation",
    public = list(
+      
+      #' @field signal
+      #'   The signal providing the basis for the derivation
       signal = NULL,
+      
+      # Method SignalDerivation$new ####
+      #
+      #' @description 
+      #'   Creates a new instance of the class SignalDerivation
+      #'   
+      #' @param signal
+      #'   An optional argument allowing the derivation to be tied to a specific signal,
+      #'   if desired.
+      #' 
       initialize = function(signal = NULL)
-         {
-            self$signal = signal;   
-         }
-      )
-);
-
-# Abstract method SignalDerivation$derive ####
-
-#' @name SignalDerivation_derive
-#' 
-#' @title 
-#'   Performs a signal derivation
-#'   
-#' @param signal
-#'   The signal on which the derivation is performed.
-#'   This parameter is only required if the SignalDerivation object is
-#'   not already associated with a signal (see \code{\link{SignalDerivation}})
-#' @param prevResults
-#'   Object representing the results from a previous derivation (if applicable)
-#' @param path
-#'   The path where the results file is written
-#' 
-#' @section Abstract method of interface:
-#'   \code{\link{SignalDerivation}}
-#'
-NULL
+      {
+         self$signal = signal;   
+      },
+      
+      # Abstract method SignalDerivation$derive ####
+      #
+      #' @description 
+      #'   This is an abstract declaration and the method
+      #'   must be implemented by extending classes.
+      #'   
+      #'   Performs a signal derivation
+      #'   
+      #' @param signal
+      #'   The signal on which the derivation is performed.
+      #'   This parameter should only be required if the SignalDerivation object is
+      #'   not already associated with a signal.
+      #' @param prevResults
+      #'   Object representing the results from a previous derivation (if applicable)
+      #' @param path
+      #'   The path where the results file is written
+      #' @param ...
+      #' 
+      #' @return 
+      #'   An object representing the results of the derivation
+      #' 
+      derive = function(...)
+      {
+         stop("SignalDerivation$derive has not been implemented.")
+      }
+      
+   )
+)

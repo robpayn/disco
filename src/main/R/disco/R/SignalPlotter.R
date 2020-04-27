@@ -41,6 +41,12 @@ SignalPlotter <- R6Class(
       #'   The margins for the plot
       mar = NULL,
       
+      #' @field device
+      #'   The device to use for coding. If NULL, a device
+      #'   will not be opened. A PDF device is currently the
+      #'   only other option.
+      device = NULL,
+      
       # Method SignalPlotter$new ####
       #
       #' @description 
@@ -61,6 +67,11 @@ SignalPlotter <- R6Class(
       #' @param mar
       #'   The margins of each panel in the figure (see \code{\link{par}})
       #'   Defaults to c(4, 4, 2, 4) + 0.1
+      #' @param device
+      #'   The device to use for coding. If NULL, a device
+      #'   will not be opened. A PDF device is currently the
+      #'   only other option.
+      #'   Defaults to "pdf".
       #'   
       initialize = function
       (
@@ -68,7 +79,8 @@ SignalPlotter <- R6Class(
          outputPath = NULL,
          fileName = "windowSummary.pdf",
          mfrow = c(3,2),
-         mar = c(4, 4, 2, 4) + 0.1
+         mar = c(4, 4, 2, 4) + 0.1,
+         device = "pdf"
       )
       {
          self$signal <- signal;
@@ -76,6 +88,7 @@ SignalPlotter <- R6Class(
          self$fileName <- fileName;
          self$mfrow <- mfrow;
          self$mar <- mar;
+         self$device <- device;
       },
       
       # Method SignalPlotter$open ####
@@ -94,11 +107,13 @@ SignalPlotter <- R6Class(
          path
       )
       {
-         pdf(file = sprintf(
-            fmt = "%s/%s",
-            path,
-            self$fileName
-         ));
+         if(!is.null(self$device)) {
+            pdf(file = sprintf(
+               fmt = "%s/%s",
+               path,
+               self$fileName
+            ));
+         }
          par(
             mfrow = self$mfrow,
             mar = self$mar
@@ -115,7 +130,9 @@ SignalPlotter <- R6Class(
       #'   
       close = function()
       {
-         dev.off();      
+         if(!is.null(self$device)) {
+            dev.off();    
+         }
       }
       
    )

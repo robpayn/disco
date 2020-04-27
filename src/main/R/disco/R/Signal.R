@@ -43,7 +43,7 @@ Signal <- R6Class(
       #' @param ...
       #'
       #' @return
-      #'   A subset of the signal as a SignalDataFrame object
+      #'   A subset of the signal as another Signal object
       #'   
       getWindow = function(...)
       {
@@ -114,15 +114,12 @@ Signal <- R6Class(
       #'   
       #'   Add a variable to a signal
       #'   
-      #' @param variableName
-      #'   The name of the variable (will be used as the header)
-      #' @param value
-      #'   The vector of values for the vector.
-      #'   Must match the length of the signal
-      #' @param units
-      #'   The units of the values.
-      #' @param dimensions
-      #'   The dimensions of the property
+      #' @param variableHeader
+      #'   The header for the property name for the new variable
+      #' @param metadata
+      #'   The metadata for the column
+      #' @param values
+      #'   The vector of values for the new column
       #' @param ...
       #' 
       addVariable = function(...)

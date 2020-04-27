@@ -49,6 +49,12 @@ TransferFunctionPlotter <- R6Class(
       #'   The margins for the plot
       mar = NULL,
       
+      #' @field device
+      #'   The device to use for coding. If NULL, a device
+      #'   will not be opened. A PDF device is currently the
+      #'   only other option.
+      device = NULL,
+      
       # Method TransferFunctionPlotter$new ####
       #
       #' @description 
@@ -72,6 +78,11 @@ TransferFunctionPlotter <- R6Class(
       #' @param mar
       #'   The margins of each panel in the figure (see \code{\link{par}})
       #'   Defaults to c(4, 4, 2, 4) + 0.1
+      #' @param device
+      #'   The device to use for coding. If NULL, a device
+      #'   will not be opened. A PDF device is currently the
+      #'   only other option.
+      #'   Defaults to "pdf".
       #'   
       initialize = function
       (
@@ -80,7 +91,8 @@ TransferFunctionPlotter <- R6Class(
          outputPath = NULL,
          fileName = "windowSummary.pdf",
          mfrow = c(3,2),
-         mar = c(4, 4, 2, 4) + 0.1
+         mar = c(4, 4, 2, 4) + 0.1,
+         device = "pdf"
       )
       {
          self$signalIn <- signalIn;
@@ -89,6 +101,7 @@ TransferFunctionPlotter <- R6Class(
          self$fileName <- fileName;
          self$mfrow <- mfrow;
          self$mar <- mar;
+         self$device <- device;
       },
       
       # Method TransferFunctionPlotter$open ####
@@ -107,11 +120,13 @@ TransferFunctionPlotter <- R6Class(
          path
       )
       {
-         pdf(file = sprintf(
-            fmt = "%s/%s",
-            path,
-            self$fileName
-         ));
+         if(!is.null(self$device)) {
+            pdf(file = sprintf(
+               fmt = "%s/%s",
+               path,
+               self$fileName
+            ));
+         }
          par(
             mfrow = self$mfrow,
             mar = self$mar
@@ -128,7 +143,9 @@ TransferFunctionPlotter <- R6Class(
       #'   
       close = function()
       {
-         dev.off();      
+         if(!is.null(self$device)) {
+            dev.off();
+         }
       }
       
    )

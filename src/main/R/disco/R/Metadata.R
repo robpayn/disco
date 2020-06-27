@@ -27,7 +27,11 @@ Metadata <- R6Class(
       
       # Constructor Metadata$initialize() ####
       
-      initialize = function(path, baseLayerName = NULL)
+      initialize = function
+      (
+         path, 
+         baseLayerName = NULL
+      )
       {
          self$path <- path;
          if (!is.null(baseLayerName)) {
@@ -75,6 +79,15 @@ Metadata <- R6Class(
          write_xml(
             x = self$xml,
             file = self$path
+         );
+      },
+
+      # Method Metadata$readXML() ####
+      
+      readXML = function()
+      {
+         self$xml <- read_xml(
+            x = self$path
          );
       },
       
@@ -147,15 +160,16 @@ Metadata <- R6Class(
          }
       }, # End method addMetadataElement
       
-      # Method Metadata$addPersonWho() ####
+      # Method Metadata$addPerson() ####
       
-      addPersonWho = function
+      addPerson = function
       (
-         whoContext,
+         context,
          name, 
          org,
          prefContact,
          prefContactType = "email",
+         category = "who",
          description = NULL,
          layerName = NULL,
          layer = self$getLayer(layerName = layerName)
@@ -173,24 +187,26 @@ Metadata <- R6Class(
          ));
          self$addMetadataElement(
             element = element,
-            category = "who",
-            context = whoContext,
+            category = category,
+            context = context,
             description = description,
             layer = layer
          );
          
-      }, # End method addPersonWho
+      }, # End method addPerson
       
-      # Method Metadata$addVariableWhat() ####
+      # Method Metadata$addVariable() ####
       
-      addVariableWhat = function
+      addVariable = function
       (
-         whatContext,
+         context,
          header,
          name,
          units,
          dimensions,
          stat,
+         instrument,
+         category = "what",
          description = NULL,
          layerName = NULL,
          layer = self$getLayer(layerName = layerName)
@@ -204,25 +220,27 @@ Metadata <- R6Class(
                name = name,
                units = units,
                dimensions = dimensions,
-               stat = stat
+               stat = stat,
+               instrument = instrument
             )
          ));
          self$addMetadataElement(
             element = element,
-            category = "what",
-            context = whatContext,
+            category = category,
+            context = context,
             description = description,
             layer = layer
          );
          
-      }, # End method addVariableWhat
+      }, # End method addVariable
       
-      # Method Metadata$addEntityWhat() ####
+      # Method Metadata$addEntity() ####
       
-      addEntityWhat = function
+      addEntity = function
       (
-         whatContext,
+         context,
          entityPath,
+         category = "what",
          description = NULL,
          layerName = NULL,
          layer = self$getLayer(layerName = layerName)
@@ -237,22 +255,146 @@ Metadata <- R6Class(
          ));
          self$addMetadataElement(
             element = element,
-            category = "what",
-            context = whatContext,
+            category = category,
+            context = context,
             description = description,
             layer = layer
          );
          
-      }, # End method addEntityWhat
+      }, # End method addEntity
       
-      # Method Metadata$addWindowWhen() ####
+      # Method Metadata$addEntityAtSite() ####
       
-      addWindowWhen = function
+      addEntityAtSite = function
       (
-         whenContext,
+         entityContext,
+         entityPath,
+         siteContext,
+         sitePath,
+         addPoint = FALSE,
+         pointContext = NULL,
+         source = NULL,
+         latitude = NULL,
+         latitudeUnits = NULL,
+         longitude = NULL,
+         longitudeUnits = NULL,
+         elevation = "unknown",
+         elevationUnits = "unknown",
+         entityCategory = "what",
+         siteCategory = "where",
+         pointCategory = "where",
+         description = NULL,
+         siteDescription = NULL,
+         pointDescription = NULL,
+         layerName = NULL,
+         layer = self$getLayer(layerName = layerName)
+      )
+      {
+         # Create the entity element and add it to the metadata in entity context
+         element <- as_xml_document(list(
+            entity = structure(
+               list(),               
+               path = entityPath
+            )
+         ));
+         self$addMetadataElement(
+            element = element,
+            category = entityCategory,
+            context = entityContext,
+            description = description,
+            layer = layer
+         );
+         
+         # Create the site element and add it to the metadata in entity and site context
+         self$addSite(
+            context = entityContext,
+            sitePath = sitePath,
+            category = entityCategory,
+            description = siteDescription,
+            layer = layer
+         )
+         self$addSite(
+            context = siteContext,
+            sitePath = sitePath,
+            category = siteCategory,
+            description = siteDescription,
+            layer = layer
+         )
+         
+         # If enabled, create the point element and add it to the metadata in entity and point context
+         if (addPoint) {
+            self$addPoint(
+               context = entityContext,
+               source = source,
+               latitude = latitude,
+               latitudeUnits = latitudeUnits,
+               longitude = longitude,
+               longitudeUnits = longitudeUnits,
+               elevation = elevation,
+               elevationUnits = elevationUnits,
+               category = entityCategory,
+               description = pointDescription,
+               layer = layer
+            );
+            self$addPoint(
+               context = pointContext,
+               source = source,
+               latitude = latitude,
+               latitudeUnits = latitudeUnits,
+               longitude = longitude,
+               longitudeUnits = longitudeUnits,
+               elevation = elevation,
+               elevationUnits = elevationUnits,
+               category = pointCategory,
+               description = pointDescription,
+               layer = layer
+            );
+         }
+         
+      }, # End method addEntityAtSite
+      
+      # Method Metadata$addFile() ####
+      
+      addFile = function
+      (
+         context,
+         fileName,
+         fileType,
+         contentType,
+         category = "what",
+         description = NULL,
+         layerName = NULL,
+         layer = self$getLayer(layerName = layerName)
+      )
+      {
+         # Create the instrument element and add it with context
+         element <- as_xml_document(list(
+            file = structure(
+               list(),               
+               fileName = fileName,
+               fileType = fileType,
+               contentType = contentType
+            )
+         ));
+         self$addMetadataElement(
+            element = element,
+            category = category,
+            context = context,
+            description = description,
+            layer = layer
+         );
+         
+      }, # End method addFile
+      
+      # Method Metadata$addTimeWindow() ####
+      
+      addTimeWindow = function
+      (
+         context,
          startTime,
          endTime,
          timeZone,
+         category = "when",
          description = NULL,
          layerName = NULL,
          layer = self$getLayer(layerName = layerName)
@@ -269,47 +411,93 @@ Metadata <- R6Class(
          ));
          self$addMetadataElement(
             element = element,
-            category = "when",
-            context = whenContext,
+            category = category,
+            context = context,
             description = description,
             layer = layer
          );
          
-      }, # End method addWindowWhen
+      }, # End method addTimeWindow
       
-      # Method Metadata$addSiteWhere() ####
+      # Method Metadata$createSiteElement() ####
       
-      addSiteWhere = function
+      createSiteElement = function
       (
-         whereContext,
+         sitePath
+      )
+      {
+         # Create the site element
+         return(
+            as_xml_document(list(
+               site = structure(
+                  list(),               
+                  path = sitePath
+               )
+            ))
+         );
+      },
+      
+      # Method Metadata$addSite() ####
+      
+      addSite = function
+      (
+         context,
          sitePath,
+         category = "where",
          description = NULL,
          layerName = NULL,
          layer = self$getLayer(layerName = layerName)
       )
       {
          # Create the site element
-         element <- as_xml_document(list(
-            site = structure(
-               list(),               
-               path = sitePath
-            )
-         ));
+         element <- self$createSiteElement(sitePath);
+         
+         # Add the site element to the where element with context
          self$addMetadataElement(
             element = element,
-            category = "where",
-            context = whereContext,
+            category = category,
+            context = context,
             description = description,
             layer = layer
          );
          
-      }, # End method addSiteWhere
+      }, # End method addSite
       
-      # Method Metadata$addPointWhere() ####
+      # Method Metadata$createPointElement ####
       
-      addPointWhere = function
+      createPointElement = function
       (
-         whereContext,
+         source,
+         latitude,
+         latitudeUnits,
+         longitude,
+         longitudeUnits,
+         elevation = "unknown",
+         elevationUnits = "unknown"
+      )
+      {
+         # Create the site element and add it with context
+         return(
+            as_xml_document(list(
+               point = structure(
+                  list(),     
+                  source = source,
+                  latitude = latitude,
+                  latitudeUnits = latitudeUnits,
+                  longitude = longitude,
+                  longitudeUnits = longitudeUnits,
+                  elevation = elevation,
+                  elevationUnits = elevationUnits
+               )
+            ))
+         );
+      },
+      
+      # Method Metadata$addPoint() ####
+      
+      addPoint = function
+      (
+         context,
          source,
          latitude,
          latitudeUnits,
@@ -317,41 +505,42 @@ Metadata <- R6Class(
          longitudeUnits,
          elevation = "unknown",
          elevationUnits = "unknown",
+         category = "where",
          description = NULL,
          layerName = NULL,
          layer = self$getLayer(layerName = layerName)
       )
       {
-         # Create the site element and add it with context
-         element <- as_xml_document(list(
-            point = structure(
-               list(),     
-               source = source,
-               latitude = latitude,
-               latitudeUnits = latitudeUnits,
-               longitude = longitude,
-               longitudeUnits = longitudeUnits,
-               elevation = elevation,
-               elevationUnits = elevationUnits
-            )
-         ));
+         # Create the point element
+         element <- self$createPointElement(     
+            source = source,
+            latitude = latitude,
+            latitudeUnits = latitudeUnits,
+            longitude = longitude,
+            longitudeUnits = longitudeUnits,
+            elevation = elevation,
+            elevationUnits = elevationUnits
+         );
+         
+         # Add the point element to the metadata with context
          self$addMetadataElement(
             element = element,
-            category = "where",
-            context = whereContext,
+            category = category,
+            context = context,
             description = description,
             layer = layer
          );
          
-      }, # End method addPointWhere
+      }, # End method addPoint
       
-      # Method Metadata$addInstrumentHow() ####
+      # Method Metadata$addInstrument() ####
       
-      addInstrumentHow = function
+      addInstrument = function
       (
-         howContext,
+         context,
          name,
          serialNumber,
+         category = "how",
          description = NULL,
          layerName = NULL,
          layer = self$getLayer(layerName = layerName)
@@ -367,20 +556,52 @@ Metadata <- R6Class(
          ));
          self$addMetadataElement(
             element = element,
-            category = "how",
-            context = howContext,
+            category = category,
+            context = context,
             description = description,
             layer = layer
          );
          
-      }, # End method addInstrumentHow
+      }, # End method addInstrument
       
-      # Method Metadata$addMotivationWhy() ####
+      # Method Metadata$addQAQCCode() ####
       
-      addMotivationWhy = function
+      addQAQCCode = function
       (
-         whyContext,
-         projectName,
+         context,
+         header,
+         code,
+         category = "how",
+         description = NULL,
+         layerName = NULL,
+         layer = self$getLayer(layerName = layerName)
+      )
+      {
+         # Create the instrument element and add it with context
+         element <- as_xml_document(list(
+            qaqcCode = structure(
+               list(),
+               header = header,
+               code = code
+            )
+         ));
+         self$addMetadataElement(
+            element = element,
+            category = category,
+            context = context,
+            description = description,
+            layer = layer
+         );
+         
+      }, # End method addQAQCCode
+      
+      # Method Metadata$addProjectEffort() ####
+      
+      addProjectEffort = function
+      (
+         context,
+         path,
+         category = "why",
          description = NULL,
          layerName = NULL,
          layer = self$getLayer(layerName = layerName)
@@ -388,20 +609,20 @@ Metadata <- R6Class(
       {
          # Create the instrument element
          element <- as_xml_document(list(
-            motivation = structure(
+            projectEffort = structure(
                list(),               
-               projectName = projectName
+               path = path
             )
          ));
          self$addMetadataElement(
             element = element,
-            category = "why",
-            context = whyContext,
+            category = category,
+            context = context,
             description = description,
             layer = layer
          );
          
-      } # End method addMotivationWhy
+      } # End method addProjectEffort
       
    ) # End list of public elements
 ) # End definition of Metadata R6 Class

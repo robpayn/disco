@@ -6,25 +6,33 @@
 #'
 NULL
 
-# R6 Class DataFileCampbell2019 ####
+# R6 Class TableDataFile ####
 
 #
 #' @export
 #'
 #' @title 
-#'   A campbell data file class (R6 Class)
+#'   A class for tabular data in a text data file (R6 Class)
 #'
 #' @description 
-#'   Provides utilities for managing data in a Campbell Scientific 
-#'   datalogger file, with the file structure typical in 2019.
+#'   Provides utilities for managing tabular data stored in
+#'   a text file using column delimiters
 #'
-DataFileCampbell2019 <- R6Class(
-   classname = "DataFileCampbell2019",
+TableDataFile <- R6Class(
+   classname = "TableDataFile",
    public = list(
+      
+      #' @field instrument
+      #'   Character string identifying the instrument used.
+      instrument = NULL,
       
       #' @field filePath
       #'   character string representing the path to the file
       filePath = NULL,
+      
+      #' @field delimiter
+      #'   Character string representing the delimiter for columns
+      delimiter = NULL,
       
       #' @field timeZone
       #'   character string representing the time zone (system dependent)
@@ -35,7 +43,7 @@ DataFileCampbell2019 <- R6Class(
       timeFormat = NULL,
       
       #' @field timeVariableName
-      #'   character string represtig the time variable header in the table
+      #'   character string representing the time variable header in the table
       timeVariableName = NULL,
       
       #' @field signal
@@ -50,86 +58,112 @@ DataFileCampbell2019 <- R6Class(
       #' @field metaColumns
       #'   Data frame with context for each column
       metaColumns = NULL,
+
+      #' @field metadata
+      #'   Data frame with context for each column
+      metadata = NULL,
       
-      # Method DataFileCampbell2019$new ####
+      # Method TableDataFile$new ####
       #
       #' @description 
-      #'   Constructs a new instance of the class DataFileCampbell2019
-      #'   
+      #'   Constructs a new instance of the class
+      #' 
+      #' @param instrument
+      #'   Character string identifying the instrument used  
       #' @param filePath
       #'   Character string representing the path to the file
+      #' @param timeVariableName
+      #'   Character string representing the time variable header in the table.
+      #' @param numMetaRows
+      #'   Integer representing the number of rows of metadata at the top
+      #'   of the file
       #' @param metaColumns
       #'   Data frame with context for each column.
+      #' @param delimiter
+      #'   Character string representing the delimiter for columns
       #' @param timeZone
-      #'   Optional character string representing the time zone.
-      #'   Defaults to "UTC".
+      #'   Character string representing the time zone.
       #' @param timeFormat
       #'   character string representing the time format (strptime)
-      #'   Defaults to Year(4-digit)-month-day Hour(24-hour):minute:second
-      #' @param timeVariableName
-      #'   Optional character string represtig the time variable header in the table.
-      #'   Defaults to "time"
-      #' @param numMetaRows
-      #'   Optional integer representing the number of rows of metadata at the top
-      #'   of the file
-      #'   Defaults to 4.
+      #' @param metadata
+      #'   Optional metadata object.
+      #'   Defaults to NULL
       #'   
       initialize = function
       (
+         instrument,
          filePath,
+         timeVariableName,
+         numMetaRows,
          metaColumns,
-         timeZone = "UTC",
-         timeFormat = "%Y-%m-%d %H:%M:%S",
-         timeVariableName = "time",
-         numMetaRows = 4
+         delimiter,
+         timeZone,
+         timeFormat,
+         metadata = NULL
       ) 
       {
+         self$instrument <- instrument;
          self$filePath <- filePath;
+         self$delimiter <- delimiter;
          self$timeZone <- timeZone;
          self$timeFormat <- timeFormat;
          self$timeVariableName <- timeVariableName;
          self$numMetaRows <- numMetaRows;
          self$metaColumns <- metaColumns;
+         self$metadata <- metadata;
       },
       
-      # Method DataFileCampbell2019$read ####
+      # Method TableDataFile$read ####
       #
       #' @description 
       #'   Read the data file to populate the signal attribute
       #'   
-      #' @param metadata
-      #'   R S3 dataframe of metadata.
-      #'   Defaults to NULL.
       #' @param stringsAsFactors
       #'   Optional logical value to turn strings as factors on or off.
       #'   Default value is FALSE (do not interpret strings as categorical factors).
       #'   
       #' @return 
-      #'   The number of data rows read from the file. 
+      #'   The signal object created by reading the file.
       #'   
       read = function
       (
-         metadata,
+         dataLayer = "root",
          stringsAsFactors = FALSE
       ) 
       {
-         data <- read.csv(
+         data <- read.table(
             file = self$filePath,
+            sep = self$delimiter,
             skip = self$numMetaRows,
             header = FALSE,
             col.names = names(self$metaColumns),
             stringsAsFactors = stringsAsFactors
          );
+         
+         if (!is.null(self$metadata)) {
+            self$addMetadata(
+               metadata = self$metadata,
+               instrument = self$instrument
+            );
+         }
 
+         self$metaColumns["dataLayer",] <- dataLayer;
+         
          self$signal <- SignalTable$new(
             data = data,
-            meta = metadata,
+            meta = self$metadata,
             metaColumns = self$metaColumns,
             timeVariableName = self$timeVariableName,
+            timeFormat = self$timeFormat,
             tz = self$timeZone
          );
          
          return(self$signal);
+      },
+      
+      addMetadata = function(metadata, instrument)
+      {
+         stop("Function TableDataFile$addMetadata has not been implemented by the subclass.");
       }
       
    )

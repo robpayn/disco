@@ -87,8 +87,11 @@ SignalTable <- R6Class(
       #'   Static method that constructs a signal based on a series of csv files providing
       #'   data and metadata bout the signal
       #'   
-      #' @param fileName
-      #'   The filename basis for the import.
+      #' @param filePath
+      #'   Path to the data file
+      #' @param metaPath
+      #'   Optional path to the metadata file.
+      #'   Default is NULL.
       #' @param timeVariableName
       #'   The header in the csv data for the column with
       #'   time data.
@@ -101,7 +104,8 @@ SignalTable <- R6Class(
       #' 
       constructFromCSV = function
       (
-         fileName,
+         filePath,
+         metaPath = NULL,
          timeVariableName = "time",
          ...
       )
@@ -109,7 +113,10 @@ SignalTable <- R6Class(
          
          return(
             SignalTable$new(
-               table = DataTable$public_methods$constructFromCSV(fileName),
+               table = DataTable$public_methods$constructFromCSV(
+                  filePath,
+                  metaPath
+               ),
                timeVariableName = timeVariableName,
                ...
             )
@@ -395,14 +402,12 @@ SignalTable <- R6Class(
       #'   The path to the written files
       #' @param name
       #'   The base name of the written files
-      #' @param timeVariableName
-      #'   Optional column name if the time should be added as a column
-      #'   in the written data.
-      #'   Defaults to NULL which will not output the time variable. Generally
-      #'   left to default if the original time variable is already in the table.
-      #' @param variables
-      #'   A vector of variable names to specify the columns to be output.
+      #' @param headers
+      #'   Optional vector of variable names to specify the columns to be output.
       #'   Defaults to NULL which will output all columns.
+      #' @param writeMetadata
+      #'   Optional logical value to determine if metadata are written
+      #'   Defaults to TRUE.
       #' 
       #' @return 
       #'   No defined return value.
@@ -411,8 +416,8 @@ SignalTable <- R6Class(
       (
          path, 
          name,
-         timeVariableName = NULL,
-         variables = NULL
+         headers = NULL,
+         writeMetadata = TRUE
       )
       {
          # Initialize the metacolumns R S3 dataframe for writing
@@ -420,28 +425,10 @@ SignalTable <- R6Class(
          # Initialize the data R S3 dataframe for writing
          dataOut <- self$table$data;
          
-         if (!is.null(timeVariableName)) {
-            # FIXME I am about to break this.
-            metaColumns <- rbind(
-               metaColumns,
-               data.frame(
-                  property = timeVariableName,
-                  units = "text",
-                  dimensions = "Time",
-                  stringsAsFactors = FALSE
-               )
-            );
-            row.names(metaColumns)[nrow(metaColumns)] <- timeVariableName;
-            dataOut[, timeVariableName] <- as.character(self$time);
-         }
-         
-         # FIXME I am about to break this.
-         
          # Adjust the output if variables argument is provided
-         if(!is.null(variables)) {
-            variables <- c(variables, timeVariableName);
-            dataOut <- dataOut[,variables];
-            metaColumns <- metaColumns[variables,];
+         if(!is.null(headers)) {
+            dataOut <- dataOut[, headers];
+            metaColumns <- metaColumns[, headers];
          }
          
          fileConn <- file(
@@ -458,7 +445,10 @@ SignalTable <- R6Class(
          );
          writeLines(
             text = paste(
-               shQuote(rownames(metaColumns), type = "cmd"),
+               shQuote(
+                  string = c("header", rownames(metaColumns)), 
+                  type = "cmd"
+               ),
                collapse = ","
             ),
             con = fileConn
@@ -474,7 +464,7 @@ SignalTable <- R6Class(
             x = metaColumns,
             file = fileConn,
             sep = ",",
-            col.names = FALSE,
+            col.names = TRUE,
             row.names = FALSE
          );
          writeLines(
@@ -489,6 +479,21 @@ SignalTable <- R6Class(
          );
          close(fileConn);
          
+         if (writeMetadata && !is.null(self$table$meta)) {
+            self$writeMetadata();
+         }
+      },
+      
+      # Method SignalTable$writeMetadata ####
+      #      
+      #' @description 
+      #'   Writes the metadata object as an XML file
+      #' 
+      #' @return 
+      #'   No defined return value
+      #'   
+      writeMetadata = function()
+      {
          self$table$meta$writeXML();
       },
 
@@ -575,6 +580,75 @@ SignalTable <- R6Class(
             self$trim(firstIndex = firstIndex, lastIndex = lastIndex)
          );
       },
+      
+      # Method SignalTable$trimWindow ####
+      #      
+      #' @description 
+      #'   Trims the signal based on removing a window
+      #' 
+      #' @param startIndex
+      #'   First index of window to be removed
+      #' @param endIndex
+      #'   Last index of window to be removed
+      #'   
+      #' @return 
+      #'   The new length of the signal
+      #'   
+      trimWindow = function
+      (
+         startIndex,
+         endIndex
+      )
+      {
+         
+         if (startIndex < 2) {
+            firstGroup = integer(length = 0);
+         } else {
+            firstGroup = 1:(startIndex - 1);
+         }
+         if (endIndex > self$getLength() - 1) {
+            lastGroup = integer(length = 0);
+         } else {
+            lastGroup = (endIndex + 1):self$getLength();
+         }
+         self$table$data <- self$table$data[c(firstGroup, lastGroup),];
+         self$time <- self$time[c(firstGroup, lastGroup)];
+         return(self$getLength());
+         
+      }, # end method trimWindow()
+      
+      # Method SignalTable$filterOut ####
+      #      
+      #' @description 
+      #'   Removes the rows designated by the provided indices
+      #' 
+      #' @param index
+      #'   A vector of numerical or logical indices. The rows specified by
+      #'   the numbers in the vector will be removed, or logical values of 'FALSE' 
+      #'   in the vector will indicate that row should be removed removed.
+      #'   
+      #' @return 
+      #'   The new length of the signal after rows are removed
+      #'   
+      filterOut = function
+      (
+         index
+      )
+      {
+         if (is.integer(index) || is.numeric(index)) {
+            logicalIndex <- !seq_len(self$getLength()) %in% as.integer(index);
+         } else if (is.logical(index)) {
+            logicalIndex <- index;
+         } else {
+            stop("SignalTable$filter can only use integer, numeric, or logical indices")
+         }
+
+         self$table$data <- self$table$data[logicalIndex, ];
+         self$time <- self$time[logicalIndex];
+         
+         return(self$getLength());
+
+      }, # end method filter()
       
       # Method SignalTable$getLength ####
       #      

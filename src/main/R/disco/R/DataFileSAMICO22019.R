@@ -6,20 +6,20 @@
 #'
 NULL
 
-# R6 Class DataFileMiniDOT2019 ####
+# R6 Class DataFileSAMICO22019 ####
 
 #
 #' @export
 #'
 #' @title 
-#'   A MiniDOT data file (R6 Class)
+#'   A DataFileSAMICO22019 file class (R6 Class)
 #'
 #' @description 
-#'   Provides utilities for managing data in a MiniDOT
-#'   datalogger file, with the file structure typical in 2019.
+#'   Provides utilities for managing data in a sAMI-CO2 data file,
+#'   with the file structure typical in 2019.
 #'
-DataFileMiniDOT2019 <- R6Class(
-   classname = "DataFileMiniDOT2019",
+DataFileSAMICO22019 <- R6Class(
+   classname = "DataFileSAMICO22019",
    public = list(
       
       #' @field filePath
@@ -29,7 +29,7 @@ DataFileMiniDOT2019 <- R6Class(
       #' @field timeZone
       #'   character string representing the time zone (system dependent)
       timeZone = NULL,
-      
+
       #' @field timeFormat
       #'   character string representing the time format (strptime)
       timeFormat = NULL,
@@ -42,15 +42,15 @@ DataFileMiniDOT2019 <- R6Class(
       #'   integer representing the number of rows of metadata at the top
       #'   of the file
       numMetaRows = NULL,
-      
+
       #' @field metaColumns
       #'   Data frame with context for each column
       metaColumns = NULL,
-      
-      # Method DataFileMiniDOT2019$new ####
+
+      # Method DataFileSAMICO22019$new ####
       #
       #' @description 
-      #'   Constructs a new instance of the class
+      #'   Constructs a new instance of the class DataFileSAMICO22019
       #'   
       #' @param filePath
       #'   Character string representing the path to the file
@@ -58,60 +58,49 @@ DataFileMiniDOT2019 <- R6Class(
       #'   Optional character string representing the time zone.
       #'   Defaults to "UTC".
       #' @param timeFormat
-      #'   character string representing the time format (strptime)
-      #'   Defaults to Year(4-digit)-month-day Hour(24-hour):minute:second
+      #'   Character string representing the time format (strptime) of the time column.
+      #'   Defaults to "month/day/Year(4-digit) Hour(24-hour):minute"
       #' @param numMetaRows
       #'   Optional integer representing the number of rows of metadata at the top
       #'   of the file
-      #'   Defaults to 4.
-      #' @param RS232
-      #'   Optional parameter for indicating an older RS232 MiniDOT.
-      #'   Default is FALSE.
+      #'   Defaults to 1.
       #' @param metaColumns
-      #'   Optional data frame with context for each column.
-      #'   Default depends on RS232 argument and will be the standard columns for 
-      #'     a MiniDOT export. RS232 output does not include a battery voltage.
+      #'   Optional data frame with metadata about the columns.
+      #'   Defaults to columns for a SAMI CO2 export with the columns
+      #'   Year Day, Round Year, DateStr, TimeStr, Type Name, CO2, Temperature C,
+      #'   Battery Voltage, DarkRef (Raw), DarkSig (Raw), 434Ratio (Raw), 434Ref (Raw),
+      #'   434Sig (Raw), 620Ratio (Raw), 620Ref (Raw), 620Sig (Raw).
       #'   
       initialize = function
       (
          filePath,
          timeZone = "UTC",
-         timeFormat = "%Y-%m-%d %H:%M:%S",
-         numMetaRows = 9,
-         RS232 = FALSE,
-         metaColumns = if (RS232) {
-            data.frame(
-               # Columns
-               unixTime = c("seconds since 1 Jan 1970 UTC", "Time"),
-               timeStringUTC = c("Gregorian UTC", "Time"),
-               timeStringLocal = c("Gregorian Local Time Zone", "Time"),
-               temp = c("degrees Celsius", "Temperature"),
-               do = c("milligrams O2 per liter", "mass per volume"),
-               doPercentSat = c("percent of saturated", "1"),
-               quality = c("Unknown", "Unknown"),
-               
-               # Parameters
-               row.names = c("units", "dimensions"),
-               stringsAsFactors = FALSE
-            ) 
-         } else {
-            data.frame(
-               # Columns
-               timeUnix = c("seconds since 1 Jan 1970 UTC", "Time"),
-               timeStringUTC = c("Gregorian UTC", "Time"),
-               timeStringLocal = c("Gregorian Local Time Zone", "Time"),
-               batteryVoltage = c("volts", "Energy per Charge"),
-               temp = c("degrees Celsius", "Temperature"),
-               do = c("milligrams O2 per liter", "mass per volume"),
-               doPercentSat = c("percent of saturated", "1"),
-               quality = c("Unknown", "Unknown"),
-               
-               # Parameters
-               row.names = c("units", "dimensions"),
-               stringsAsFactors = FALSE
-            )
-         }
-      )
+         timeFormat = "%m/%d/%Y %H:%M",
+         numMetaRows = 1,
+         metaColumns = data.frame(
+            # Columns
+            dayOfYear = c("days UTC", "Time"),
+            year = c("years CE UTC", "Time"),
+            dateString = c("Gregorian UTC", "Time"),
+            timeString = c("Hour(24):minute UTC", "Time"),
+            recordType = c("Text", "Category"),
+            pCO2 = c("microatmospheres", "Force per Area"),
+            temp = c("degrees C", "Temperature"),
+            batteryVoltage = c("volts", "Energy per Charge"),
+            refDarkRaw = c("unknown", "unknown"),
+            sigDarkRaw = c("unknown", "unknown"),	
+            ratio434Raw = c("unknown", "unknown"),	
+            ref434Raw = c("unknown", "unknown"),
+            sig434Raw = c("unknown", "unknown"),
+            ratio620Raw = c("unknown", "unknown"),
+            ref620Raw = c("unknown", "unknown"),
+            sig620Raw = c("unknown", "unknown"),
+            
+            # Parameters
+            row.names = c("units", "dimensions"),
+            stringsAsFactors = FALSE
+         )
+      ) 
       {
          self$filePath <- filePath;
          self$timeZone <- timeZone;
@@ -120,7 +109,7 @@ DataFileMiniDOT2019 <- R6Class(
          self$metaColumns <- metaColumns;
       },
       
-      # Method DataFileMiniDOT2019$read ####
+      # Method DataFileSAMICO22019$read ####
       #
       #' @description 
       #'   Read the data file to populate the signal attribute
@@ -130,62 +119,96 @@ DataFileMiniDOT2019 <- R6Class(
       #'   Defaults to NULL.
       #' @param instrument
       #'   Optional character string naming the instrument used.
-      #'   Defaults to "PME MiniDOT".
+      #'   Defaults to "Sunburst SAMI CO2".
       #' @param dataLayer
-      #'   Optional character string naming the associated data layer in the metadata.
+      #'   Optional character string naming the associated datalayer in the metadata.
       #'   Defaults to "root"
       #' @param stringsAsFactors
       #'   Optional logical value to turn strings as factors on or off.
       #'   Default value is FALSE (do not interpret strings as categorical factors).
+      #' @param recordType
+      #'   Optional parameter for designating the record type to include in the signal.
+      #'   Defaults to "CO2Aver+".
       #'   
       #' @return 
-      #'   Reference to the signal object created from data in the file. 
+      #'   Reference to the signal object created from data in the file.
       #'   
       read = function
       (
-         metadata,
-         instrument = "PME MiniDOT",
+         metadata = NULL,
+         instrument = "Sunburst SAMI CO2",
          dataLayer = "root",
-         stringsAsFactors = FALSE
+         stringsAsFactors = FALSE,
+         recordType = "CO2Aver+"
       ) 
       {
-         data <- read.csv(
+         data <- read.table(
             file = self$filePath,
+            sep = "\t",
             skip = self$numMetaRows,
             header = FALSE,
             col.names = names(self$metaColumns),
-            strip.white = TRUE,
             stringsAsFactors = stringsAsFactors
          );
-
+         
          if (!is.null(metadata)) {
             metadata$addVariable(
                category = "what",
                context = "PropertiesWereEvaluated",
-               header = "timeUnix",
-               name = "Time in Unix format",
-               units = "seconds since 1 Jan 1970 UTC",
+               header = "dayOfYear",
+               name = "Decimal day of the year",
+               units = "days UTC",
                dimensions = "Time",
-               stat = "instantaneous",
+               stat = "instataneous",
                instrument = instrument
             );
             metadata$addVariable(
                category = "what",
                context = "PropertiesWereEvaluated",
-               header = "timeStringUTC",
-               name = "Time in Gregorian format UTC",
+               header = "year",
+               name = "Yers current era",
+               units = "years CE UTC",
+               dimensions = "Time",
+               stat = "instataneous",
+               instrument = instrument
+            );
+            metadata$addVariable(
+               category = "what",
+               context = "PropertiesWereEvaluated",
+               header = "date",
+               name = "Date",
                units = "Gregorian UTC",
                dimensions = "Time",
-               stat = "instantaneous",
+               stat = "instataneous",
                instrument = instrument
             );
             metadata$addVariable(
                category = "what",
                context = "PropertiesWereEvaluated",
-               header = "timeStringLocal",
-               name = "Time in Gregorian format configured time zone",
-               units = "Gregorian configured time zone",
+               header = "timeOfDay",
+               name = "Time of day",
+               units = "Hour(24):minute UTC",
                dimensions = "Time",
+               stat = "instataneous",
+               instrument = instrument
+            );
+            metadata$addVariable(
+               category = "what",
+               context = "PropertiesWereEvaluated",
+               header = "pCO2",
+               name = "Partial pressure of carbon dioxide",
+               units = "microatmospheres",
+               dimensions = "Force per Area",
+               stat = "circa 5-min equilibration",
+               instrument = instrument
+            );
+            metadata$addVariable(
+               category = "what",
+               context = "PropertiesWereEvaluated",
+               header = "temp",
+               name = "Water temperature",
+               units = "degrees C",
+               dimensions = "Temperature",
                stat = "instantaneous",
                instrument = instrument
             );
@@ -202,34 +225,94 @@ DataFileMiniDOT2019 <- R6Class(
             metadata$addVariable(
                category = "what",
                context = "PropertiesWereEvaluated",
-               header = "temp",
-               name = "Temperature",
-               units = "degrees C",
-               dimensions = "Temperature",
+               header = "refDarkRaw",
+               name = "Dark reference",
+               units = "unknown",
+               dimensions = "unknown",
                stat = "instantaneous",
                instrument = instrument
             );
             metadata$addVariable(
                category = "what",
                context = "PropertiesWereEvaluated",
-               header = "do",
-               name = "Dissolved oxygen concentration",
-               units = "milligrams dioxygen gas per liter",
-               dimensions = "Mass per Volume",
+               header = "sigDarkRaw",
+               name = "Dark signal",
+               units = "unknown",
+               dimensions = "unknown",
                stat = "instantaneous",
                instrument = instrument
             );
             metadata$addVariable(
                category = "what",
                context = "PropertiesWereEvaluated",
-               header = "do_percentsat",
-               name = "Percent of saturated dissolved oxygen Concentration",
-               units = "percent",
-               dimensions = "1",
+               header = "ratio434Raw",
+               name = "Ratio for 434 nanometers",
+               units = "unknown",
+               dimensions = "unknown",
+               stat = "instantaneous",
+               instrument = instrument
+            );
+            metadata$addVariable(
+               category = "what",
+               context = "PropertiesWereEvaluated",
+               header = "ref434Raw",
+               name = "Reference for 434 nanometers",
+               units = "unknown",
+               dimensions = "unknown",
+               stat = "instantaneous",
+               instrument = instrument
+            );
+            metadata$addVariable(
+               category = "what",
+               context = "PropertiesWereEvaluated",
+               header = "sig434Raw",
+               name = "Signal for 434 nanometers",
+               units = "unknown",
+               dimensions = "unknown",
+               stat = "instantaneous",
+               instrument = instrument
+            );
+            metadata$addVariable(
+               category = "what",
+               context = "PropertiesWereEvaluated",
+               header = "ratio620Raw",
+               name = "Ratio for 620 nanometers",
+               units = "unknown",
+               dimensions = "unknown",
+               stat = "instantaneous",
+               instrument = instrument
+            );
+            metadata$addVariable(
+               category = "what",
+               context = "PropertiesWereEvaluated",
+               header = "ref620Raw",
+               name = "Reference for 620 nanometers",
+               units = "unknown",
+               dimensions = "unknown",
+               stat = "instantaneous",
+               instrument = instrument
+            );
+            metadata$addVariable(
+               category = "what",
+               context = "PropertiesWereEvaluated",
+               header = "sig620Raw",
+               name = "Signal for 620 nanometers",
+               units = "unknown",
+               dimensions = "unknown",
                stat = "instantaneous",
                instrument = instrument
             );
          }
+
+         data <- data[(data$recordType == recordType),];
+         
+         data$time <- as.character(as.POSIXct(
+            x = paste(data$dateString, data$timeString),
+            tz = self$timeZone,
+            format = self$timeFormat
+         ));
+         
+         self$metaColumns$time <- c("Gregorian UTC", "Time");
          
          self$metaColumns["dataLayer",] <- dataLayer;
          
@@ -237,17 +320,16 @@ DataFileMiniDOT2019 <- R6Class(
             data = data,
             meta = metadata,
             metaColumns = self$metaColumns,
-            timeVariableName = "timeStringUTC",
             tz = self$timeZone
          );
          
          return(self$signal);
       },
       
-      # Method DataFileMiniDOT2019$plotDO ####
+      # Method DataFileSAMICO22019$plotCO2 ####
       #
       #' @description 
-      #'   Plot the dissolved oxygen data
+      #'   Plot the pCO2 data
       #'   
       #' @param signal
       #'   Optional signal to plot.
@@ -270,76 +352,49 @@ DataFileMiniDOT2019 <- R6Class(
       #' @param timepadj
       #'   Optional adjustment (axis argument) to the location of the labels on the time axis.
       #'   Defaults to 0.5.
-      #' @param yMass
-      #'   Optional vector for the DO mass concentration scaled by the right y axis.
-      #'   Default value is the DO concentration from the signal argument above.
-      #' @param ylimMass
-      #'   Optional limits for the mass concentration scaled by the right y axis.
-      #'   Default value is the min and max of yMass
-      #' @param ylabMass
-      #'   Optional label for the right y axis.
-      #'   Default value is formatted DO concentration with units of milligrams N per liter
-      #' @param yMolar
-      #'   Optional vector for the DO molar concentration scaled by the left y axis.
-      #'   Default value is yMass / 0.032.
-      #' @param ylimMolar
-      #'   Optional limits for the molar concentration scaled by the left y axis.
-      #'   Default value is the min and max of yMolar
-      #' @param ylabMolar
-      #'   Optional label for the left y axis.
-      #'   Default value is formatted DO concentration with units of moles NO3 per liter
-      #' @param massArgs
-      #'   Optional additional parameters passed on to the call to 
-      #'   plot.default for mass concentration.
-      #'   Default value is an empty list (no additional parameters)
-      #' @param molarArgs
-      #'   Optional additional parameters passed on to the call to 
-      #'   plot.default for molar concentration.
-      #'   Default value is an empty list (no additional parameters)
+      #' @param ypCO2
+      #'   Optional vector for the pCO2 to plot on y axis.
+      #'   Default value is the pCO2 in the signal argument above.
+      #' @param ylim
+      #'   Optional limits for the pCO2 scale on the y axis.
+      #'   Default value is the min and max of the ypCO2 argument
+      #' @param ylab
+      #'   Optional label for the y axis.
+      #'   Default value is formatted CO2 partial pressure with units of microatmospheres
+      #' @param ...
+      #'   Optional additional parameters passed on to the call to plot.default
       #'   
       #' @return 
       #'   No defined return value. 
       #'   
-      plotDO = function
+      plotpCO2 = function
       (
          signal = self$signal,
-         mar = c(4.5, 4.5, 1, 4.5),
+         mar = c(4.5, 4.5, 1, 1),
          time = signal$time,
          timeZone = self$timeZone,
          timeLab = sprintf("Time (%s Time Zone)", timeZone),
          timeAxisFormat = "%e %b \n %H:%M",
          timepadj = 0.5,
-         yMass = signal$getVariable("do"),
-         ylimMass = c(
-            min(yMass),
-            max(yMass)
+         ypCO2 = signal$getVariable("pCO2"),
+         ylim = c(
+            min(ypCO2),
+            max(ypCO2)
          ),
-         ylabMass = bquote(DO ~ conc. ~ .("(") * mg ~ O[2] ~ L^-1 * .(")")),
-         yMolar = yMass / 0.032,
-         ylimMolar = c(
-            min(yMolar),
-            max(yMolar)
-         ),
-         ylabMolar = bquote(DO ~ conc. ~ .("(") * mu * mol ~ O[2] ~ L^-1 * .(")")),
-         massArgs = list(),
-         molarArgs = list()
+         ylab = bquote(CO[2] ~ partial ~ pressure ~ .("(") * mu * atm * .(")")),
+         ...
       )
       {
          attributes(time)$tzone <- timeZone;
          par(mar = mar);
-         do.call(
-            what = plot.default, 
-            args = c(
-               list(
-                  x = time,
-                  xaxt = "n",
-                  xlab = sprintf("Time (%s Time Zone)", timeZone),
-                  y = yMolar,
-                  ylim = ylimMolar,
-                  ylab = ylabMolar
-               ),
-               molarArgs
-            )
+         plot.default( 
+            x = time,
+            xaxt = "n",
+            xlab = timeLab,
+            y = ypCO2,
+            ylim = ylim,
+            ylab = ylab,
+            ...
          );
          axis.POSIXct(
             side = 1,
@@ -347,45 +402,19 @@ DataFileMiniDOT2019 <- R6Class(
             padj = timepadj,
             format = timeAxisFormat
          );
-         
-         par(new = TRUE);
-         do.call(
-            what = plot.default, 
-            args = c(
-               list(
-                  x = time,
-                  xlab = "",
-                  y = yMass,
-                  ylim = ylimMass,
-                  ylab = "",
-                  type = "n",
-                  axes = FALSE
-               ),
-               massArgs
-            )
-         );
-         axis(
-            side = 4
-         );
-         mtext(
-            text = ylabMass,
-            side = 4,
-            line = 3
-         );
-         
       },
       
-      # Method DataFileMiniDOT2019$plotTemp ####
+      # Method DataFileSAMICO22019$plotTemp ####
       #
       #' @description 
-      #'   Plot the temperature data
+      #'   Plot the nitrate data
       #'   
       #' @param signal
       #'   Optional signal to plot.
       #'   Defaults to the signal attribute of this object.
       #' @param mar
       #'   Optional vector of values to use as margins passed to par.
-      #'   Defaults to c(4.5, 4.5, 1, 4.5).
+      #'   Defaults to c(4.5, 4.5, 1, 1).
       #' @param time
       #'   Optional vector for time axis.
       #'   Default value is the time associated with this object.
@@ -402,14 +431,14 @@ DataFileMiniDOT2019 <- R6Class(
       #'   Optional adjustment (axis argument) to the location of the labels on the time axis.
       #'   Defaults to 0.5.
       #' @param ytemp
-      #'   Optional vector for the temperature.
+      #'   Optional vector for the temperature to plot on the y axis.
       #'   Default value is the temperature from the signal argument above.
       #' @param ylim
-      #'   Optional axis limits for the temperature.
-      #'   Default value is the min and max of ytemp
+      #'   Optional limits for the temperature axis.
+      #'   Default value is the min and max of the ytemp argument
       #' @param ylab
       #'   Optional label for the y axis.
-      #'   Default value is formatted Temperature with units of degrees Celsius
+      #'   Default value is formatted Temperature in degrees Celsius
       #' @param ...
       #'   Optional additional parameters passed on to the call to plot.default
       #'   
@@ -419,7 +448,7 @@ DataFileMiniDOT2019 <- R6Class(
       plotTemp = function
       (
          signal = self$signal,
-         mar = c(4.5, 4.5, 1, 4.5),
+         mar = c(4.5, 4.5, 1, 1),
          time = signal$time,
          timeZone = self$timeZone,
          timeLab = sprintf("Time (%s Time Zone)", timeZone),

@@ -64,45 +64,74 @@ DataTable <- R6Class(
       #'   Static method for creating a DataTable object 
       #'   based on csv formatted information
       #' 
-      #' @param fileName
-      #'   Base name of the files containing the csv data and metadata
+      #' @param filePath
+      #'   Path to the data file
+      #' @param metaPath
+      #'   Optional path to the metadata file.
+      #'   Defaults to NULL.
       #'   
-      constructFromCSV = function(fileName)
+      constructFromCSV = function
+      (
+         filePath,
+         metaPath = NULL
+      )
       {
+         con <- file(
+            description = filePath,
+            open = "r"
+         );
          
-         dataTable <- DataTable$new();
-         dataTable$data <- read.csv(
-            file = paste(
-               fileName,
-               ".csv",
-               sep = ""
-            ),
-            header = TRUE,
+         metaNames <- as.character(read.table(
+            file = con,
+            sep = ",",
+            nrows = 1,
+            comment.char = "#",
             stringsAsFactors = FALSE
-         );
-         dataTable$meta <- read.csv(
-            file = paste(
-               fileName,
-               "_meta.csv",
-               sep = ""
-            ),
-            header = TRUE,
-            stringsAsFactors = FALSE
-         );
-         rownames(dataTable$meta) <- dataTable$meta$key;
-         # FIXME I am about to break this
-         dataTable$metaColumns <- read.csv(
-            file = paste(
-               fileName,
-               "_meta_columns.csv",
-               sep = ""
-            ),
-            header = TRUE,
-            stringsAsFactors = FALSE
-         );
-         rownames(dataTable$metaColumns) <- dataTable$metaColumns$property;
-         return(dataTable);
+         )[1,]);
          
+         headers <- as.character(read.table(
+            file = con,
+            sep = ",",
+            nrows = 1,
+            comment.char = "#",
+            stringsAsFactors = FALSE
+         )[1,]);
+         
+         metaColumns <- read.table(
+            file = con,
+            sep = ",",
+            nrows = length(metaNames) - 1,
+            col.names = headers,
+            row.names = metaNames[2:length(metaNames)],
+            stringsAsFactors = FALSE
+         );
+         
+         data <- read.table(
+            file = con,
+            sep = ",",
+            header = TRUE,
+            comment.char = "#",
+            stringsAsFactors = FALSE
+         )
+         
+         close(con);
+
+         if (!is.null(metaPath)) {
+            meta <- Metadata$new(
+               path = metaPath
+            );
+            meta$readXML();
+         } else {
+            meta <- null;
+         }
+         
+         return(
+            DataTable$new(
+               dataframe = data,
+               meta = meta,
+               metaColumns = metaColumns
+            )
+         );
       },
       
       # Method DataTable$copyMetaData ####

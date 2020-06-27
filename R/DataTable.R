@@ -25,10 +25,6 @@ DataTable <- R6Class(
       #'   the S3 dataframe underlying the data structure
       data = NULL,
       
-      #' @field meta 
-      #'   the S3 dataframe containing the general metadata
-      meta = NULL,
-      
       #' @field metaColumns
       #'   the S3 dataframe containing the column metadata
       metaColumns = NULL,
@@ -38,100 +34,145 @@ DataTable <- R6Class(
       #' @description 
       #'   Construct a new instance of a data table
       #' 
-      #' @param dataframe
-      #'   An R S3 dataframe object with the data.
-      #' @param meta
-      #'   Optional R S3 dataframe with general metadata.
-      #'   Default value is NULL.
+      #' @param x
+      #'   R object indicating the source of information for constructing a data table.
+      #'   If the class of the object is a character string, an data table will be attempted
+      #'   to be constructed from a standard DataTable csv file.
       #' @param metaColumns
-      #'   Optional RS3 dataframe with column-specific metadata.
-      #'   Default value is NULL.
+      #'   Optional data frame of metadata for the columns in the data table. Metadata from the
+      #'   text file will be used if constructing from a file. Metadata must be provided if
+      #'   constructing from a dataframe.
+      #'   Defaults to NULL.
       #'   
-      initialize = function(
-         dataframe,
-         meta = NULL,
+      initialize = function
+      (
+         x,
          metaColumns = NULL
       )
       {
-         self$data <- dataframe;
-         self$meta <- meta;
-         self$metaColumns <- metaColumns;
-      },
-      
-      # Method (static) DataTable.constructFromCSV ####
-      #
-      #' @description 
-      #'   Static method for creating a DataTable object 
-      #'   based on csv formatted information
-      #' 
-      #' @param filePath
-      #'   Path to the data file
-      #' @param metaPath
-      #'   Optional path to the metadata file.
-      #'   Defaults to NULL.
-      #'   
-      constructFromCSV = function
-      (
-         filePath,
-         metaPath = NULL
-      )
-      {
-         con <- file(
-            description = filePath,
-            open = "r"
-         );
-         
-         metaNames <- as.character(read.table(
-            file = con,
-            sep = ",",
-            nrows = 1,
-            comment.char = "#",
-            stringsAsFactors = FALSE
-         )[1,]);
-         
-         headers <- as.character(read.table(
-            file = con,
-            sep = ",",
-            nrows = 1,
-            comment.char = "#",
-            stringsAsFactors = FALSE
-         )[1,]);
-         
-         metaColumns <- read.table(
-            file = con,
-            sep = ",",
-            nrows = length(metaNames) - 1,
-            col.names = headers,
-            row.names = metaNames[2:length(metaNames)],
-            stringsAsFactors = FALSE
-         );
-         
-         data <- read.table(
-            file = con,
-            sep = ",",
-            header = TRUE,
-            comment.char = "#",
-            stringsAsFactors = FALSE
-         )
-         
-         close(con);
+         switch(
+            class(x),
+            character = 
+            {
+               
+               con <- file(
+                  description = x,
+                  open = "r"
+               );
+               
+               metaNames <- as.character(read.table(
+                  file = con,
+                  sep = ",",
+                  nrows = 1,
+                  comment.char = "#",
+                  stringsAsFactors = FALSE
+               )[1,]);
+               
+               headers <- as.character(read.table(
+                  file = con,
+                  sep = ",",
+                  nrows = 1,
+                  comment.char = "#",
+                  stringsAsFactors = FALSE
+               )[1,]);
+               
+               self$metaColumns <- read.table(
+                  file = con,
+                  sep = ",",
+                  nrows = length(metaNames) - 1,
+                  col.names = headers,
+                  row.names = metaNames[2:length(metaNames)],
+                  stringsAsFactors = FALSE
+               );
+               
+               self$data <- read.table(
+                  file = con,
+                  sep = ",",
+                  header = TRUE,
+                  comment.char = "#",
+                  stringsAsFactors = FALSE
+               )
+               
+               close(con);
 
-         if (!is.null(metaPath)) {
-            meta <- Metadata$new(
-               path = metaPath
-            );
-            meta$readXML();
-         } else {
-            meta <- null;
+            },
+            data.frame = 
+            {
+               self$data <- x;
+               if(is.null(metaColumns)) {
+                  stop("Argument 'metaColumns' must not be NULL if a dataframe is used to construct a data table.")
+               }
+            }
+         );
+         
+         if(!is.null(metaColumns)) {
+            self$metaColumns <- metaColumns;
          }
          
-         return(
-            DataTable$new(
-               dataframe = data,
-               meta = meta,
-               metaColumns = metaColumns
-            )
-         );
+      },
+      
+      # Method DataTable$getLength ####
+      #      
+      #' @description 
+      #'   Gets the length of the data table
+      #' 
+      #' @return 
+      #'   The number of rows in the data table
+      #'   
+      getLength = function()
+      {
+         return(nrow(self$data));
+      },
+      
+      # Method DataTable$getLength ####
+      #      
+      #' @description 
+      #'   Gets the vector of values for a variable in the table
+      #' 
+      #' @return 
+      #'   Vector of values corresponding to the provided header
+      #'   
+      getVariable = function(header)
+      {
+         return(self$data[[header]]);
+      },
+      
+      # Method DataTable$setVariable ####
+      #
+      #' @description 
+      #'   Adds a column of data and associated metata 
+      #'   as a variable to the data table
+      #'   
+      #' @param header
+      #'   The header for the property name for the new column
+      #' @param values
+      #'   The vector of values for the new column
+      #' @param metadata
+      #'   Optional list of values representing the metadata for the column.
+      #'   Defaults to the existing metadata if column already exists.
+      #'   
+      #' @return 
+      #'   No defined return value.
+      #'   
+      setVariable = function
+      (
+         header,
+         values,
+         metadata = self$metaColumns[[header]]
+      )
+      {
+         if(is.null(self$data[[header]]) && is.null(metadata)) {
+            stop("DataTable$setVariable must provide metadata for a variable that does not exist.")
+         }
+         self$data[[header]] <- values;
+         self$metaColumns[[header]] <- metadata;
+      },
+      
+      filterVariables = function(headers)
+      {
+         self$data <- self$data[, headers];
+         self$metaColumns <- self$metaColumns[, headers];
+         return(NULL);
       },
       
       # Method DataTable$copyMetaData ####
@@ -150,37 +191,7 @@ DataTable <- R6Class(
       {
          self$meta <- dataTable$meta;
          self$metaColumns <- dataTable$metaColumns;
-      },
-      
-      # Method DataTable$addColumn ####
-      #
-      #' @description 
-      #'   Adds a column of data and associated metata 
-      #'   as a variable to the data table
-      #'   
-      #' @param header
-      #'   The header for the property name for the new column
-      #' @param metadata
-      #'   The metadata for the column
-      #' @param values
-      #'   The vector of values for the new column
-      #'   
-      #' @return 
-      #'   No defined return value.
-      #'   
-      addColumn = function
-      (
-         header,
-         metadata,
-         values
-      )
-      {
-         if (length(metadata) != nrow(self$metaColumns)) {
-            stop("Number of elements in metadata vector does not match length of metadata required.")
-         }
-         self$data[, header] <- values;
-         self$metaColumns[, header] <- metadata;
       }
-      
+
    )
 )

@@ -124,10 +124,13 @@ DataTable <- R6Class(
          return(nrow(self$data));
       },
       
-      # Method DataTable$getLength ####
+      # Method DataTable$getVariable ####
       #      
       #' @description 
       #'   Gets the vector of values for a variable in the table
+      #' 
+      #' @param header
+      #'   Charater string representing the header for the variable values to get
       #' 
       #' @return 
       #'   Vector of values corresponding to the provided header
@@ -168,30 +171,23 @@ DataTable <- R6Class(
          self$metaColumns[[header]] <- metadata;
       },
       
+      # Method DataTable$filterVarialbes ####
+      #
+      #' @description 
+      #'   Removes all variables except those specified 
+      #'   
+      #' @param headers
+      #'   Vector of character strings representing the variables to keep
+      #'   
+      #' @return 
+      #'   No defined return value.
+      #'   
       filterVariables = function(headers)
       {
          self$data <- self$data[, headers];
          self$metaColumns <- self$metaColumns[, headers];
          return(NULL);
-      },
-      
-      # Method DataTable$copyMetaData ####
-      #
-      #' @description 
-      #'   Copies the metadata from the provided data table 
-      #'   object to this data table object
-      #'   
-      #' @param dataTable
-      #'   The data table object from which the metadata is copied
-      #'   
-      #' @return 
-      #'   No defined return value.
-      #'   
-      copyMetaData = function(dataTable)
-      {
-         self$meta <- dataTable$meta;
-         self$metaColumns <- dataTable$metaColumns;
       }
-
+      
    )
 )

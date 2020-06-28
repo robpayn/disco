@@ -25,6 +25,9 @@ Signal <- R6Class(
       #' @field timeHeader
       #'   The name of the column in the data frame with the time data
       timeHeader = NULL,
+
+      #' @field timeFormat
+      #'   Charater string with the time format (strptime)
       timeFormat = NULL,
 
       # Method Signal$initialize ####
@@ -113,11 +116,24 @@ Signal <- R6Class(
          return(self$getVariable(self$timeHeader));
       },
       
+      # Method Signal$setTimeHeader ####
+      #
+      #' @description 
+      #'   Set the time header
+      #' 
+      #' @param timeHeader
+      #'   Character string representing the new time header to use
+      #' 
+      #' @return 
+      #'   The old value of the time header
+      #'   
       setTimeHeader = function(timeHeader)
       {
+         oldHeader <- self$timeHeader;
          names(self$data)[names(self$data) == self$timeHeader] <- timeHeader;
          names(self$metaColumns)[names(self$metaColumns) == self$timeHeader] <- timeHeader;
          self$timeHeader <- timeHeader;
+         return(oldHeader);
       },
       
       # Method Signal$setTimeZone ####
@@ -125,7 +141,7 @@ Signal <- R6Class(
       #' @description 
       #'   Set the time zone
       #' 
-      #' @param 
+      #' @param timeZone
       #'   Character string representing the time zone
       #' 
       #' @return 
@@ -143,6 +159,19 @@ Signal <- R6Class(
          return(prevTimeZone);
       },
       
+      # Method Signal$filterVariables ####
+      #
+      #' @description 
+      #'   Filter the signal to the desired variables
+      #' 
+      #' @param headers
+      #'   Vector of character strings representing the headers for
+      #'   variable to keep. All other variables will be excluded, 
+      #'   escept the variable with time.
+      #' 
+      #' @return 
+      #'   Value returned by the super$filterVariables method
+      #'   
       filterVariables = function(headers)
       {
          if(!any(headers == self$timeHeader)) {
@@ -157,9 +186,9 @@ Signal <- R6Class(
       #'   Get a subset of the signal based on a provided window of time
       #' 
       #' @param minTime
-      #'   The starting time of the window
+      #'   POSIXct object with the starting time of the window
       #' @param maxTime
-      #'   The ending time of the window
+      #'   POSIXct object with the ending time of the window
       #'
       #' @return 
       #'   A new signal object representing the subset of the current signal
@@ -194,6 +223,9 @@ Signal <- R6Class(
       #' @param mar
       #'   Value for the graphing parameter controling margins
       #'   Defaults to \code{c(4, 4, 1, 1) + 0.1}
+      #' @param headers
+      #'   Vector of character strings specifying the headers for which
+      #'   variables to summarize.
       #' 
       #' @return 
       #'   No defined return value.
@@ -329,7 +361,7 @@ Signal <- R6Class(
                compareWith, 
                FUN = function(x) 
                {
-                  time <- x$time;
+                  time <- x$getTime();
                   if(!is.na(timeZone)) {
                      attributes(time)$tzone <- timeZone;
                   } 
@@ -411,14 +443,13 @@ Signal <- R6Class(
       (
          path, 
          name,
-         headers = NULL,
-         writeMetadata = TRUE
+         headers = NULL
       )
       {
          # Initialize the metacolumns R S3 dataframe for writing
-         metaColumns <- self$table$metaColumns;
+         metaColumns <- self$metaColumns;
          # Initialize the data R S3 dataframe for writing
-         dataOut <- self$table$data;
+         dataOut <- self$data;
          
          # Adjust the output if variables argument is provided
          if(!is.null(headers)) {
@@ -474,24 +505,8 @@ Signal <- R6Class(
          );
          close(fileConn);
          
-         if (writeMetadata && !is.null(self$table$meta)) {
-            self$writeMetadata();
-         }
       },
       
-      # Method Signal$writeMetadata ####
-      #      
-      #' @description 
-      #'   Writes the metadata object as an XML file
-      #' 
-      #' @return 
-      #'   No defined return value
-      #'   
-      writeMetadata = function()
-      {
-         self$table$meta$writeXML();
-      },
-
       # Method Signal$interpolate ####
       #      
       #' @description 
@@ -643,78 +658,7 @@ Signal <- R6Class(
          
          return(self$getLength());
 
-      }, # end method filter()
-      
-      # Method Signal$writeRData ####
-      #      
-      #' @description 
-      #'   Writes the signal as a list in an RData file
-      #' 
-      #' @param path
-      #'   The path to the written file
-      #' @param name
-      #'   The base name of the written file
-      #' @param timeHeader
-      #'   Optional name of the the time variable to write in the data
-      #'   Defaults to NULL which will result in the time variable
-      #'   not being written to the output.
-      #' @param variables
-      #'   Optional vector of variable names to specify the columns to be output.
-      #'   Defaults to NULL which will output all columns.
-      #'   
-      #' @return 
-      #'   No defined return value.
-      #'   
-      writeRData = function
-      (
-         path, 
-         name,
-         timeHeader = NULL,
-         variables = NULL
-      )
-      {
-         # Initiate the metacolumns dataframe for writing
-         metaColumns <- self$table$metaColumns;
-         # Initiate the data dataframe for writing
-         dataOut <- self$table$data;
-         
-         # FIXME I am about to break this
-         if (!is.null(timeHeader)) {
-            metaColumns <- rbind(
-               metaColumns,
-               data.frame(
-                  property = timeHeader,
-                  units = "text",
-                  dimensions = "Time",
-                  stringsAsFactors = FALSE
-               )
-            );
-            row.names(metaColumns)[nrow(metaColumns)] <- timeHeader;
-            dataOut[, timeHeader] <- as.character(self$time);
-         }
-         
-         # Adjust the output if variables argument is provided
-         if(!is.null(variables)) {
-            variables <- c(variables, timeHeader);
-            dataOut <- dataOut[,variables];
-            
-            # FIXME I am about to break this.
-            metaColumns <- metaColumns[variables,];
-         }
-         
-         saveRDS(
-            object = list(
-               data = dataOut,
-               data_meta_columns = metaColumns,
-               data_meta = self$table$meta
-            ),
-            file = sprintf(
-               fmt = "%s/%s.RData",
-               path,
-               name
-            )
-         );
-      }
+      } # end method filterOut()
       
    )
 )

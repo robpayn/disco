@@ -28,6 +28,8 @@ Manages a windowed signal analysis, where the windows are
 
 \item{\code{windowDays}}{The number of days composing each window}
 
+\item{\code{timeZone}}{Character string representing the time zone}
+
 \item{\code{slideDays}}{The number of days to slide the window for generating each
 window for analysis.}
 
@@ -63,6 +65,7 @@ Create an instance of the class DielWindowedSignal
   windowStart,
   windowEnd,
   windowDays,
+  timeZone,
   slideDays = 1
 )}\if{html}{\out{</div>}}
 }
@@ -84,6 +87,8 @@ Create an instance of the class DielWindowedSignal
 
 \item{\code{windowDays}}{The number of days for a given window}
 
+\item{\code{timeZone}}{Character string representing the time zone for the times}
+
 \item{\code{slideDays}}{The number of days to slide the window for generating each
 window for analysis.
 Defaults to 1.}
@@ -97,20 +102,17 @@ Defaults to 1.}
 \subsection{Method \code{generateWindowInput()}}{
 Parses the signal into windows based on the window definitions
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DielWindowedSignal$generateWindowInput(
-  pipelineDir = "dates",
-  inputDir = "input"
-)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DielWindowedSignal$generateWindowInput(outerDir = "dates", innerDir = "input")}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{pipelineDir}}{Optional directory structure from the base path where the folders corresponding
+\item{\code{outerDir}}{Optional directory structure from the base path where the folders corresponding
 to analysis windows should be placed.
 Default value is "dates".}
 
-\item{\code{inputDir}}{Optional name of the directory within each window folder where the 
+\item{\code{innerDir}}{Optional name of the directory within each window folder where the 
 input data for that window should be placed.
 Default value is "input".}
 }
@@ -128,8 +130,8 @@ Runs the provided analyzer object for all windows
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DielWindowedSignal$analyze(
   signalDerivation,
-  pipelineDir = "dates",
-  outputDir = "output"
+  outerDir = "dates",
+  innerDir = "output"
 )}\if{html}{\out{</div>}}
 }
 
@@ -139,11 +141,11 @@ Runs the provided analyzer object for all windows
 \item{\code{signalDerivation}}{A SignalDerivation object that will perform the analysis
 for each window}
 
-\item{\code{pipelineDir}}{Optional directory structure from the base path where the folders corresponding
+\item{\code{outerDir}}{Optional directory structure from the base path where the folders corresponding
 to analysis windows should be placed.
 Default value is "dates".}
 
-\item{\code{outputDir}}{Optional name of the directory within each window folder where the 
+\item{\code{innerDir}}{Optional name of the directory within each window folder where the 
 output data for that window should be placed.
 Default value is "output".}
 }

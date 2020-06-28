@@ -12,8 +12,6 @@ An R6 implementation of a data table, including metadata
 \describe{
 \item{\code{data}}{the S3 dataframe underlying the data structure}
 
-\item{\code{meta}}{the S3 dataframe containing the general metadata}
-
 \item{\code{metaColumns}}{the S3 dataframe containing the column metadata}
 }
 \if{html}{\out{</div>}}
@@ -22,9 +20,10 @@ An R6 implementation of a data table, including metadata
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{DataTable$new()}}
-\item \href{#method-constructFromCSV}{\code{DataTable$constructFromCSV()}}
-\item \href{#method-copyMetaData}{\code{DataTable$copyMetaData()}}
-\item \href{#method-addColumn}{\code{DataTable$addColumn()}}
+\item \href{#method-getLength}{\code{DataTable$getLength()}}
+\item \href{#method-getVariable}{\code{DataTable$getVariable()}}
+\item \href{#method-setVariable}{\code{DataTable$setVariable()}}
+\item \href{#method-filterVariables}{\code{DataTable$filterVariables()}}
 \item \href{#method-clone}{\code{DataTable$clone()}}
 }
 }
@@ -34,58 +33,76 @@ An R6 implementation of a data table, including metadata
 \subsection{Method \code{new()}}{
 Construct a new instance of a data table
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DataTable$new(dataframe, meta = NULL, metaColumns = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DataTable$new(x, metaColumns = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{dataframe}}{An R S3 dataframe object with the data.}
+\item{\code{x}}{R object indicating the source of information for constructing a data table.
+If the class of the object is a character string, an data table will be attempted
+to be constructed from a standard DataTable csv file.}
 
-\item{\code{meta}}{Optional R S3 dataframe with general metadata.
-Default value is NULL.}
-
-\item{\code{metaColumns}}{Optional RS3 dataframe with column-specific metadata.
-Default value is NULL.}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-constructFromCSV"></a>}}
-\if{latex}{\out{\hypertarget{method-constructFromCSV}{}}}
-\subsection{Method \code{constructFromCSV()}}{
-Static method for creating a DataTable object 
-  based on csv formatted information
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DataTable$constructFromCSV(filePath, metaPath = NULL)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{filePath}}{Path to the data file}
-
-\item{\code{metaPath}}{Optional path to the metadata file.
+\item{\code{metaColumns}}{Optional data frame of metadata for the columns in the data table. Metadata from the
+text file will be used if constructing from a file. Metadata must be provided if
+constructing from a dataframe.
 Defaults to NULL.}
 }
 \if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-copyMetaData"></a>}}
-\if{latex}{\out{\hypertarget{method-copyMetaData}{}}}
-\subsection{Method \code{copyMetaData()}}{
-Copies the metadata from the provided data table 
-  object to this data table object
+\if{html}{\out{<a id="method-getLength"></a>}}
+\if{latex}{\out{\hypertarget{method-getLength}{}}}
+\subsection{Method \code{getLength()}}{
+Gets the length of the data table
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DataTable$copyMetaData(dataTable)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DataTable$getLength()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+The number of rows in the data table
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-getVariable"></a>}}
+\if{latex}{\out{\hypertarget{method-getVariable}{}}}
+\subsection{Method \code{getVariable()}}{
+Gets the vector of values for a variable in the table
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataTable$getVariable(header)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{dataTable}}{The data table object from which the metadata is copied}
+\item{\code{header}}{Charater string representing the header for the variable values to get}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Vector of values corresponding to the provided header
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-setVariable"></a>}}
+\if{latex}{\out{\hypertarget{method-setVariable}{}}}
+\subsection{Method \code{setVariable()}}{
+Adds a column of data and associated metata 
+  as a variable to the data table
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataTable$setVariable(header, values, metadata = self$metaColumns[[header]])}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{header}}{The header for the property name for the new column}
+
+\item{\code{values}}{The vector of values for the new column}
+
+\item{\code{metadata}}{Optional list of values representing the metadata for the column.
+Defaults to the existing metadata if column already exists.}
 }
 \if{html}{\out{</div>}}
 }
@@ -94,23 +111,18 @@ No defined return value.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-addColumn"></a>}}
-\if{latex}{\out{\hypertarget{method-addColumn}{}}}
-\subsection{Method \code{addColumn()}}{
-Adds a column of data and associated metata 
-  as a variable to the data table
+\if{html}{\out{<a id="method-filterVariables"></a>}}
+\if{latex}{\out{\hypertarget{method-filterVariables}{}}}
+\subsection{Method \code{filterVariables()}}{
+Removes all variables except those specified
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DataTable$addColumn(header, metadata, values)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DataTable$filterVariables(headers)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{header}}{The header for the property name for the new column}
-
-\item{\code{metadata}}{The metadata for the column}
-
-\item{\code{values}}{The vector of values for the new column}
+\item{\code{headers}}{Vector of character strings representing the variables to keep}
 }
 \if{html}{\out{</div>}}
 }

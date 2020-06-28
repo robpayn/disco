@@ -2,207 +2,473 @@
 % Please edit documentation in R/Signal.R
 \name{Signal}
 \alias{Signal}
-\title{R6 abstract class defining a signal}
+\title{R6 Class representing a signal data frame}
 \description{
-Defines an abstract interface for an R6 class that manages
-  a multivariate time series data set. Full functional implementations
-  of this interface must implement the functions described below.
+This is an implementation of the Signal interface that is
+  composed of a DataTable object for the time series data
+}
+\section{Super class}{
+\code{\link[disco:DataTable]{disco::DataTable}} -> \code{Signal}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{time}}{A vector representing the times for the elements of the signal}
+\item{\code{timeHeader}}{The name of the column in the data frame with the time data}
+
+\item{\code{timeFormat}}{Charater string with the time format (strptime)}
 }
 \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
+\item \href{#method-new}{\code{Signal$new()}}
+\item \href{#method-getTime}{\code{Signal$getTime()}}
+\item \href{#method-setTimeHeader}{\code{Signal$setTimeHeader()}}
+\item \href{#method-setTimeZone}{\code{Signal$setTimeZone()}}
+\item \href{#method-filterVariables}{\code{Signal$filterVariables()}}
 \item \href{#method-getWindow}{\code{Signal$getWindow()}}
-\item \href{#method-getVariable}{\code{Signal$getVariable()}}
 \item \href{#method-plotSummary}{\code{Signal$plotSummary()}}
 \item \href{#method-plot}{\code{Signal$plot()}}
-\item \href{#method-addVariable}{\code{Signal$addVariable()}}
 \item \href{#method-writeCSV}{\code{Signal$writeCSV()}}
 \item \href{#method-interpolate}{\code{Signal$interpolate()}}
+\item \href{#method-trim}{\code{Signal$trim()}}
+\item \href{#method-trimEdges}{\code{Signal$trimEdges()}}
+\item \href{#method-trimWindow}{\code{Signal$trimWindow()}}
+\item \href{#method-filterOut}{\code{Signal$filterOut()}}
+\item \href{#method-writeRData}{\code{Signal$writeRData()}}
 \item \href{#method-clone}{\code{Signal$clone()}}
+}
+}
+\if{html}{
+\out{<details open ><summary>Inherited methods</summary>}
+\itemize{
+\item \out{<span class="pkg-link" data-pkg="disco" data-topic="DataTable" data-id="getLength">}\href{../../disco/html/DataTable.html#method-getLength}{\code{disco::DataTable$getLength()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="disco" data-topic="DataTable" data-id="getVariable">}\href{../../disco/html/DataTable.html#method-getVariable}{\code{disco::DataTable$getVariable()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="disco" data-topic="DataTable" data-id="setVariable">}\href{../../disco/html/DataTable.html#method-setVariable}{\code{disco::DataTable$setVariable()}}\out{</span>}
+}
+\out{</details>}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-new"></a>}}
+\if{latex}{\out{\hypertarget{method-new}{}}}
+\subsection{Method \code{new()}}{
+Create an instance of class Signal
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Signal$new(
+  x,
+  metaColumns = NULL,
+  timeHeader = "time",
+  timeFormat = "\%Y-\%m-\%d \%H:\%M:\%S",
+  timeZone = "UTC",
+  ...
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{x}}{R object indicating the source of information for constructing a signal.
+If the class of the object is a character string, an signal will be attempted
+to be constructed from a standard DataTable csv file.}
+
+\item{\code{metaColumns}}{Optional data frame of metadata for the columns in the signal. Metadata from the
+text file will be used if constructing from a file. Metadata must be provided if
+constructing from a dataframe.
+Defaults to NULL.}
+
+\item{\code{timeHeader}}{Optional character string representing the header for the table column with time data.
+Defaults to "time".}
+
+\item{\code{timeFormat}}{Optional character string representing the format in "strptime" for the time column
+that needs to be converted from a character string vector.
+Defaults to <4 character year>:<2 character month of year>:<2 character day of month>
+<24 hour time>:<2 character minutes of hour>:<2 character seconds of minute>}
+
+\item{\code{timeZone}}{Optional system specific string for the time zone for the times column.
+Defaults to "UTC"}
+
+\item{\code{...}}{Optional additional arguments passed to as.POSIXct for coverting the time
+data to a POSIXct vector.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A reference to an object that is a new instance of the class
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-getTime"></a>}}
+\if{latex}{\out{\hypertarget{method-getTime}{}}}
+\subsection{Method \code{getTime()}}{
+Get the vector of values representing the times for the signal data
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Signal$getTime()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+A vector of times.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-setTimeHeader"></a>}}
+\if{latex}{\out{\hypertarget{method-setTimeHeader}{}}}
+\subsection{Method \code{setTimeHeader()}}{
+Set the time header
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Signal$setTimeHeader(timeHeader)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{timeHeader}}{Character string representing the new time header to use}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+The old value of the time header
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-setTimeZone"></a>}}
+\if{latex}{\out{\hypertarget{method-setTimeZone}{}}}
+\subsection{Method \code{setTimeZone()}}{
+Set the time zone
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Signal$setTimeZone(timeZone)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{timeZone}}{Character string representing the time zone}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+The previous setting for the time zone
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-filterVariables"></a>}}
+\if{latex}{\out{\hypertarget{method-filterVariables}{}}}
+\subsection{Method \code{filterVariables()}}{
+Filter the signal to the desired variables
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Signal$filterVariables(headers)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{headers}}{Vector of character strings representing the headers for
+variable to keep. All other variables will be excluded, 
+escept the variable with time.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Value returned by the super$filterVariables method
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-getWindow"></a>}}
 \if{latex}{\out{\hypertarget{method-getWindow}{}}}
 \subsection{Method \code{getWindow()}}{
-This is an abstract declaration and the method
-  must be implemented by extending classes.
-  
-  Method for getting a subset of a signal. The time
-  stamps included in the window should start on or after
-  the minimum time and before or on the maximum time.
+Get a subset of the signal based on a provided window of time
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Signal$getWindow(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Signal$getWindow(minTime, maxTime)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{}
+\item{\code{minTime}}{POSIXct object with the starting time of the window}
 
-\item{\code{minTime}}{Time defining the beginning of the window}
-
-\item{\code{maxTime}}{Time defining the end of the window}
+\item{\code{maxTime}}{POSIXct object with the ending time of the window}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A subset of the signal as another Signal object
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getVariable"></a>}}
-\if{latex}{\out{\hypertarget{method-getVariable}{}}}
-\subsection{Method \code{getVariable()}}{
-This is an abstract declaration and the method
-  must be implemented by extending classes.
-  
-  Gets the vector of values for a given variable
-  in the multivariate signal
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Signal$getVariable(...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{}
-
-\item{\code{variableName}}{The name of the variable}
-}
-\if{html}{\out{</div>}}
+A new signal object representing the subset of the current signal
+  defined by the provided minimum and maximum times.
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-plotSummary"></a>}}
 \if{latex}{\out{\hypertarget{method-plotSummary}{}}}
 \subsection{Method \code{plotSummary()}}{
-This is an abstract declaration and the method
-  must be implemented by extending classes.
-  
-  Plot a summary of the variables in the signal
+Plot a summary of the multivariate signal
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Signal$plotSummary(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Signal$plotSummary(
+  x = NULL,
+  mar = c(4, 4, 1, 1) + 0.1,
+  mfrow = NULL,
+  headers = character()
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{}
+\item{\code{x}}{Vector to plot on the x axis
+Defaults to signal time variable}
 
-\item{\code{x}}{X-axis variable}
+\item{\code{mar}}{Value for the graphing parameter controling margins
+Defaults to \code{c(4, 4, 1, 1) + 0.1}}
 
-\item{\code{mfrow}}{Plot layout (see \code{\link{par}})}
+\item{\code{mfrow}}{Value for graphing parameter controlling multipanel plots
+Defaults to \code{c(length(self$table$data) - 1, 1)}}
 
-\item{\code{mar}}{Plot margins (see \code{\link{par}})}
+\item{\code{headers}}{Vector of character strings specifying the headers for which
+variables to summarize.}
 }
 \if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+No defined return value.
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-plot"></a>}}
 \if{latex}{\out{\hypertarget{method-plot}{}}}
 \subsection{Method \code{plot()}}{
-This is an abstract declaration and the method
-  must be implemented by extending classes.
-  
-  Plot a single variable in the signal
+Plots a single variable in the signal based on the provided header
+  for the variable
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Signal$plot(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Signal$plot(
+  header,
+  x = self$getTime(),
+  timeZone = NA,
+  y = self$getVariable(header),
+  xlim = c(min(x), max(x)),
+  xlab = self$timeHeader,
+  ylim = c(min(y, na.rm = TRUE), max(y, na.rm = TRUE)),
+  ylab = sprintf("\%s (\%s)", header, self$metaColumns["units", header]),
+  compareWith = list(),
+  comp.colors = c("purple", "orange", "green"),
+  comp.pchs = c(0, 2, 5),
+  ...
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{}
+\item{\code{header}}{Name of the variable to plot on the y axis.}
 
-\item{\code{variableName}}{The variable header to plot}
+\item{\code{x}}{Variable plotted on x axis. 
+Default value is the time.}
+
+\item{\code{timeZone}}{If specified, the time zone for the datetime scale.
+Defult value is NA (no change in time zone).}
+
+\item{\code{y}}{Variable plotted on y axis. 
+Default value is the values in the provided header argument.}
+
+\item{\code{xlim}}{Vector of 2 values for the min and max of x axis scale.
+Default is min and max of x variable}
+
+\item{\code{xlab}}{Label for x axis.
+Default value is the header for time data.}
+
+\item{\code{ylim}}{Vector of 2 values for the min and max of y axis scale.
+Default value is min and max of y variable.}
+
+\item{\code{ylab}}{Label for y axis.
+Default value is the header selected and the units
+for that variable}
+
+\item{\code{compareWith}}{Vector of signals to plot on the same axes.
+Specifying signals for comparison will adjust the xlim
+and ylim values to be sure all values will be visible on
+plot.
+Default value is an empty list (no additional plots).}
+
+\item{\code{comp.colors}}{A vector of character strings specifying colors for additional
+plots.
+Defaults to a color blind friendly palette of purple, orange,
+and green.}
+
+\item{\code{comp.pchs}}{A vector of integers specifying the point symbol to use for 
+additional plots.
+Defaults to square, triangle, and diamond.}
+
+\item{\code{...}}{Any remaining arguments provided will be passed to the call to
+the plot.default method, allowing for further customization of
+the plot.}
 }
 \if{html}{\out{</div>}}
 }
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-addVariable"></a>}}
-\if{latex}{\out{\hypertarget{method-addVariable}{}}}
-\subsection{Method \code{addVariable()}}{
-This is an abstract declaration and the method
-  must be implemented by extending classes.
-  
-  Add a variable to a signal
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Signal$addVariable(...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{}
-
-\item{\code{variableHeader}}{The header for the property name for the new variable}
-
-\item{\code{metadata}}{The metadata for the column}
-
-\item{\code{values}}{The vector of values for the new column}
-}
-\if{html}{\out{</div>}}
+\subsection{Returns}{
+No defined return value.
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-writeCSV"></a>}}
 \if{latex}{\out{\hypertarget{method-writeCSV}{}}}
 \subsection{Method \code{writeCSV()}}{
-This is an abstract declaration and the method
-  must be implemented by extending classes.
-  
-  Write the signal in csv format
+Write the signal in csv format
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Signal$writeCSV(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Signal$writeCSV(path, name, headers = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{}
+\item{\code{path}}{The path to the written files}
 
-\item{\code{path}}{Path to the CSV files that will be created}
+\item{\code{name}}{The base name of the written files}
 
-\item{\code{name}}{Name base for the files}
+\item{\code{headers}}{Optional vector of variable names to specify the columns to be output.
+Defaults to NULL which will output all columns.}
 
-\item{\code{timeVariableName}}{Header to use for the time column}
-
-\item{\code{variables}}{Vector of variable names to include in output}
+\item{\code{writeMetadata}}{Optional logical value to determine if metadata are written
+Defaults to TRUE.}
 }
 \if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+No defined return value.
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-interpolate"></a>}}
 \if{latex}{\out{\hypertarget{method-interpolate}{}}}
 \subsection{Method \code{interpolate()}}{
-This is an abstract declaration and the method
-  must be implemented by extending classes.
-  
-  Creates a new signal by interpolating between points of
-  this signal based on a provided vector of times
+Interpolates a signal based on the provided time vector
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Signal$interpolate(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Signal$interpolate(time)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{}
-
-\item{\code{time}}{Vector of times at which the signal should be interpolated}
+\item{\code{time}}{Time vector providing the basis for the interpolation}
 }
 \if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A new signal with values interpolated from the current
+  signal based on the provided time vector
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-trim"></a>}}
+\if{latex}{\out{\hypertarget{method-trim}{}}}
+\subsection{Method \code{trim()}}{
+Trims the signal based on indices provided
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Signal$trim(firstIndex, lastIndex)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{firstIndex}}{Index that will become the first element of the signal}
+
+\item{\code{lastIndex}}{Index that will become the last element of the signal}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+The new length of the signal
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-trimEdges"></a>}}
+\if{latex}{\out{\hypertarget{method-trimEdges}{}}}
+\subsection{Method \code{trimEdges()}}{
+Trims the signal based on skipped rows
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Signal$trimEdges(skipBeginning, skipEnding)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{skipBeginning}}{Rows to skip at the beginning of the signal}
+
+\item{\code{skipEnding}}{Rows to skip at the end of the signal}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+The new length of the signal
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-trimWindow"></a>}}
+\if{latex}{\out{\hypertarget{method-trimWindow}{}}}
+\subsection{Method \code{trimWindow()}}{
+Trims the signal based on removing a window
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Signal$trimWindow(startIndex, endIndex)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{startIndex}}{First index of window to be removed}
+
+\item{\code{endIndex}}{Last index of window to be removed}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+The new length of the signal
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-filterOut"></a>}}
+\if{latex}{\out{\hypertarget{method-filterOut}{}}}
+\subsection{Method \code{filterOut()}}{
+Removes the rows designated by the provided indices
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Signal$filterOut(index)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{index}}{A vector of numerical or logical indices. The rows specified by
+the numbers in the vector will be removed, or logical values of 'FALSE' 
+in the vector will indicate that row should be removed removed.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+The new length of the signal after rows are removed
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-writeRData"></a>}}
+\if{latex}{\out{\hypertarget{method-writeRData}{}}}
+\subsection{Method \code{writeRData()}}{
+Writes the signal as a list in an RData file
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Signal$writeRData(path, name, timeHeader = NULL, variables = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{path}}{The path to the written file}
+
+\item{\code{name}}{The base name of the written file}
+
+\item{\code{timeHeader}}{Optional name of the the time variable to write in the data
+Defaults to NULL which will result in the time variable
+not being written to the output.}
+
+\item{\code{variables}}{Optional vector of variable names to specify the columns to be output.
+Defaults to NULL which will output all columns.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+No defined return value.
 }
 }
 \if{html}{\out{<hr>}}

@@ -124,6 +124,51 @@ DataTable <- R6Class(
          return(nrow(self$data));
       },
       
+      # Method DataTable$getMetaColumn ####
+      #      
+      #' @description 
+      #'   Gets the metadata for a single variable
+      #'   
+      #' @param header
+      #'   Character string representing the header for the metadata to get
+      #' 
+      #' @return 
+      #'   Vector of character strings containing the column metdata
+      #'   
+      getMetaColumn = function(header)
+      {
+         return(self$metaColumns[[header]]);
+      },
+      
+      # Method DataTable$getMetaColumns ####
+      #      
+      #' @description 
+      #'   Gets the metadata for a collection of variables.
+      #'   
+      #' @param headers
+      #'   Optional vector of character strings representing the headers for the metadata to get.
+      #'   Defaults to returning metdata for all columns.
+      #' 
+      #' @return 
+      #'   Data frame containing the metdata for the specificed columns
+      #'   
+      getMetaColumns = function(
+         headers = names(self$metaColumns)
+      )
+      {
+         if (length(headers) == 0) {
+            return(NULL);
+         }
+         metaColumns <- self$metaColumns[, headers];
+         if (length(headers) == 1) {
+            metaColumns <- data.frame(
+               metaColumns,
+               row.names = row.names(self$metaColumns)
+            );
+         }
+         return(metaColumns);
+      },
+      
       # Method DataTable$getVariable ####
       #      
       #' @description 

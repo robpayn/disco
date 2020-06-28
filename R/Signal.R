@@ -37,8 +37,11 @@ Signal <- R6Class(
       #' 
       #' @param x
       #'   R object indicating the source of information for constructing a signal.
-      #'   If the class of the object is a character string, an signal will be attempted
-      #'   to be constructed from a standard DataTable csv file.
+      #'   If the class of the object is a character string, a signal will be constructed from 
+      #'   a standard DataTable csv file. If the class of the object is a data frame, a signal
+      #'   will be constructed from the data frame. Note that the constructor will try to turn
+      #'   the time column into a POSIXct if it is not already that type (based on the provided
+      #'   time format and time zone).
       #' @param metaColumns
       #'   Optional data frame of metadata for the columns in the signal. Metadata from the
       #'   text file will be used if constructing from a file. Metadata must be provided if
@@ -97,7 +100,13 @@ Signal <- R6Class(
             },
             data.frame =
             {
-
+               if(class(self$data[[timeHeader]])[1] != "POSIXct") {
+                  self$data[[timeHeader]] <- as.POSIXct(
+                     self$data[[timeHeader]],
+                     format = timeFormat,
+                     tz = timeZone
+                  );
+               }
             }
          );
                   
@@ -159,25 +168,17 @@ Signal <- R6Class(
          return(prevTimeZone);
       },
       
-      # Method Signal$filterVariables ####
+      # Method Signal$getDataframe ####
       #
       #' @description 
-      #'   Filter the signal to the desired variables
-      #' 
-      #' @param headers
-      #'   Vector of character strings representing the headers for
-      #'   variable to keep. All other variables will be excluded, 
-      #'   escept the variable with time.
+      #'   Get the signal in a data frame format
       #' 
       #' @return 
-      #'   Value returned by the super$filterVariables method
+      #'   Signal in data frame format
       #'   
-      filterVariables = function(headers)
+      getDataframe = function()
       {
-         if(!any(headers == self$timeHeader)) {
-            headers <- c(headers, self$timeHeader)
-         }
-         return(super$filterVariables(headers = headers));
+         return(self$data);
       },
       
       # Method Signal$getWindow ####
@@ -208,6 +209,245 @@ Signal <- R6Class(
          );
          return(signal);
       },
+      
+      # Method Signal$interpolate ####
+      #      
+      #' @description 
+      #'   Interpolates a signal based on the provided time vector
+      #' 
+      #' @param time
+      #'   Time vector providing the basis for the interpolation
+      #'   
+      #' @return 
+      #'   A new signal with values interpolated from the current
+      #'   signal based on the provided time vector
+      #'   
+      interpolate = function(
+         headers, 
+         time,
+         timeMeta = c("seconds since datum"),
+         ...
+      )
+      {
+         
+         interpSignal <- Signal$new(
+            x = data.frame(time = time),
+            timeHeader = "time",
+            metaColumns = data.frame(
+               timeMeta,
+               row.names = row.names(self$metaColumns)
+            )
+         );
+         for (header in headers) {
+            interpSignal$setVariable(
+               header = header,
+               values = approx(
+                  x = self$getTime(),
+                  y = self$getVariable(header),
+                  xout = time,
+                  ...
+               )$y,
+               metadata = self$metaColumns[[header]]
+            );
+         }
+         
+         return(interpSignal);
+         
+      },
+      
+      # Method Signal$trim ####
+      #      
+      #' @description 
+      #'   Trims the signal based on indices provided
+      #' 
+      #' @param firstIndex
+      #'   Index that will become the first element of the signal
+      #' @param lastIndex
+      #'   Index that will become the last element of the signal
+      #'   
+      #' @return 
+      #'   The new length of the signal
+      #'   
+      trim = function(firstIndex, lastIndex)
+      {
+         self$data <- self$data[firstIndex:lastIndex,];
+         return(self$getLength());
+      },
+      
+      # Method Signal$trimEdges ####
+      #      
+      #' @description 
+      #'   Trims the signal based on skipped rows
+      #' 
+      #' @param skipBeginning
+      #'   Rows to skip at the beginning of the signal
+      #' @param skipEnding
+      #'   Rows to skip at the end of the signal
+      #'   
+      #' @return 
+      #'   The new length of the signal
+      #'   
+      trimEdges = function
+      (
+         skipBeginning,
+         skipEnding
+      )
+      {
+         firstIndex <- 1 + skipBeginning;
+         lastIndex <- self$getLength() - skipEnding;
+         return(
+            self$trim(firstIndex = firstIndex, lastIndex = lastIndex)
+         );
+      },
+      
+      # Method Signal$filterVariables ####
+      #
+      #' @description 
+      #'   Filter the signal to the desired variables
+      #' 
+      #' @param headers
+      #'   Vector of character strings representing the headers for
+      #'   variable to keep. All other variables will be excluded, 
+      #'   escept the variable with time.
+      #' 
+      #' @return 
+      #'   Value returned by the super$filterVariables method
+      #'   
+      filterVariables = function(headers)
+      {
+         if(!any(headers == self$timeHeader)) {
+            headers <- c(headers, self$timeHeader)
+         }
+         return(super$filterVariables(headers = headers));
+      },
+      
+      # Method Signal$filterRows ####
+      #      
+      #' @description 
+      #'   Removes the rows designated by the provided indices
+      #' 
+      #' @param index
+      #'   A vector of numerical or logical indices. The rows specified by
+      #'   the numbers in the vector will be removed, or logical values of 'FALSE' 
+      #'   in the vector will indicate that row should be removed removed.
+      #' @param out
+      #'   Optional logical value indicating if filter is in the "out" or "in" direction.
+      #'   Defaluts to "TRUE", which will remove the rows with the provided indices. Setting
+      #'   to "FALSE" will remove all rows except those with the provided indices.
+      #'   
+      #' @return 
+      #'   The new length of the signal after rows are removed
+      #'   
+      filterRows = function
+      (
+         index,
+         out = TRUE
+      )
+      {
+         if (is.integer(index) || is.numeric(index)) {
+            logicalIndex <- !seq_len(self$getLength()) %in% as.integer(index);
+         } else if (is.logical(index)) {
+            logicalIndex <- index;
+         } else {
+            stop("Signal$filter can only use integer, numeric, or logical indices")
+         }
+         
+         if(!out) {
+            logicalIndex <- !logicalIndex;
+         }
+
+         self$data <- self$data[logicalIndex, ];
+
+         return(self$getLength());
+
+      }, 
+      
+      # Method Signal$writeCSV ####
+      #
+      #' @description 
+      #'   Write the signal in csv format
+      #'   
+      #' @param path
+      #'   The path to the written files
+      #' @param name
+      #'   The base name of the written files
+      #' @param headers
+      #'   Optional vector of variable names to specify the columns to be output.
+      #'   Defaults to NULL which will output all columns.
+      #' @param writeMetadata
+      #'   Optional logical value to determine if metadata are written
+      #'   Defaults to TRUE.
+      #' 
+      #' @return 
+      #'   No defined return value.
+      #'   
+      writeCSV = function
+      (
+         path, 
+         name,
+         headers = NULL
+      )
+      {
+         # Initialize the metacolumns R S3 dataframe for writing
+         metaColumns <- self$metaColumns;
+         # Initialize the data R S3 dataframe for writing
+         dataOut <- self$data;
+         
+         # Adjust the output if variables argument is provided
+         if(!is.null(headers)) {
+            dataOut <- dataOut[, headers];
+            metaColumns <- metaColumns[, headers];
+         }
+         
+         fileConn <- file(
+            description = sprintf(
+               fmt = "%s/%s.csv",
+               path,
+               name
+            ), 
+            open = "w"
+         );
+         writeLines(
+            text = "# The following row contains the names of metadata rows that precede the data.",
+            con = fileConn
+         );
+         writeLines(
+            text = paste(
+               shQuote(
+                  string = c("header", rownames(metaColumns)), 
+                  type = "cmd"
+               ),
+               collapse = ","
+            ),
+            con = fileConn
+         );
+         writeLines(
+            text = c(
+               "# The following rows contain the metadata for each column.",
+               "# There will be one row of metadata corresponding to each name of a metadata row specified above."
+            ),
+            con = fileConn
+         );
+         write.table(
+            x = metaColumns,
+            file = fileConn,
+            sep = ",",
+            col.names = TRUE,
+            row.names = FALSE
+         );
+         writeLines(
+            text = "# The following rows contain the variable headers and tabular data.",
+            con = fileConn
+         );
+         write.table(
+            x = dataOut,
+            file = fileConn,
+            sep = ",",
+            row.names = FALSE
+         );
+         close(fileConn);
+         
+      }, 
       
       # Method Signal$plotSummary ####
       #
@@ -266,7 +506,6 @@ Signal <- R6Class(
             }
          }
       },
-      
       
       # Method Signal$plot ####
       #
@@ -418,247 +657,7 @@ Signal <- R6Class(
                );
             }
          }
-      },
-      
-      # Method Signal$writeCSV ####
-      #
-      #' @description 
-      #'   Write the signal in csv format
-      #'   
-      #' @param path
-      #'   The path to the written files
-      #' @param name
-      #'   The base name of the written files
-      #' @param headers
-      #'   Optional vector of variable names to specify the columns to be output.
-      #'   Defaults to NULL which will output all columns.
-      #' @param writeMetadata
-      #'   Optional logical value to determine if metadata are written
-      #'   Defaults to TRUE.
-      #' 
-      #' @return 
-      #'   No defined return value.
-      #'   
-      writeCSV = function
-      (
-         path, 
-         name,
-         headers = NULL
-      )
-      {
-         # Initialize the metacolumns R S3 dataframe for writing
-         metaColumns <- self$metaColumns;
-         # Initialize the data R S3 dataframe for writing
-         dataOut <- self$data;
-         
-         # Adjust the output if variables argument is provided
-         if(!is.null(headers)) {
-            dataOut <- dataOut[, headers];
-            metaColumns <- metaColumns[, headers];
-         }
-         
-         fileConn <- file(
-            description = sprintf(
-               fmt = "%s/%s.csv",
-               path,
-               name
-            ), 
-            open = "w"
-         );
-         writeLines(
-            text = "# The following row contains the names of metadata rows that precede the data.",
-            con = fileConn
-         );
-         writeLines(
-            text = paste(
-               shQuote(
-                  string = c("header", rownames(metaColumns)), 
-                  type = "cmd"
-               ),
-               collapse = ","
-            ),
-            con = fileConn
-         );
-         writeLines(
-            text = c(
-               "# The following rows contain the metadata for each column.",
-               "# There will be one row of metadata corresponding to each name of a metadata row specified above."
-            ),
-            con = fileConn
-         );
-         write.table(
-            x = metaColumns,
-            file = fileConn,
-            sep = ",",
-            col.names = TRUE,
-            row.names = FALSE
-         );
-         writeLines(
-            text = "# The following rows contain the variable headers and tabular data.",
-            con = fileConn
-         );
-         write.table(
-            x = dataOut,
-            file = fileConn,
-            sep = ",",
-            row.names = FALSE
-         );
-         close(fileConn);
-         
-      },
-      
-      # Method Signal$interpolate ####
-      #      
-      #' @description 
-      #'   Interpolates a signal based on the provided time vector
-      #' 
-      #' @param time
-      #'   Time vector providing the basis for the interpolation
-      #'   
-      #' @return 
-      #'   A new signal with values interpolated from the current
-      #'   signal based on the provided time vector
-      #'   
-      interpolate = function(time)
-      {
-         interpSignal <- Signal$new();
-         interpSignal$time <- time;
-         interpSignal$table$copyMetaData(self$table);
-         
-         interpSignal$table$data <- data.frame(
-            as.character(time),
-            stringsAsFactors = FALSE
-         );
-         names(interpSignal$table$data) <- interpSignal$timeHeader;
-         
-         for(column in 1:length(self$table$data)) {
-            if (names(self$table$data)[column] != self$timeHeader) {
-               interpSignal$table$data[,names(self$table$data)[column]] <- 
-                  approx(
-                     x = self$time,
-                     y = self$table$data[,column],
-                     xout = interpSignal$time
-                  )$y;
-            }
-         }
-         
-         return(interpSignal);
-      },
-      
-      # Method Signal$trim ####
-      #      
-      #' @description 
-      #'   Trims the signal based on indices provided
-      #' 
-      #' @param firstIndex
-      #'   Index that will become the first element of the signal
-      #' @param lastIndex
-      #'   Index that will become the last element of the signal
-      #'   
-      #' @return 
-      #'   The new length of the signal
-      #'   
-      trim = function(firstIndex, lastIndex)
-      {
-         self$table$data <- self$table$data[firstIndex:lastIndex,];
-         self$time <- self$time[firstIndex:lastIndex];
-         return(self$getLength());
-      },
-      
-      # Method Signal$trimEdges ####
-      #      
-      #' @description 
-      #'   Trims the signal based on skipped rows
-      #' 
-      #' @param skipBeginning
-      #'   Rows to skip at the beginning of the signal
-      #' @param skipEnding
-      #'   Rows to skip at the end of the signal
-      #'   
-      #' @return 
-      #'   The new length of the signal
-      #'   
-      trimEdges = function
-      (
-         skipBeginning,
-         skipEnding
-      )
-      {
-         firstIndex <- 1 + skipBeginning;
-         lastIndex <- self$getLength() - skipEnding;
-         return(
-            self$trim(firstIndex = firstIndex, lastIndex = lastIndex)
-         );
-      },
-      
-      # Method Signal$trimWindow ####
-      #      
-      #' @description 
-      #'   Trims the signal based on removing a window
-      #' 
-      #' @param startIndex
-      #'   First index of window to be removed
-      #' @param endIndex
-      #'   Last index of window to be removed
-      #'   
-      #' @return 
-      #'   The new length of the signal
-      #'   
-      trimWindow = function
-      (
-         startIndex,
-         endIndex
-      )
-      {
-         
-         if (startIndex < 2) {
-            firstGroup = integer(length = 0);
-         } else {
-            firstGroup = 1:(startIndex - 1);
-         }
-         if (endIndex > self$getLength() - 1) {
-            lastGroup = integer(length = 0);
-         } else {
-            lastGroup = (endIndex + 1):self$getLength();
-         }
-         self$table$data <- self$table$data[c(firstGroup, lastGroup),];
-         self$time <- self$time[c(firstGroup, lastGroup)];
-         return(self$getLength());
-         
-      }, # end method trimWindow()
-      
-      # Method Signal$filterOut ####
-      #      
-      #' @description 
-      #'   Removes the rows designated by the provided indices
-      #' 
-      #' @param index
-      #'   A vector of numerical or logical indices. The rows specified by
-      #'   the numbers in the vector will be removed, or logical values of 'FALSE' 
-      #'   in the vector will indicate that row should be removed removed.
-      #'   
-      #' @return 
-      #'   The new length of the signal after rows are removed
-      #'   
-      filterOut = function
-      (
-         index
-      )
-      {
-         if (is.integer(index) || is.numeric(index)) {
-            logicalIndex <- !seq_len(self$getLength()) %in% as.integer(index);
-         } else if (is.logical(index)) {
-            logicalIndex <- index;
-         } else {
-            stop("Signal$filter can only use integer, numeric, or logical indices")
-         }
-
-         self$table$data <- self$table$data[logicalIndex, ];
-         self$time <- self$time[logicalIndex];
-         
-         return(self$getLength());
-
-      } # end method filterOut()
+      }
       
    )
 )

@@ -26,17 +26,16 @@ This is an implementation of the Signal interface that is
 \item \href{#method-getTime}{\code{Signal$getTime()}}
 \item \href{#method-setTimeHeader}{\code{Signal$setTimeHeader()}}
 \item \href{#method-setTimeZone}{\code{Signal$setTimeZone()}}
-\item \href{#method-filterVariables}{\code{Signal$filterVariables()}}
+\item \href{#method-getDataframe}{\code{Signal$getDataframe()}}
 \item \href{#method-getWindow}{\code{Signal$getWindow()}}
-\item \href{#method-plotSummary}{\code{Signal$plotSummary()}}
-\item \href{#method-plot}{\code{Signal$plot()}}
-\item \href{#method-writeCSV}{\code{Signal$writeCSV()}}
 \item \href{#method-interpolate}{\code{Signal$interpolate()}}
 \item \href{#method-trim}{\code{Signal$trim()}}
 \item \href{#method-trimEdges}{\code{Signal$trimEdges()}}
-\item \href{#method-trimWindow}{\code{Signal$trimWindow()}}
-\item \href{#method-filterOut}{\code{Signal$filterOut()}}
-\item \href{#method-writeRData}{\code{Signal$writeRData()}}
+\item \href{#method-filterVariables}{\code{Signal$filterVariables()}}
+\item \href{#method-filterRows}{\code{Signal$filterRows()}}
+\item \href{#method-writeCSV}{\code{Signal$writeCSV()}}
+\item \href{#method-plotSummary}{\code{Signal$plotSummary()}}
+\item \href{#method-plot}{\code{Signal$plot()}}
 \item \href{#method-clone}{\code{Signal$clone()}}
 }
 }
@@ -44,6 +43,8 @@ This is an implementation of the Signal interface that is
 \out{<details open ><summary>Inherited methods</summary>}
 \itemize{
 \item \out{<span class="pkg-link" data-pkg="disco" data-topic="DataTable" data-id="getLength">}\href{../../disco/html/DataTable.html#method-getLength}{\code{disco::DataTable$getLength()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="disco" data-topic="DataTable" data-id="getMetaColumn">}\href{../../disco/html/DataTable.html#method-getMetaColumn}{\code{disco::DataTable$getMetaColumn()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="disco" data-topic="DataTable" data-id="getMetaColumns">}\href{../../disco/html/DataTable.html#method-getMetaColumns}{\code{disco::DataTable$getMetaColumns()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="disco" data-topic="DataTable" data-id="getVariable">}\href{../../disco/html/DataTable.html#method-getVariable}{\code{disco::DataTable$getVariable()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="disco" data-topic="DataTable" data-id="setVariable">}\href{../../disco/html/DataTable.html#method-setVariable}{\code{disco::DataTable$setVariable()}}\out{</span>}
 }
@@ -69,8 +70,11 @@ Create an instance of class Signal
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{x}}{R object indicating the source of information for constructing a signal.
-If the class of the object is a character string, an signal will be attempted
-to be constructed from a standard DataTable csv file.}
+If the class of the object is a character string, a signal will be constructed from 
+a standard DataTable csv file. If the class of the object is a data frame, a signal
+will be constructed from the data frame. Note that the constructor will try to turn
+the time column into a POSIXct if it is not already that type (based on the provided
+time format and time zone).}
 
 \item{\code{metaColumns}}{Optional data frame of metadata for the columns in the signal. Metadata from the
 text file will be used if constructing from a file. Metadata must be provided if
@@ -151,25 +155,16 @@ The previous setting for the time zone
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-filterVariables"></a>}}
-\if{latex}{\out{\hypertarget{method-filterVariables}{}}}
-\subsection{Method \code{filterVariables()}}{
-Filter the signal to the desired variables
+\if{html}{\out{<a id="method-getDataframe"></a>}}
+\if{latex}{\out{\hypertarget{method-getDataframe}{}}}
+\subsection{Method \code{getDataframe()}}{
+Get the signal in a data frame format
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Signal$filterVariables(headers)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Signal$getDataframe()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{headers}}{Vector of character strings representing the headers for
-variable to keep. All other variables will be excluded, 
-escept the variable with time.}
-}
-\if{html}{\out{</div>}}
-}
 \subsection{Returns}{
-Value returned by the super$filterVariables method
+Signal in data frame format
 }
 }
 \if{html}{\out{<hr>}}
@@ -193,6 +188,147 @@ Get a subset of the signal based on a provided window of time
 \subsection{Returns}{
 A new signal object representing the subset of the current signal
   defined by the provided minimum and maximum times.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-interpolate"></a>}}
+\if{latex}{\out{\hypertarget{method-interpolate}{}}}
+\subsection{Method \code{interpolate()}}{
+Interpolates a signal based on the provided time vector
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Signal$interpolate(headers, time, timeMeta = c("seconds since datum"), ...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{time}}{Time vector providing the basis for the interpolation}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A new signal with values interpolated from the current
+  signal based on the provided time vector
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-trim"></a>}}
+\if{latex}{\out{\hypertarget{method-trim}{}}}
+\subsection{Method \code{trim()}}{
+Trims the signal based on indices provided
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Signal$trim(firstIndex, lastIndex)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{firstIndex}}{Index that will become the first element of the signal}
+
+\item{\code{lastIndex}}{Index that will become the last element of the signal}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+The new length of the signal
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-trimEdges"></a>}}
+\if{latex}{\out{\hypertarget{method-trimEdges}{}}}
+\subsection{Method \code{trimEdges()}}{
+Trims the signal based on skipped rows
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Signal$trimEdges(skipBeginning, skipEnding)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{skipBeginning}}{Rows to skip at the beginning of the signal}
+
+\item{\code{skipEnding}}{Rows to skip at the end of the signal}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+The new length of the signal
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-filterVariables"></a>}}
+\if{latex}{\out{\hypertarget{method-filterVariables}{}}}
+\subsection{Method \code{filterVariables()}}{
+Filter the signal to the desired variables
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Signal$filterVariables(headers)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{headers}}{Vector of character strings representing the headers for
+variable to keep. All other variables will be excluded, 
+escept the variable with time.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Value returned by the super$filterVariables method
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-filterRows"></a>}}
+\if{latex}{\out{\hypertarget{method-filterRows}{}}}
+\subsection{Method \code{filterRows()}}{
+Removes the rows designated by the provided indices
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Signal$filterRows(index, out = TRUE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{index}}{A vector of numerical or logical indices. The rows specified by
+the numbers in the vector will be removed, or logical values of 'FALSE' 
+in the vector will indicate that row should be removed removed.}
+
+\item{\code{out}}{Optional logical value indicating if filter is in the "out" or "in" direction.
+Defaluts to "TRUE", which will remove the rows with the provided indices. Setting
+to "FALSE" will remove all rows except those with the provided indices.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+The new length of the signal after rows are removed
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-writeCSV"></a>}}
+\if{latex}{\out{\hypertarget{method-writeCSV}{}}}
+\subsection{Method \code{writeCSV()}}{
+Write the signal in csv format
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Signal$writeCSV(path, name, headers = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{path}}{The path to the written files}
+
+\item{\code{name}}{The base name of the written files}
+
+\item{\code{headers}}{Optional vector of variable names to specify the columns to be output.
+Defaults to NULL which will output all columns.}
+
+\item{\code{writeMetadata}}{Optional logical value to determine if metadata are written
+Defaults to TRUE.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+No defined return value.
 }
 }
 \if{html}{\out{<hr>}}
@@ -298,172 +434,6 @@ Defaults to square, triangle, and diamond.}
 \item{\code{...}}{Any remaining arguments provided will be passed to the call to
 the plot.default method, allowing for further customization of
 the plot.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-No defined return value.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-writeCSV"></a>}}
-\if{latex}{\out{\hypertarget{method-writeCSV}{}}}
-\subsection{Method \code{writeCSV()}}{
-Write the signal in csv format
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Signal$writeCSV(path, name, headers = NULL)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{path}}{The path to the written files}
-
-\item{\code{name}}{The base name of the written files}
-
-\item{\code{headers}}{Optional vector of variable names to specify the columns to be output.
-Defaults to NULL which will output all columns.}
-
-\item{\code{writeMetadata}}{Optional logical value to determine if metadata are written
-Defaults to TRUE.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-No defined return value.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-interpolate"></a>}}
-\if{latex}{\out{\hypertarget{method-interpolate}{}}}
-\subsection{Method \code{interpolate()}}{
-Interpolates a signal based on the provided time vector
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Signal$interpolate(time)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{time}}{Time vector providing the basis for the interpolation}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A new signal with values interpolated from the current
-  signal based on the provided time vector
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-trim"></a>}}
-\if{latex}{\out{\hypertarget{method-trim}{}}}
-\subsection{Method \code{trim()}}{
-Trims the signal based on indices provided
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Signal$trim(firstIndex, lastIndex)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{firstIndex}}{Index that will become the first element of the signal}
-
-\item{\code{lastIndex}}{Index that will become the last element of the signal}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-The new length of the signal
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-trimEdges"></a>}}
-\if{latex}{\out{\hypertarget{method-trimEdges}{}}}
-\subsection{Method \code{trimEdges()}}{
-Trims the signal based on skipped rows
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Signal$trimEdges(skipBeginning, skipEnding)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{skipBeginning}}{Rows to skip at the beginning of the signal}
-
-\item{\code{skipEnding}}{Rows to skip at the end of the signal}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-The new length of the signal
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-trimWindow"></a>}}
-\if{latex}{\out{\hypertarget{method-trimWindow}{}}}
-\subsection{Method \code{trimWindow()}}{
-Trims the signal based on removing a window
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Signal$trimWindow(startIndex, endIndex)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{startIndex}}{First index of window to be removed}
-
-\item{\code{endIndex}}{Last index of window to be removed}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-The new length of the signal
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-filterOut"></a>}}
-\if{latex}{\out{\hypertarget{method-filterOut}{}}}
-\subsection{Method \code{filterOut()}}{
-Removes the rows designated by the provided indices
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Signal$filterOut(index)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{index}}{A vector of numerical or logical indices. The rows specified by
-the numbers in the vector will be removed, or logical values of 'FALSE' 
-in the vector will indicate that row should be removed removed.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-The new length of the signal after rows are removed
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-writeRData"></a>}}
-\if{latex}{\out{\hypertarget{method-writeRData}{}}}
-\subsection{Method \code{writeRData()}}{
-Writes the signal as a list in an RData file
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Signal$writeRData(path, name, timeHeader = NULL, variables = NULL)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{path}}{The path to the written file}
-
-\item{\code{name}}{The base name of the written file}
-
-\item{\code{timeHeader}}{Optional name of the the time variable to write in the data
-Defaults to NULL which will result in the time variable
-not being written to the output.}
-
-\item{\code{variables}}{Optional vector of variable names to specify the columns to be output.
-Defaults to NULL which will output all columns.}
 }
 \if{html}{\out{</div>}}
 }

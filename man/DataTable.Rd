@@ -21,6 +21,8 @@ An R6 implementation of a data table, including metadata
 \itemize{
 \item \href{#method-new}{\code{DataTable$new()}}
 \item \href{#method-getLength}{\code{DataTable$getLength()}}
+\item \href{#method-getMetaColumn}{\code{DataTable$getMetaColumn()}}
+\item \href{#method-getMetaColumns}{\code{DataTable$getMetaColumns()}}
 \item \href{#method-getVariable}{\code{DataTable$getVariable()}}
 \item \href{#method-setVariable}{\code{DataTable$setVariable()}}
 \item \href{#method-filterVariables}{\code{DataTable$filterVariables()}}
@@ -62,6 +64,47 @@ Gets the length of the data table
 
 \subsection{Returns}{
 The number of rows in the data table
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-getMetaColumn"></a>}}
+\if{latex}{\out{\hypertarget{method-getMetaColumn}{}}}
+\subsection{Method \code{getMetaColumn()}}{
+Gets the metadata for a single variable
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataTable$getMetaColumn(header)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{header}}{Character string representing the header for the metadata to get}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Vector of character strings containing the column metdata
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-getMetaColumns"></a>}}
+\if{latex}{\out{\hypertarget{method-getMetaColumns}{}}}
+\subsection{Method \code{getMetaColumns()}}{
+Gets the metadata for a collection of variables.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataTable$getMetaColumns(headers = names(self$metaColumns))}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{headers}}{Optional vector of character strings representing the headers for the metadata to get.
+Defaults to returning metdata for all columns.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Data frame containing the metdata for the specificed columns
 }
 }
 \if{html}{\out{<hr>}}

@@ -174,7 +174,7 @@ Signal <- R6Class(
       #'   Get the signal in a data frame format
       #' 
       #' @return 
-      #'   Signal in data frame format
+      #'   Copy of the signal data in data frame format
       #'   
       getDataframe = function()
       {
@@ -225,10 +225,14 @@ Signal <- R6Class(
       interpolate = function(
          headers, 
          time,
-         timeMeta = c("seconds since datum"),
+         timeMeta = NULL,
          ...
       )
       {
+         
+         if(is.null(timeMeta)) {
+            timeMeta <- self$metaColumns[[self$timeHeader]];
+         }
          
          interpSignal <- Signal$new(
             x = data.frame(time = time),

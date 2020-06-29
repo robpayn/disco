@@ -164,7 +164,7 @@ Get the signal in a data frame format
 }
 
 \subsection{Returns}{
-Signal in data frame format
+Copy of the signal data in data frame format
 }
 }
 \if{html}{\out{<hr>}}
@@ -196,7 +196,7 @@ A new signal object representing the subset of the current signal
 \subsection{Method \code{interpolate()}}{
 Interpolates a signal based on the provided time vector
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Signal$interpolate(headers, time, timeMeta = c("seconds since datum"), ...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Signal$interpolate(headers, time, timeMeta = NULL, ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{

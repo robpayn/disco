@@ -31,6 +31,8 @@ Manages a windowed transfer function analysis based on an input
 
 \item{\code{windowDays}}{The number of days composing each window}
 
+\item{\code{timeZone}}{Character string representing the time zone}
+
 \item{\code{slideDays}}{The number of days to slide the window for generating each
 window for analysis.}
 
@@ -67,6 +69,7 @@ Constructs a new instance of the class DielWindowedTransferFunction
   windowStart,
   windowEnd,
   windowDays,
+  timeZone,
   slideDays = 1
 )}\if{html}{\out{</div>}}
 }
@@ -90,6 +93,8 @@ Constructs a new instance of the class DielWindowedTransferFunction
 
 \item{\code{windowDays}}{The number of days for a given window}
 
+\item{\code{timeZone}}{Character string representing the time zone for the times}
+
 \item{\code{slideDays}}{The number of days to slide the window for generating each
 window for analysis.
 Defaults to 1.}
@@ -108,8 +113,9 @@ Parses the signal into windows based on the window definitions
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DielWindowedTransferFunction$generateWindowInputOffset(
   offsetTime,
-  pipelineDir = "dates",
-  inputDir = "input"
+  headersIn,
+  outerDir = "dates",
+  innerDir = "input"
 )}\if{html}{\out{</div>}}
 }
 
@@ -118,11 +124,14 @@ Parses the signal into windows based on the window definitions
 \describe{
 \item{\code{offsetTime}}{The offset time between the input signal and output signal in seconds}
 
-\item{\code{pipelineDir}}{Optional directory structure from the base path where the folders corresponding
+\item{\code{headersIn}}{Vector of character strings indicating the headers of variables from signalIn that need
+to be considered the input signal}
+
+\item{\code{outerDir}}{Optional directory structure from the base path where the folders corresponding
 to analysis windows should be placed.
 Default value is "dates".}
 
-\item{\code{inputDir}}{Optional name of the directory within each window folder where the 
+\item{\code{innerDir}}{Optional name of the directory within each window folder where the 
 input data for that window should be placed.
 Default value is "input".}
 }
@@ -140,7 +149,7 @@ Runs the provided analyzer object for all windows
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DielWindowedTransferFunction$analyze(
   transferFunctionDerivation,
-  pipelineDir = "dates",
+  outerDir = "dates",
   outputDir = "output"
 )}\if{html}{\out{</div>}}
 }
@@ -151,7 +160,7 @@ Runs the provided analyzer object for all windows
 \item{\code{transferFunctionDerivation}}{A TransferFunctionDerivation object that will perform the analysis
 for each window}
 
-\item{\code{pipelineDir}}{Optional directory structure from the base path where the folders corresponding
+\item{\code{outerDir}}{Optional directory structure from the base path where the folders corresponding
 to analysis windows should be placed.
 Default value is "dates".}
 

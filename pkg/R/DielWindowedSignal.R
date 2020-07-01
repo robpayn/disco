@@ -55,6 +55,10 @@ DielWindowedSignal <- R6Class(
       #'   The number of days composing each window
       windowDays = NULL,
       
+      #' @field timeZone
+      #'   Character string representing the time zone
+      timeZone = NULL,
+      
       #' @field slideDays
       #'   The number of days to slide the window for generating each
       #'   window for analysis.
@@ -105,6 +109,7 @@ DielWindowedSignal <- R6Class(
          windowStart,
          windowEnd,
          windowDays,
+         timeZone,
          slideDays = 1
       )
       {
@@ -121,6 +126,7 @@ DielWindowedSignal <- R6Class(
          );
          self$windowStart <- windowStart;
          self$windowEnd <- windowEnd;
+         self$timeZone <- timeZone;
       },
       
       # Method DielWindowedSignal$generateWindowInput ####
@@ -128,11 +134,11 @@ DielWindowedSignal <- R6Class(
       #' @description 
       #'   Parses the signal into windows based on the window definitions
       #'   
-      #' @param pipelineDir
+      #' @param outerDir
       #'   Optional directory structure from the base path where the folders corresponding
       #'   to analysis windows should be placed.
       #'   Default value is "dates".
-      #' @param inputDir
+      #' @param innerDir
       #'   Optional name of the directory within each window folder where the 
       #'   input data for that window should be placed.
       #'   Default value is "input".
@@ -142,16 +148,16 @@ DielWindowedSignal <- R6Class(
       #'   
       generateWindowInput = function
       (
-         pipelineDir = "dates",
-         inputDir = "input"
+         outerDir = "dates",
+         innerDir = "input"
       )
       {
          self$inputPaths <- sprintf(
             fmt = "%s/%s/%s/%s", 
             self$path, 
-            pipelineDir,
+            outerDir,
             self$windows,
-            inputDir
+            innerDir
          );
          self$inputFilePaths <- sprintf(
             fmt = "%s/signal.RData",
@@ -170,15 +176,21 @@ DielWindowedSignal <- R6Class(
             showWarnings = FALSE
          );
          for (index in 1:length(self$windows)) {
-            minTime = sprintf(
-               fmt = "%s %s",
-               self$windows[index],
-               self$windowStart
+            minTime = as.POSIXct(
+               sprintf(
+                  fmt = "%s %s",
+                  self$windows[index],
+                  self$windowStart
+               ),
+               tz = self$timeZone
             );
-            maxTime = sprintf(
-               fmt = "%s %s",
-               self$windows[index] + self$windowDays,
-               self$windowEnd
+            maxTime = as.POSIXct(
+               sprintf(
+                  fmt = "%s %s",
+                  self$windows[index] + self$windowDays,
+                  self$windowEnd
+               ),
+               tz = self$timeZone
             );
             signal <- self$signal$getWindow(
                minTime = minTime,
@@ -199,11 +211,11 @@ DielWindowedSignal <- R6Class(
       #' @param signalDerivation
       #'   A SignalDerivation object that will perform the analysis
       #'   for each window
-      #' @param pipelineDir
+      #' @param outerDir
       #'   Optional directory structure from the base path where the folders corresponding
       #'   to analysis windows should be placed.
       #'   Default value is "dates".
-      #' @param outputDir
+      #' @param innerDir
       #'   Optional name of the directory within each window folder where the 
       #'   output data for that window should be placed.
       #'   Default value is "output".
@@ -214,16 +226,16 @@ DielWindowedSignal <- R6Class(
       analyze = function
       (
          signalDerivation,
-         pipelineDir = "dates",
-         outputDir = "output"
+         outerDir = "dates",
+         innerDir = "output"
       )
       {
          self$outputPaths <- sprintf(
             fmt = "%s/%s/%s/%s", 
             self$path,
-            pipelineDir,
+            outerDir,
             self$windows,
-            outputDir
+            innerDir
          );
          sapply(
             X = self$outputPaths,
@@ -290,15 +302,21 @@ DielWindowedSignal <- R6Class(
          # Iterate the summary through the windows
          for(index in 1:length(self$windows)) {
             signal <- readRDS(file = self$inputFilePaths[index]);
-            minTime = sprintf(
-               fmt = "%s %s",
-               self$windows[index],
-               self$windowStart
+            minTime = as.POSIXct(
+               sprintf(
+                  fmt = "%s %s",
+                  self$windows[index],
+                  self$windowStart
+               ),
+               tz = self$timeZone
             );
-            maxTime = sprintf(
-               fmt = "%s %s",
-               self$windows[index] + self$windowDays,
-               self$windowEnd
+            maxTime = as.POSIXct(
+               sprintf(
+                  fmt = "%s %s",
+                  self$windows[index] + self$windowDays,
+                  self$windowEnd
+               ),
+               tz = self$timeZone
             );
             if (!useResults | is.null(self$outputPaths)) {
                outputPath <- NULL;

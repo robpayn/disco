@@ -60,6 +60,10 @@ DielWindowedTransferFunction <- R6Class(
       #'   The number of days composing each window
       windowDays = NULL,
       
+      #' @field timeZone
+      #'   Character string representing the time zone
+      timeZone = NULL,
+      
       #' @field slideDays
       #'   The number of days to slide the window for generating each
       #'   window for analysis.
@@ -98,6 +102,8 @@ DielWindowedTransferFunction <- R6Class(
       #'   The time of day to end a given window
       #' @param windowDays
       #'   The number of days for a given window
+      #' @param timeZone
+      #'   Character string representing the time zone for the times
       #' @param slideDays
       #'   The number of days to slide the window for generating each
       #'   window for analysis.
@@ -113,6 +119,7 @@ DielWindowedTransferFunction <- R6Class(
          windowStart,
          windowEnd,
          windowDays,
+         timeZone,
          slideDays = 1
       )
       {
@@ -130,6 +137,7 @@ DielWindowedTransferFunction <- R6Class(
          );
          self$windowStart <- windowStart;
          self$windowEnd <- windowEnd;
+         self$timeZone <- timeZone;
       },
       
       # Method DielWindowedTransferFunction$generateWindowInputOffset ####
@@ -142,11 +150,14 @@ DielWindowedTransferFunction <- R6Class(
       #'   
       #' @param offsetTime
       #'   The offset time between the input signal and output signal in seconds
-      #' @param pipelineDir
+      #' @param headersIn
+      #'   Vector of character strings indicating the headers of variables from signalIn that need
+      #'   to be considered the input signal
+      #' @param outerDir
       #'   Optional directory structure from the base path where the folders corresponding
       #'   to analysis windows should be placed.
       #'   Default value is "dates".
-      #' @param inputDir
+      #' @param innerDir
       #'   Optional name of the directory within each window folder where the 
       #'   input data for that window should be placed.
       #'   Default value is "input".
@@ -157,8 +168,9 @@ DielWindowedTransferFunction <- R6Class(
       generateWindowInputOffset = function
       (
          offsetTime,
-         pipelineDir = "dates",
-         inputDir = "input"
+         headersIn,
+         outerDir = "dates",
+         innerDir = "input"
       )
       {
          # Create the input directories
@@ -166,9 +178,9 @@ DielWindowedTransferFunction <- R6Class(
          self$inputPaths <- sprintf(
             fmt = "%s/%s/%s/%s", 
             self$path, 
-            pipelineDir,
+            outerDir,
             self$windows,
-            inputDir
+            innerDir
          );
          self$inputFilePaths <- sprintf(
             fmt = "%s/signal.RData",
@@ -193,15 +205,21 @@ DielWindowedTransferFunction <- R6Class(
             
             # Define the time window
             
-            minTime = sprintf(
-               fmt = "%s %s",
-               self$windows[index],
-               self$windowStart
+            minTime = as.POSIXct(
+               sprintf(
+                  fmt = "%s %s",
+                  self$windows[index],
+                  self$windowStart
+               ),
+               tz = self$timeZone
             );
-            maxTime = sprintf(
-               fmt = "%s %s",
-               self$windows[index] + self$windowDays,
-               self$windowEnd
+            maxTime = as.POSIXct(
+               sprintf(
+                  fmt = "%s %s",
+                  self$windows[index] + self$windowDays,
+                  self$windowEnd
+               ),
+               tz = self$timeZone
             );
             
             # Write the output signal and interpolate
@@ -212,7 +230,8 @@ DielWindowedTransferFunction <- R6Class(
                maxTime = maxTime
             );
             signalIn <- self$signalIn$interpolate(
-               time = signalOut$time - offsetTime
+               headers = headersIn,
+               time = signalOut$getTime() - offsetTime
             );
             saveRDS(
                list(signalIn = signalIn, signalOut = signalOut), 
@@ -230,7 +249,7 @@ DielWindowedTransferFunction <- R6Class(
       #' @param transferFunctionDerivation
       #'   A TransferFunctionDerivation object that will perform the analysis
       #'   for each window
-      #' @param pipelineDir
+      #' @param outerDir
       #'   Optional directory structure from the base path where the folders corresponding
       #'   to analysis windows should be placed.
       #'   Default value is "dates".
@@ -245,14 +264,14 @@ DielWindowedTransferFunction <- R6Class(
       analyze = function
       (
          transferFunctionDerivation,
-         pipelineDir = "dates",
+         outerDir = "dates",
          outputDir = "output"
       )
       {
          self$outputPaths <- sprintf(
             fmt = "%s/%s/%s/%s", 
             self$path, 
-            pipelineDir,
+            outerDir,
             self$windows,
             outputDir
          );
@@ -320,15 +339,21 @@ DielWindowedTransferFunction <- R6Class(
          
          for(index in 1:length(self$windows)) {
             signals <- readRDS(file = self$inputFilePaths[index]);
-            minTime = sprintf(
-               fmt = "%s %s",
-               self$windows[index],
-               self$windowStart
+            minTime = as.POSIXct(
+               sprintf(
+                  fmt = "%s %s",
+                  self$windows[index],
+                  self$windowStart
+               ),
+               tz = self$timeZone
             );
-            maxTime = sprintf(
-               fmt = "%s %s",
-               self$windows[index] + self$windowDays,
-               self$windowEnd
+            maxTime = as.POSIXct(
+               sprintf(
+                  fmt = "%s %s",
+                  self$windows[index] + self$windowDays,
+                  self$windowEnd
+               ),
+               tz = self$timeZone
             );
             if (!useResults | is.null(self$outputPaths)) {
                outputPath <- NULL;
@@ -340,7 +365,7 @@ DielWindowedTransferFunction <- R6Class(
                signalOut = signals$signalOut,
                outputPath = outputPath,
                label = self$windows[index], 
-               timeBounds = c(as.POSIXct(minTime), as.POSIXct(maxTime))
+               timeBounds = c(minTime, maxTime)
             );
          }
          

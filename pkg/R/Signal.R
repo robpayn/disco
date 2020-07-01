@@ -17,7 +17,6 @@ NULL
 #'   This is an implementation of the Signal interface that is
 #'   composed of a DataTable object for the time series data
 #'   
-
 Signal <- R6Class(
    classname = "Signal",
    inherit = DataTable,
@@ -662,7 +661,6 @@ Signal <- R6Class(
                );
             }
          }
-
       }
       
    )

@@ -96,7 +96,7 @@ DielWindowedSignal <- R6Class(
       #' @param windowDays
       #'   The number of days for a given window
       #' @param timeZone
-      #'   Character string representing the time zone for the time arguments
+      #'   Character string representing the time zone for the times
       #' @param slideDays
       #'   The number of days to slide the window for generating each
       #'   window for analysis.

@@ -87,7 +87,7 @@ Create an instance of the class DielWindowedSignal
 
 \item{\code{windowDays}}{The number of days for a given window}
 
-\item{\code{timeZone}}{Character string representing the time zone for the times}
+\item{\code{timeZone}}{Character string representing the time zone for the time arguments}
 
 \item{\code{slideDays}}{The number of days to slide the window for generating each
 window for analysis.

@@ -378,9 +378,6 @@ Signal <- R6Class(
       #' @param headers
       #'   Optional vector of variable names to specify the columns to be output.
       #'   Defaults to NULL which will output all columns.
-      #' @param writeMetadata
-      #'   Optional logical value to determine if metadata are written
-      #'   Defaults to TRUE.
       #' 
       #' @return 
       #'   No defined return value.

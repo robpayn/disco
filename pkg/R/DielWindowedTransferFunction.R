@@ -286,7 +286,8 @@ DielWindowedTransferFunction <- R6Class(
             signalIn = signals$signalIn,
             signalOut = signals$signalOut,
             prevResults = NULL,
-            path = self$outputPaths[1]
+            path = self$outputPaths[1],
+            index = 1
          );
          for(index in 2:length(self$windows)) {
             signals <- readRDS(file = self$inputFilePaths[index]);
@@ -294,7 +295,8 @@ DielWindowedTransferFunction <- R6Class(
                signalIn = signals$signalIn,
                signalOut = signals$signalOut,
                prevResults = results,
-               path = self$outputPaths[index]
+               path = self$outputPaths[index],
+               index = index
             );
          }
       },

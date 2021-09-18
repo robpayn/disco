@@ -74,6 +74,8 @@ TransferFunctionDerivation <- R6Class(
       #'   Object representing the results from a previous derivation (if applicable)
       #' @param path
       #'   The path where the results file is written
+      #' @param index
+      #'   Index of the derivation being performed
       #' @param ...
       #' 
       #' @return 

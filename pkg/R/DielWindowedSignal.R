@@ -250,14 +250,16 @@ DielWindowedSignal <- R6Class(
          results <- signalDerivation$derive(
             signal = signal, 
             prevResults = NULL,
-            path = self$outputPaths[1]
+            path = self$outputPaths[1],
+            index = 1
          );
          for(index in 2:length(self$windows)) {
             signal <- readRDS(file = self$inputFilePaths[index]);
             results <- signalDerivation$derive(
                signal = signal, 
                prevResults = results,
-               path = self$outputPaths[index]
+               path = self$outputPaths[index],
+               index = index
             );
          }
       },

@@ -1,7 +1,7 @@
 Package: disco
 Type: Package
 Title: Workflow for scientific discovery
-Version: 0.0.1
+Version: 0.2
 Author: Robert A. Payn
 Maintainer: Robert Payn <rpayn@montana.edu>
 Description: Tools for managing scientific workflow.

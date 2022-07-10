@@ -47,16 +47,16 @@ window for analysis.}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{DielWindowedTransferFunction$new()}}
-\item \href{#method-generateWindowInputOffset}{\code{DielWindowedTransferFunction$generateWindowInputOffset()}}
-\item \href{#method-analyze}{\code{DielWindowedTransferFunction$analyze()}}
-\item \href{#method-summarizeWindows}{\code{DielWindowedTransferFunction$summarizeWindows()}}
-\item \href{#method-clone}{\code{DielWindowedTransferFunction$clone()}}
+\item \href{#method-DielWindowedTransferFunction-new}{\code{DielWindowedTransferFunction$new()}}
+\item \href{#method-DielWindowedTransferFunction-generateWindowInputOffset}{\code{DielWindowedTransferFunction$generateWindowInputOffset()}}
+\item \href{#method-DielWindowedTransferFunction-analyze}{\code{DielWindowedTransferFunction$analyze()}}
+\item \href{#method-DielWindowedTransferFunction-summarizeWindows}{\code{DielWindowedTransferFunction$summarizeWindows()}}
+\item \href{#method-DielWindowedTransferFunction-clone}{\code{DielWindowedTransferFunction$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-DielWindowedTransferFunction-new"></a>}}
+\if{latex}{\out{\hypertarget{method-DielWindowedTransferFunction-new}{}}}
 \subsection{Method \code{new()}}{
 Constructs a new instance of the class DielWindowedTransferFunction
 \subsection{Usage}{
@@ -103,8 +103,8 @@ Defaults to 1.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-generateWindowInputOffset"></a>}}
-\if{latex}{\out{\hypertarget{method-generateWindowInputOffset}{}}}
+\if{html}{\out{<a id="method-DielWindowedTransferFunction-generateWindowInputOffset"></a>}}
+\if{latex}{\out{\hypertarget{method-DielWindowedTransferFunction-generateWindowInputOffset}{}}}
 \subsection{Method \code{generateWindowInputOffset()}}{
 Parses the signal into windows based on the window definitions
   and a temporal offset between the output signal and the input signal.
@@ -142,8 +142,8 @@ No defined return value.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-analyze"></a>}}
-\if{latex}{\out{\hypertarget{method-analyze}{}}}
+\if{html}{\out{<a id="method-DielWindowedTransferFunction-analyze"></a>}}
+\if{latex}{\out{\hypertarget{method-DielWindowedTransferFunction-analyze}{}}}
 \subsection{Method \code{analyze()}}{
 Runs the provided analyzer object for all windows
 \subsection{Usage}{
@@ -175,8 +175,8 @@ No defined return value.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-summarizeWindows"></a>}}
-\if{latex}{\out{\hypertarget{method-summarizeWindows}{}}}
+\if{html}{\out{<a id="method-DielWindowedTransferFunction-summarizeWindows"></a>}}
+\if{latex}{\out{\hypertarget{method-DielWindowedTransferFunction-summarizeWindows}{}}}
 \subsection{Method \code{summarizeWindows()}}{
 Uses the provided TransferFunctionSummarizer to generate a summary
   of the analysis of each window.
@@ -207,8 +207,8 @@ No defined return value.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-DielWindowedTransferFunction-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-DielWindowedTransferFunction-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

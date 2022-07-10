@@ -20,14 +20,14 @@ This defines an abstract interface to a transfer function derivation.
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{TransferFunctionDerivation$new()}}
-\item \href{#method-derive}{\code{TransferFunctionDerivation$derive()}}
-\item \href{#method-clone}{\code{TransferFunctionDerivation$clone()}}
+\item \href{#method-TransferFunctionDerivation-new}{\code{TransferFunctionDerivation$new()}}
+\item \href{#method-TransferFunctionDerivation-derive}{\code{TransferFunctionDerivation$derive()}}
+\item \href{#method-TransferFunctionDerivation-clone}{\code{TransferFunctionDerivation$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-TransferFunctionDerivation-new"></a>}}
+\if{latex}{\out{\hypertarget{method-TransferFunctionDerivation-new}{}}}
 \subsection{Method \code{new()}}{
 Constructs a new instance of class TransferFunctionDerivation
 \subsection{Usage}{
@@ -47,8 +47,8 @@ if desired.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-derive"></a>}}
-\if{latex}{\out{\hypertarget{method-derive}{}}}
+\if{html}{\out{<a id="method-TransferFunctionDerivation-derive"></a>}}
+\if{latex}{\out{\hypertarget{method-TransferFunctionDerivation-derive}{}}}
 \subsection{Method \code{derive()}}{
 This is an abstract declaration and the method
   must be implemented by extending classes.
@@ -76,6 +76,8 @@ not already associated with an output signal
 \item{\code{prevResults}}{Object representing the results from a previous derivation (if applicable)}
 
 \item{\code{path}}{The path where the results file is written}
+
+\item{\code{index}}{Index of the derivation being performed}
 }
 \if{html}{\out{</div>}}
 }
@@ -84,8 +86,8 @@ An object representing the results of the derivation
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-TransferFunctionDerivation-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-TransferFunctionDerivation-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

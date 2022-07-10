@@ -31,22 +31,22 @@ only other option.}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{SignalPlotter$new()}}
-\item \href{#method-open}{\code{SignalPlotter$open()}}
-\item \href{#method-close}{\code{SignalPlotter$close()}}
-\item \href{#method-clone}{\code{SignalPlotter$clone()}}
+\item \href{#method-SignalPlotter-new}{\code{SignalPlotter$new()}}
+\item \href{#method-SignalPlotter-open}{\code{SignalPlotter$open()}}
+\item \href{#method-SignalPlotter-close}{\code{SignalPlotter$close()}}
+\item \href{#method-SignalPlotter-clone}{\code{SignalPlotter$clone()}}
 }
 }
-\if{html}{
-\out{<details open ><summary>Inherited methods</summary>}
-\itemize{
-\item \out{<span class="pkg-link" data-pkg="disco" data-topic="SignalSummarizer" data-id="summarize">}\href{../../disco/html/SignalSummarizer.html#method-summarize}{\code{disco::SignalSummarizer$summarize()}}\out{</span>}
-}
-\out{</details>}
-}
+\if{html}{\out{
+<details open><summary>Inherited methods</summary>
+<ul>
+<li><span class="pkg-link" data-pkg="disco" data-topic="SignalSummarizer" data-id="summarize"><a href='../../disco/html/SignalSummarizer.html#method-SignalSummarizer-summarize'><code>disco::SignalSummarizer$summarize()</code></a></li>
+</ul>
+</details>
+}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-SignalPlotter-new"></a>}}
+\if{latex}{\out{\hypertarget{method-SignalPlotter-new}{}}}
 \subsection{Method \code{new()}}{
 Constructs a new instance of the class SignalPlotter
 \subsection{Usage}{
@@ -87,8 +87,8 @@ Defaults to "pdf".}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-open"></a>}}
-\if{latex}{\out{\hypertarget{method-open}{}}}
+\if{html}{\out{<a id="method-SignalPlotter-open"></a>}}
+\if{latex}{\out{\hypertarget{method-SignalPlotter-open}{}}}
 \subsection{Method \code{open()}}{
 Opens the PDF graphics device on the provided path
 \subsection{Usage}{
@@ -107,8 +107,8 @@ No defined return value.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-close"></a>}}
-\if{latex}{\out{\hypertarget{method-close}{}}}
+\if{html}{\out{<a id="method-SignalPlotter-close"></a>}}
+\if{latex}{\out{\hypertarget{method-SignalPlotter-close}{}}}
 \subsection{Method \code{close()}}{
 Closes the graphics device to write the PDF file
 \subsection{Usage}{
@@ -120,8 +120,8 @@ No defined return value.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-SignalPlotter-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-SignalPlotter-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

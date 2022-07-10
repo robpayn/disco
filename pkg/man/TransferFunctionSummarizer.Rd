@@ -9,15 +9,15 @@ Summarizes a transfer function and possibly its analysis
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-open}{\code{TransferFunctionSummarizer$open()}}
-\item \href{#method-summarize}{\code{TransferFunctionSummarizer$summarize()}}
-\item \href{#method-close}{\code{TransferFunctionSummarizer$close()}}
-\item \href{#method-clone}{\code{TransferFunctionSummarizer$clone()}}
+\item \href{#method-TransferFunctionSummarizer-open}{\code{TransferFunctionSummarizer$open()}}
+\item \href{#method-TransferFunctionSummarizer-summarize}{\code{TransferFunctionSummarizer$summarize()}}
+\item \href{#method-TransferFunctionSummarizer-close}{\code{TransferFunctionSummarizer$close()}}
+\item \href{#method-TransferFunctionSummarizer-clone}{\code{TransferFunctionSummarizer$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-open"></a>}}
-\if{latex}{\out{\hypertarget{method-open}{}}}
+\if{html}{\out{<a id="method-TransferFunctionSummarizer-open"></a>}}
+\if{latex}{\out{\hypertarget{method-TransferFunctionSummarizer-open}{}}}
 \subsection{Method \code{open()}}{
 Performs an initial operations necessary to get the summarizer
   ready for multiple calls to method summarize.
@@ -36,8 +36,8 @@ Performs an initial operations necessary to get the summarizer
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-summarize"></a>}}
-\if{latex}{\out{\hypertarget{method-summarize}{}}}
+\if{html}{\out{<a id="method-TransferFunctionSummarizer-summarize"></a>}}
+\if{latex}{\out{\hypertarget{method-TransferFunctionSummarizer-summarize}{}}}
 \subsection{Method \code{summarize()}}{
 Perform the summary on an analysis of a provided 
   input and output signal
@@ -68,8 +68,8 @@ Return value not required.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-close"></a>}}
-\if{latex}{\out{\hypertarget{method-close}{}}}
+\if{html}{\out{<a id="method-TransferFunctionSummarizer-close"></a>}}
+\if{latex}{\out{\hypertarget{method-TransferFunctionSummarizer-close}{}}}
 \subsection{Method \code{close()}}{
 Perform any operations necesary to close the summarizer
   and write any final output.
@@ -89,8 +89,8 @@ Return value not required.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-TransferFunctionSummarizer-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-TransferFunctionSummarizer-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

@@ -9,15 +9,15 @@ Summarizes a signal and possibly its analysis
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-open}{\code{SignalSummarizer$open()}}
-\item \href{#method-summarize}{\code{SignalSummarizer$summarize()}}
-\item \href{#method-close}{\code{SignalSummarizer$close()}}
-\item \href{#method-clone}{\code{SignalSummarizer$clone()}}
+\item \href{#method-SignalSummarizer-open}{\code{SignalSummarizer$open()}}
+\item \href{#method-SignalSummarizer-summarize}{\code{SignalSummarizer$summarize()}}
+\item \href{#method-SignalSummarizer-close}{\code{SignalSummarizer$close()}}
+\item \href{#method-SignalSummarizer-clone}{\code{SignalSummarizer$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-open"></a>}}
-\if{latex}{\out{\hypertarget{method-open}{}}}
+\if{html}{\out{<a id="method-SignalSummarizer-open"></a>}}
+\if{latex}{\out{\hypertarget{method-SignalSummarizer-open}{}}}
 \subsection{Method \code{open()}}{
 This is an abstract declaration and the method
   must be implemented by extending classes.
@@ -42,8 +42,8 @@ Return value not required.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-summarize"></a>}}
-\if{latex}{\out{\hypertarget{method-summarize}{}}}
+\if{html}{\out{<a id="method-SignalSummarizer-summarize"></a>}}
+\if{latex}{\out{\hypertarget{method-SignalSummarizer-summarize}{}}}
 \subsection{Method \code{summarize()}}{
 This is an abstract declaration and the method
   must be implemented by extending classes.
@@ -74,8 +74,8 @@ Return value not required.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-close"></a>}}
-\if{latex}{\out{\hypertarget{method-close}{}}}
+\if{html}{\out{<a id="method-SignalSummarizer-close"></a>}}
+\if{latex}{\out{\hypertarget{method-SignalSummarizer-close}{}}}
 \subsection{Method \code{close()}}{
 This is an abstract declaration and the method
   must be implemented by extending classes.
@@ -98,8 +98,8 @@ Return value not required.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-SignalSummarizer-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-SignalSummarizer-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

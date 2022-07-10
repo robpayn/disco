@@ -9,31 +9,31 @@ Provides utilities for managing metadata for a data product
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{Metadata$new()}}
-\item \href{#method-createLayerWithMetadata}{\code{Metadata$createLayerWithMetadata()}}
-\item \href{#method-writeXML}{\code{Metadata$writeXML()}}
-\item \href{#method-readXML}{\code{Metadata$readXML()}}
-\item \href{#method-getLayer}{\code{Metadata$getLayer()}}
-\item \href{#method-addMetadataElement}{\code{Metadata$addMetadataElement()}}
-\item \href{#method-addPerson}{\code{Metadata$addPerson()}}
-\item \href{#method-addVariable}{\code{Metadata$addVariable()}}
-\item \href{#method-addEntity}{\code{Metadata$addEntity()}}
-\item \href{#method-addEntityAtSite}{\code{Metadata$addEntityAtSite()}}
-\item \href{#method-addFile}{\code{Metadata$addFile()}}
-\item \href{#method-addTimeWindow}{\code{Metadata$addTimeWindow()}}
-\item \href{#method-createSiteElement}{\code{Metadata$createSiteElement()}}
-\item \href{#method-addSite}{\code{Metadata$addSite()}}
-\item \href{#method-createPointElement}{\code{Metadata$createPointElement()}}
-\item \href{#method-addPoint}{\code{Metadata$addPoint()}}
-\item \href{#method-addInstrument}{\code{Metadata$addInstrument()}}
-\item \href{#method-addQAQCCode}{\code{Metadata$addQAQCCode()}}
-\item \href{#method-addProjectEffort}{\code{Metadata$addProjectEffort()}}
-\item \href{#method-clone}{\code{Metadata$clone()}}
+\item \href{#method-Metadata-new}{\code{Metadata$new()}}
+\item \href{#method-Metadata-createLayerWithMetadata}{\code{Metadata$createLayerWithMetadata()}}
+\item \href{#method-Metadata-writeXML}{\code{Metadata$writeXML()}}
+\item \href{#method-Metadata-readXML}{\code{Metadata$readXML()}}
+\item \href{#method-Metadata-getLayer}{\code{Metadata$getLayer()}}
+\item \href{#method-Metadata-addMetadataElement}{\code{Metadata$addMetadataElement()}}
+\item \href{#method-Metadata-addPerson}{\code{Metadata$addPerson()}}
+\item \href{#method-Metadata-addVariable}{\code{Metadata$addVariable()}}
+\item \href{#method-Metadata-addEntity}{\code{Metadata$addEntity()}}
+\item \href{#method-Metadata-addEntityAtSite}{\code{Metadata$addEntityAtSite()}}
+\item \href{#method-Metadata-addFile}{\code{Metadata$addFile()}}
+\item \href{#method-Metadata-addTimeWindow}{\code{Metadata$addTimeWindow()}}
+\item \href{#method-Metadata-createSiteElement}{\code{Metadata$createSiteElement()}}
+\item \href{#method-Metadata-addSite}{\code{Metadata$addSite()}}
+\item \href{#method-Metadata-createPointElement}{\code{Metadata$createPointElement()}}
+\item \href{#method-Metadata-addPoint}{\code{Metadata$addPoint()}}
+\item \href{#method-Metadata-addInstrument}{\code{Metadata$addInstrument()}}
+\item \href{#method-Metadata-addQAQCCode}{\code{Metadata$addQAQCCode()}}
+\item \href{#method-Metadata-addProjectEffort}{\code{Metadata$addProjectEffort()}}
+\item \href{#method-Metadata-clone}{\code{Metadata$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-Metadata-new"></a>}}
+\if{latex}{\out{\hypertarget{method-Metadata-new}{}}}
 \subsection{Method \code{new()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Metadata$new(path, baseLayerName = NULL)}\if{html}{\out{</div>}}
@@ -41,8 +41,8 @@ Provides utilities for managing metadata for a data product
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-createLayerWithMetadata"></a>}}
-\if{latex}{\out{\hypertarget{method-createLayerWithMetadata}{}}}
+\if{html}{\out{<a id="method-Metadata-createLayerWithMetadata"></a>}}
+\if{latex}{\out{\hypertarget{method-Metadata-createLayerWithMetadata}{}}}
 \subsection{Method \code{createLayerWithMetadata()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Metadata$createLayerWithMetadata(layer = NULL, name)}\if{html}{\out{</div>}}
@@ -50,8 +50,8 @@ Provides utilities for managing metadata for a data product
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-writeXML"></a>}}
-\if{latex}{\out{\hypertarget{method-writeXML}{}}}
+\if{html}{\out{<a id="method-Metadata-writeXML"></a>}}
+\if{latex}{\out{\hypertarget{method-Metadata-writeXML}{}}}
 \subsection{Method \code{writeXML()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Metadata$writeXML()}\if{html}{\out{</div>}}
@@ -59,8 +59,8 @@ Provides utilities for managing metadata for a data product
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-readXML"></a>}}
-\if{latex}{\out{\hypertarget{method-readXML}{}}}
+\if{html}{\out{<a id="method-Metadata-readXML"></a>}}
+\if{latex}{\out{\hypertarget{method-Metadata-readXML}{}}}
 \subsection{Method \code{readXML()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Metadata$readXML()}\if{html}{\out{</div>}}
@@ -68,8 +68,8 @@ Provides utilities for managing metadata for a data product
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getLayer"></a>}}
-\if{latex}{\out{\hypertarget{method-getLayer}{}}}
+\if{html}{\out{<a id="method-Metadata-getLayer"></a>}}
+\if{latex}{\out{\hypertarget{method-Metadata-getLayer}{}}}
 \subsection{Method \code{getLayer()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Metadata$getLayer(layerName)}\if{html}{\out{</div>}}
@@ -77,8 +77,8 @@ Provides utilities for managing metadata for a data product
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-addMetadataElement"></a>}}
-\if{latex}{\out{\hypertarget{method-addMetadataElement}{}}}
+\if{html}{\out{<a id="method-Metadata-addMetadataElement"></a>}}
+\if{latex}{\out{\hypertarget{method-Metadata-addMetadataElement}{}}}
 \subsection{Method \code{addMetadataElement()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Metadata$addMetadataElement(element, category, context, description, layer)}\if{html}{\out{</div>}}
@@ -86,8 +86,8 @@ Provides utilities for managing metadata for a data product
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-addPerson"></a>}}
-\if{latex}{\out{\hypertarget{method-addPerson}{}}}
+\if{html}{\out{<a id="method-Metadata-addPerson"></a>}}
+\if{latex}{\out{\hypertarget{method-Metadata-addPerson}{}}}
 \subsection{Method \code{addPerson()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Metadata$addPerson(
@@ -105,8 +105,8 @@ Provides utilities for managing metadata for a data product
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-addVariable"></a>}}
-\if{latex}{\out{\hypertarget{method-addVariable}{}}}
+\if{html}{\out{<a id="method-Metadata-addVariable"></a>}}
+\if{latex}{\out{\hypertarget{method-Metadata-addVariable}{}}}
 \subsection{Method \code{addVariable()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Metadata$addVariable(
@@ -126,8 +126,8 @@ Provides utilities for managing metadata for a data product
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-addEntity"></a>}}
-\if{latex}{\out{\hypertarget{method-addEntity}{}}}
+\if{html}{\out{<a id="method-Metadata-addEntity"></a>}}
+\if{latex}{\out{\hypertarget{method-Metadata-addEntity}{}}}
 \subsection{Method \code{addEntity()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Metadata$addEntity(
@@ -142,8 +142,8 @@ Provides utilities for managing metadata for a data product
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-addEntityAtSite"></a>}}
-\if{latex}{\out{\hypertarget{method-addEntityAtSite}{}}}
+\if{html}{\out{<a id="method-Metadata-addEntityAtSite"></a>}}
+\if{latex}{\out{\hypertarget{method-Metadata-addEntityAtSite}{}}}
 \subsection{Method \code{addEntityAtSite()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Metadata$addEntityAtSite(
@@ -173,8 +173,8 @@ Provides utilities for managing metadata for a data product
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-addFile"></a>}}
-\if{latex}{\out{\hypertarget{method-addFile}{}}}
+\if{html}{\out{<a id="method-Metadata-addFile"></a>}}
+\if{latex}{\out{\hypertarget{method-Metadata-addFile}{}}}
 \subsection{Method \code{addFile()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Metadata$addFile(
@@ -191,8 +191,8 @@ Provides utilities for managing metadata for a data product
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-addTimeWindow"></a>}}
-\if{latex}{\out{\hypertarget{method-addTimeWindow}{}}}
+\if{html}{\out{<a id="method-Metadata-addTimeWindow"></a>}}
+\if{latex}{\out{\hypertarget{method-Metadata-addTimeWindow}{}}}
 \subsection{Method \code{addTimeWindow()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Metadata$addTimeWindow(
@@ -209,8 +209,8 @@ Provides utilities for managing metadata for a data product
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-createSiteElement"></a>}}
-\if{latex}{\out{\hypertarget{method-createSiteElement}{}}}
+\if{html}{\out{<a id="method-Metadata-createSiteElement"></a>}}
+\if{latex}{\out{\hypertarget{method-Metadata-createSiteElement}{}}}
 \subsection{Method \code{createSiteElement()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Metadata$createSiteElement(sitePath)}\if{html}{\out{</div>}}
@@ -218,8 +218,8 @@ Provides utilities for managing metadata for a data product
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-addSite"></a>}}
-\if{latex}{\out{\hypertarget{method-addSite}{}}}
+\if{html}{\out{<a id="method-Metadata-addSite"></a>}}
+\if{latex}{\out{\hypertarget{method-Metadata-addSite}{}}}
 \subsection{Method \code{addSite()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Metadata$addSite(
@@ -234,8 +234,8 @@ Provides utilities for managing metadata for a data product
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-createPointElement"></a>}}
-\if{latex}{\out{\hypertarget{method-createPointElement}{}}}
+\if{html}{\out{<a id="method-Metadata-createPointElement"></a>}}
+\if{latex}{\out{\hypertarget{method-Metadata-createPointElement}{}}}
 \subsection{Method \code{createPointElement()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Metadata$createPointElement(
@@ -251,8 +251,8 @@ Provides utilities for managing metadata for a data product
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-addPoint"></a>}}
-\if{latex}{\out{\hypertarget{method-addPoint}{}}}
+\if{html}{\out{<a id="method-Metadata-addPoint"></a>}}
+\if{latex}{\out{\hypertarget{method-Metadata-addPoint}{}}}
 \subsection{Method \code{addPoint()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Metadata$addPoint(
@@ -273,8 +273,8 @@ Provides utilities for managing metadata for a data product
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-addInstrument"></a>}}
-\if{latex}{\out{\hypertarget{method-addInstrument}{}}}
+\if{html}{\out{<a id="method-Metadata-addInstrument"></a>}}
+\if{latex}{\out{\hypertarget{method-Metadata-addInstrument}{}}}
 \subsection{Method \code{addInstrument()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Metadata$addInstrument(
@@ -290,8 +290,8 @@ Provides utilities for managing metadata for a data product
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-addQAQCCode"></a>}}
-\if{latex}{\out{\hypertarget{method-addQAQCCode}{}}}
+\if{html}{\out{<a id="method-Metadata-addQAQCCode"></a>}}
+\if{latex}{\out{\hypertarget{method-Metadata-addQAQCCode}{}}}
 \subsection{Method \code{addQAQCCode()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Metadata$addQAQCCode(
@@ -307,8 +307,8 @@ Provides utilities for managing metadata for a data product
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-addProjectEffort"></a>}}
-\if{latex}{\out{\hypertarget{method-addProjectEffort}{}}}
+\if{html}{\out{<a id="method-Metadata-addProjectEffort"></a>}}
+\if{latex}{\out{\hypertarget{method-Metadata-addProjectEffort}{}}}
 \subsection{Method \code{addProjectEffort()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Metadata$addProjectEffort(
@@ -323,8 +323,8 @@ Provides utilities for managing metadata for a data product
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-Metadata-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-Metadata-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

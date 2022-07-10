@@ -44,16 +44,16 @@ window for analysis.}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{DielWindowedSignal$new()}}
-\item \href{#method-generateWindowInput}{\code{DielWindowedSignal$generateWindowInput()}}
-\item \href{#method-analyze}{\code{DielWindowedSignal$analyze()}}
-\item \href{#method-summarizeWindows}{\code{DielWindowedSignal$summarizeWindows()}}
-\item \href{#method-clone}{\code{DielWindowedSignal$clone()}}
+\item \href{#method-DielWindowedSignal-new}{\code{DielWindowedSignal$new()}}
+\item \href{#method-DielWindowedSignal-generateWindowInput}{\code{DielWindowedSignal$generateWindowInput()}}
+\item \href{#method-DielWindowedSignal-analyze}{\code{DielWindowedSignal$analyze()}}
+\item \href{#method-DielWindowedSignal-summarizeWindows}{\code{DielWindowedSignal$summarizeWindows()}}
+\item \href{#method-DielWindowedSignal-clone}{\code{DielWindowedSignal$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-DielWindowedSignal-new"></a>}}
+\if{latex}{\out{\hypertarget{method-DielWindowedSignal-new}{}}}
 \subsection{Method \code{new()}}{
 Create an instance of the class DielWindowedSignal
 \subsection{Usage}{
@@ -97,8 +97,8 @@ Defaults to 1.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-generateWindowInput"></a>}}
-\if{latex}{\out{\hypertarget{method-generateWindowInput}{}}}
+\if{html}{\out{<a id="method-DielWindowedSignal-generateWindowInput"></a>}}
+\if{latex}{\out{\hypertarget{method-DielWindowedSignal-generateWindowInput}{}}}
 \subsection{Method \code{generateWindowInput()}}{
 Parses the signal into windows based on the window definitions
 \subsection{Usage}{
@@ -123,8 +123,8 @@ No defined return value.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-analyze"></a>}}
-\if{latex}{\out{\hypertarget{method-analyze}{}}}
+\if{html}{\out{<a id="method-DielWindowedSignal-analyze"></a>}}
+\if{latex}{\out{\hypertarget{method-DielWindowedSignal-analyze}{}}}
 \subsection{Method \code{analyze()}}{
 Runs the provided analyzer object for all windows
 \subsection{Usage}{
@@ -156,8 +156,8 @@ No defined return value.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-summarizeWindows"></a>}}
-\if{latex}{\out{\hypertarget{method-summarizeWindows}{}}}
+\if{html}{\out{<a id="method-DielWindowedSignal-summarizeWindows"></a>}}
+\if{latex}{\out{\hypertarget{method-DielWindowedSignal-summarizeWindows}{}}}
 \subsection{Method \code{summarizeWindows()}}{
 Uses the provided SignalSummarizer to generate a summary
   of the analysis of each window.
@@ -188,8 +188,8 @@ No defined return value.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-DielWindowedSignal-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-DielWindowedSignal-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

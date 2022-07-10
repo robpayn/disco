@@ -37,22 +37,22 @@ only other option.}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{TransferFunctionPlotter$new()}}
-\item \href{#method-open}{\code{TransferFunctionPlotter$open()}}
-\item \href{#method-close}{\code{TransferFunctionPlotter$close()}}
-\item \href{#method-clone}{\code{TransferFunctionPlotter$clone()}}
+\item \href{#method-TransferFunctionPlotter-new}{\code{TransferFunctionPlotter$new()}}
+\item \href{#method-TransferFunctionPlotter-open}{\code{TransferFunctionPlotter$open()}}
+\item \href{#method-TransferFunctionPlotter-close}{\code{TransferFunctionPlotter$close()}}
+\item \href{#method-TransferFunctionPlotter-clone}{\code{TransferFunctionPlotter$clone()}}
 }
 }
-\if{html}{
-\out{<details open ><summary>Inherited methods</summary>}
-\itemize{
-\item \out{<span class="pkg-link" data-pkg="disco" data-topic="TransferFunctionSummarizer" data-id="summarize">}\href{../../disco/html/TransferFunctionSummarizer.html#method-summarize}{\code{disco::TransferFunctionSummarizer$summarize()}}\out{</span>}
-}
-\out{</details>}
-}
+\if{html}{\out{
+<details open><summary>Inherited methods</summary>
+<ul>
+<li><span class="pkg-link" data-pkg="disco" data-topic="TransferFunctionSummarizer" data-id="summarize"><a href='../../disco/html/TransferFunctionSummarizer.html#method-TransferFunctionSummarizer-summarize'><code>disco::TransferFunctionSummarizer$summarize()</code></a></li>
+</ul>
+</details>
+}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-TransferFunctionPlotter-new"></a>}}
+\if{latex}{\out{\hypertarget{method-TransferFunctionPlotter-new}{}}}
 \subsection{Method \code{new()}}{
 Constructs a new instance of the class
 \subsection{Usage}{
@@ -97,8 +97,8 @@ Defaults to "pdf".}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-open"></a>}}
-\if{latex}{\out{\hypertarget{method-open}{}}}
+\if{html}{\out{<a id="method-TransferFunctionPlotter-open"></a>}}
+\if{latex}{\out{\hypertarget{method-TransferFunctionPlotter-open}{}}}
 \subsection{Method \code{open()}}{
 Opens the PDF graphics device on the provided path
 \subsection{Usage}{
@@ -117,8 +117,8 @@ No defined return value.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-close"></a>}}
-\if{latex}{\out{\hypertarget{method-close}{}}}
+\if{html}{\out{<a id="method-TransferFunctionPlotter-close"></a>}}
+\if{latex}{\out{\hypertarget{method-TransferFunctionPlotter-close}{}}}
 \subsection{Method \code{close()}}{
 Closes the graphics device to write the PDF file
 \subsection{Usage}{
@@ -130,8 +130,8 @@ No defined return value.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-TransferFunctionPlotter-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-TransferFunctionPlotter-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

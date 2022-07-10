@@ -17,14 +17,14 @@ This defines an abstract interface to a signal derivation. A signal derivation
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{SignalDerivation$new()}}
-\item \href{#method-derive}{\code{SignalDerivation$derive()}}
-\item \href{#method-clone}{\code{SignalDerivation$clone()}}
+\item \href{#method-SignalDerivation-new}{\code{SignalDerivation$new()}}
+\item \href{#method-SignalDerivation-derive}{\code{SignalDerivation$derive()}}
+\item \href{#method-SignalDerivation-clone}{\code{SignalDerivation$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-SignalDerivation-new"></a>}}
+\if{latex}{\out{\hypertarget{method-SignalDerivation-new}{}}}
 \subsection{Method \code{new()}}{
 Creates a new instance of the class SignalDerivation
 \subsection{Usage}{
@@ -41,8 +41,8 @@ if desired.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-derive"></a>}}
-\if{latex}{\out{\hypertarget{method-derive}{}}}
+\if{html}{\out{<a id="method-SignalDerivation-derive"></a>}}
+\if{latex}{\out{\hypertarget{method-SignalDerivation-derive}{}}}
 \subsection{Method \code{derive()}}{
 This is an abstract declaration and the method
   must be implemented by extending classes.
@@ -64,6 +64,8 @@ not already associated with a signal.}
 \item{\code{prevResults}}{Object representing the results from a previous derivation (if applicable)}
 
 \item{\code{path}}{The path where the results file is written}
+
+\item{\code{index}}{Index of the derivation being performed}
 }
 \if{html}{\out{</div>}}
 }
@@ -72,8 +74,8 @@ An object representing the results of the derivation
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-SignalDerivation-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-SignalDerivation-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

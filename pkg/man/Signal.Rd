@@ -22,37 +22,37 @@ This is an implementation of the Signal interface that is
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{Signal$new()}}
-\item \href{#method-getTime}{\code{Signal$getTime()}}
-\item \href{#method-setTimeHeader}{\code{Signal$setTimeHeader()}}
-\item \href{#method-setTimeZone}{\code{Signal$setTimeZone()}}
-\item \href{#method-getDataframe}{\code{Signal$getDataframe()}}
-\item \href{#method-getWindow}{\code{Signal$getWindow()}}
-\item \href{#method-interpolate}{\code{Signal$interpolate()}}
-\item \href{#method-trim}{\code{Signal$trim()}}
-\item \href{#method-trimEdges}{\code{Signal$trimEdges()}}
-\item \href{#method-filterVariables}{\code{Signal$filterVariables()}}
-\item \href{#method-filterRows}{\code{Signal$filterRows()}}
-\item \href{#method-writeCSV}{\code{Signal$writeCSV()}}
-\item \href{#method-plotSummary}{\code{Signal$plotSummary()}}
-\item \href{#method-plot}{\code{Signal$plot()}}
-\item \href{#method-clone}{\code{Signal$clone()}}
+\item \href{#method-Signal-new}{\code{Signal$new()}}
+\item \href{#method-Signal-getTime}{\code{Signal$getTime()}}
+\item \href{#method-Signal-setTimeHeader}{\code{Signal$setTimeHeader()}}
+\item \href{#method-Signal-setTimeZone}{\code{Signal$setTimeZone()}}
+\item \href{#method-Signal-getDataframe}{\code{Signal$getDataframe()}}
+\item \href{#method-Signal-getWindow}{\code{Signal$getWindow()}}
+\item \href{#method-Signal-interpolate}{\code{Signal$interpolate()}}
+\item \href{#method-Signal-trim}{\code{Signal$trim()}}
+\item \href{#method-Signal-trimEdges}{\code{Signal$trimEdges()}}
+\item \href{#method-Signal-filterVariables}{\code{Signal$filterVariables()}}
+\item \href{#method-Signal-filterRows}{\code{Signal$filterRows()}}
+\item \href{#method-Signal-writeCSV}{\code{Signal$writeCSV()}}
+\item \href{#method-Signal-plotSummary}{\code{Signal$plotSummary()}}
+\item \href{#method-Signal-plot}{\code{Signal$plot()}}
+\item \href{#method-Signal-clone}{\code{Signal$clone()}}
 }
 }
-\if{html}{
-\out{<details open ><summary>Inherited methods</summary>}
-\itemize{
-\item \out{<span class="pkg-link" data-pkg="disco" data-topic="DataTable" data-id="getLength">}\href{../../disco/html/DataTable.html#method-getLength}{\code{disco::DataTable$getLength()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="disco" data-topic="DataTable" data-id="getMetaColumn">}\href{../../disco/html/DataTable.html#method-getMetaColumn}{\code{disco::DataTable$getMetaColumn()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="disco" data-topic="DataTable" data-id="getMetaColumns">}\href{../../disco/html/DataTable.html#method-getMetaColumns}{\code{disco::DataTable$getMetaColumns()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="disco" data-topic="DataTable" data-id="getVariable">}\href{../../disco/html/DataTable.html#method-getVariable}{\code{disco::DataTable$getVariable()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="disco" data-topic="DataTable" data-id="setVariable">}\href{../../disco/html/DataTable.html#method-setVariable}{\code{disco::DataTable$setVariable()}}\out{</span>}
-}
-\out{</details>}
-}
+\if{html}{\out{
+<details open><summary>Inherited methods</summary>
+<ul>
+<li><span class="pkg-link" data-pkg="disco" data-topic="DataTable" data-id="getLength"><a href='../../disco/html/DataTable.html#method-DataTable-getLength'><code>disco::DataTable$getLength()</code></a></li>
+<li><span class="pkg-link" data-pkg="disco" data-topic="DataTable" data-id="getMetaColumn"><a href='../../disco/html/DataTable.html#method-DataTable-getMetaColumn'><code>disco::DataTable$getMetaColumn()</code></a></li>
+<li><span class="pkg-link" data-pkg="disco" data-topic="DataTable" data-id="getMetaColumns"><a href='../../disco/html/DataTable.html#method-DataTable-getMetaColumns'><code>disco::DataTable$getMetaColumns()</code></a></li>
+<li><span class="pkg-link" data-pkg="disco" data-topic="DataTable" data-id="getVariable"><a href='../../disco/html/DataTable.html#method-DataTable-getVariable'><code>disco::DataTable$getVariable()</code></a></li>
+<li><span class="pkg-link" data-pkg="disco" data-topic="DataTable" data-id="setVariable"><a href='../../disco/html/DataTable.html#method-DataTable-setVariable'><code>disco::DataTable$setVariable()</code></a></li>
+</ul>
+</details>
+}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-Signal-new"></a>}}
+\if{latex}{\out{\hypertarget{method-Signal-new}{}}}
 \subsection{Method \code{new()}}{
 Create an instance of class Signal
 \subsection{Usage}{
@@ -102,8 +102,8 @@ A reference to an object that is a new instance of the class
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getTime"></a>}}
-\if{latex}{\out{\hypertarget{method-getTime}{}}}
+\if{html}{\out{<a id="method-Signal-getTime"></a>}}
+\if{latex}{\out{\hypertarget{method-Signal-getTime}{}}}
 \subsection{Method \code{getTime()}}{
 Get the vector of values representing the times for the signal data
 \subsection{Usage}{
@@ -115,8 +115,8 @@ A vector of times.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-setTimeHeader"></a>}}
-\if{latex}{\out{\hypertarget{method-setTimeHeader}{}}}
+\if{html}{\out{<a id="method-Signal-setTimeHeader"></a>}}
+\if{latex}{\out{\hypertarget{method-Signal-setTimeHeader}{}}}
 \subsection{Method \code{setTimeHeader()}}{
 Set the time header
 \subsection{Usage}{
@@ -135,8 +135,8 @@ The old value of the time header
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-setTimeZone"></a>}}
-\if{latex}{\out{\hypertarget{method-setTimeZone}{}}}
+\if{html}{\out{<a id="method-Signal-setTimeZone"></a>}}
+\if{latex}{\out{\hypertarget{method-Signal-setTimeZone}{}}}
 \subsection{Method \code{setTimeZone()}}{
 Set the time zone
 \subsection{Usage}{
@@ -155,8 +155,8 @@ The previous setting for the time zone
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getDataframe"></a>}}
-\if{latex}{\out{\hypertarget{method-getDataframe}{}}}
+\if{html}{\out{<a id="method-Signal-getDataframe"></a>}}
+\if{latex}{\out{\hypertarget{method-Signal-getDataframe}{}}}
 \subsection{Method \code{getDataframe()}}{
 Get the signal in a data frame format
 \subsection{Usage}{
@@ -168,8 +168,8 @@ Copy of the signal data in data frame format
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getWindow"></a>}}
-\if{latex}{\out{\hypertarget{method-getWindow}{}}}
+\if{html}{\out{<a id="method-Signal-getWindow"></a>}}
+\if{latex}{\out{\hypertarget{method-Signal-getWindow}{}}}
 \subsection{Method \code{getWindow()}}{
 Get a subset of the signal based on a provided window of time
 \subsection{Usage}{
@@ -191,8 +191,8 @@ A new signal object representing the subset of the current signal
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-interpolate"></a>}}
-\if{latex}{\out{\hypertarget{method-interpolate}{}}}
+\if{html}{\out{<a id="method-Signal-interpolate"></a>}}
+\if{latex}{\out{\hypertarget{method-Signal-interpolate}{}}}
 \subsection{Method \code{interpolate()}}{
 Interpolates a signal based on the provided time vector
 \subsection{Usage}{
@@ -212,8 +212,8 @@ A new signal with values interpolated from the current
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-trim"></a>}}
-\if{latex}{\out{\hypertarget{method-trim}{}}}
+\if{html}{\out{<a id="method-Signal-trim"></a>}}
+\if{latex}{\out{\hypertarget{method-Signal-trim}{}}}
 \subsection{Method \code{trim()}}{
 Trims the signal based on indices provided
 \subsection{Usage}{
@@ -234,8 +234,8 @@ The new length of the signal
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-trimEdges"></a>}}
-\if{latex}{\out{\hypertarget{method-trimEdges}{}}}
+\if{html}{\out{<a id="method-Signal-trimEdges"></a>}}
+\if{latex}{\out{\hypertarget{method-Signal-trimEdges}{}}}
 \subsection{Method \code{trimEdges()}}{
 Trims the signal based on skipped rows
 \subsection{Usage}{
@@ -256,8 +256,8 @@ The new length of the signal
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-filterVariables"></a>}}
-\if{latex}{\out{\hypertarget{method-filterVariables}{}}}
+\if{html}{\out{<a id="method-Signal-filterVariables"></a>}}
+\if{latex}{\out{\hypertarget{method-Signal-filterVariables}{}}}
 \subsection{Method \code{filterVariables()}}{
 Filter the signal to the desired variables
 \subsection{Usage}{
@@ -278,8 +278,8 @@ Value returned by the super$filterVariables method
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-filterRows"></a>}}
-\if{latex}{\out{\hypertarget{method-filterRows}{}}}
+\if{html}{\out{<a id="method-Signal-filterRows"></a>}}
+\if{latex}{\out{\hypertarget{method-Signal-filterRows}{}}}
 \subsection{Method \code{filterRows()}}{
 Removes the rows designated by the provided indices
 \subsection{Usage}{
@@ -304,8 +304,8 @@ The new length of the signal after rows are removed
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-writeCSV"></a>}}
-\if{latex}{\out{\hypertarget{method-writeCSV}{}}}
+\if{html}{\out{<a id="method-Signal-writeCSV"></a>}}
+\if{latex}{\out{\hypertarget{method-Signal-writeCSV}{}}}
 \subsection{Method \code{writeCSV()}}{
 Write the signal in csv format
 \subsection{Usage}{
@@ -329,8 +329,8 @@ No defined return value.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-plotSummary"></a>}}
-\if{latex}{\out{\hypertarget{method-plotSummary}{}}}
+\if{html}{\out{<a id="method-Signal-plotSummary"></a>}}
+\if{latex}{\out{\hypertarget{method-Signal-plotSummary}{}}}
 \subsection{Method \code{plotSummary()}}{
 Plot a summary of the multivariate signal
 \subsection{Usage}{
@@ -364,8 +364,8 @@ No defined return value.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-plot"></a>}}
-\if{latex}{\out{\hypertarget{method-plot}{}}}
+\if{html}{\out{<a id="method-Signal-plot"></a>}}
+\if{latex}{\out{\hypertarget{method-Signal-plot}{}}}
 \subsection{Method \code{plot()}}{
 Plots a single variable in the signal based on the provided header
   for the variable
@@ -439,8 +439,8 @@ No defined return value.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-Signal-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-Signal-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

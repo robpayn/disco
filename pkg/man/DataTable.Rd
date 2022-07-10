@@ -19,19 +19,19 @@ An R6 implementation of a data table, including metadata
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{DataTable$new()}}
-\item \href{#method-getLength}{\code{DataTable$getLength()}}
-\item \href{#method-getMetaColumn}{\code{DataTable$getMetaColumn()}}
-\item \href{#method-getMetaColumns}{\code{DataTable$getMetaColumns()}}
-\item \href{#method-getVariable}{\code{DataTable$getVariable()}}
-\item \href{#method-setVariable}{\code{DataTable$setVariable()}}
-\item \href{#method-filterVariables}{\code{DataTable$filterVariables()}}
-\item \href{#method-clone}{\code{DataTable$clone()}}
+\item \href{#method-DataTable-new}{\code{DataTable$new()}}
+\item \href{#method-DataTable-getLength}{\code{DataTable$getLength()}}
+\item \href{#method-DataTable-getMetaColumn}{\code{DataTable$getMetaColumn()}}
+\item \href{#method-DataTable-getMetaColumns}{\code{DataTable$getMetaColumns()}}
+\item \href{#method-DataTable-getVariable}{\code{DataTable$getVariable()}}
+\item \href{#method-DataTable-setVariable}{\code{DataTable$setVariable()}}
+\item \href{#method-DataTable-filterVariables}{\code{DataTable$filterVariables()}}
+\item \href{#method-DataTable-clone}{\code{DataTable$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-DataTable-new"></a>}}
+\if{latex}{\out{\hypertarget{method-DataTable-new}{}}}
 \subsection{Method \code{new()}}{
 Construct a new instance of a data table
 \subsection{Usage}{
@@ -54,8 +54,8 @@ Defaults to NULL.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getLength"></a>}}
-\if{latex}{\out{\hypertarget{method-getLength}{}}}
+\if{html}{\out{<a id="method-DataTable-getLength"></a>}}
+\if{latex}{\out{\hypertarget{method-DataTable-getLength}{}}}
 \subsection{Method \code{getLength()}}{
 Gets the length of the data table
 \subsection{Usage}{
@@ -67,8 +67,8 @@ The number of rows in the data table
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getMetaColumn"></a>}}
-\if{latex}{\out{\hypertarget{method-getMetaColumn}{}}}
+\if{html}{\out{<a id="method-DataTable-getMetaColumn"></a>}}
+\if{latex}{\out{\hypertarget{method-DataTable-getMetaColumn}{}}}
 \subsection{Method \code{getMetaColumn()}}{
 Gets the metadata for a single variable
 \subsection{Usage}{
@@ -87,8 +87,8 @@ Vector of character strings containing the column metdata
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getMetaColumns"></a>}}
-\if{latex}{\out{\hypertarget{method-getMetaColumns}{}}}
+\if{html}{\out{<a id="method-DataTable-getMetaColumns"></a>}}
+\if{latex}{\out{\hypertarget{method-DataTable-getMetaColumns}{}}}
 \subsection{Method \code{getMetaColumns()}}{
 Gets the metadata for a collection of variables.
 \subsection{Usage}{
@@ -108,8 +108,8 @@ Data frame containing the metdata for the specificed columns
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getVariable"></a>}}
-\if{latex}{\out{\hypertarget{method-getVariable}{}}}
+\if{html}{\out{<a id="method-DataTable-getVariable"></a>}}
+\if{latex}{\out{\hypertarget{method-DataTable-getVariable}{}}}
 \subsection{Method \code{getVariable()}}{
 Gets the vector of values for a variable in the table
 \subsection{Usage}{
@@ -128,8 +128,8 @@ Vector of values corresponding to the provided header
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-setVariable"></a>}}
-\if{latex}{\out{\hypertarget{method-setVariable}{}}}
+\if{html}{\out{<a id="method-DataTable-setVariable"></a>}}
+\if{latex}{\out{\hypertarget{method-DataTable-setVariable}{}}}
 \subsection{Method \code{setVariable()}}{
 Adds a column of data and associated metata 
   as a variable to the data table
@@ -154,8 +154,8 @@ No defined return value.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-filterVariables"></a>}}
-\if{latex}{\out{\hypertarget{method-filterVariables}{}}}
+\if{html}{\out{<a id="method-DataTable-filterVariables"></a>}}
+\if{latex}{\out{\hypertarget{method-DataTable-filterVariables}{}}}
 \subsection{Method \code{filterVariables()}}{
 Removes all variables except those specified
 \subsection{Usage}{
@@ -174,8 +174,8 @@ No defined return value.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-DataTable-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-DataTable-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

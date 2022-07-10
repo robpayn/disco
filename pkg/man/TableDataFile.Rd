@@ -36,15 +36,15 @@ of the file}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{TableDataFile$new()}}
-\item \href{#method-read}{\code{TableDataFile$read()}}
-\item \href{#method-addMetadata}{\code{TableDataFile$addMetadata()}}
-\item \href{#method-clone}{\code{TableDataFile$clone()}}
+\item \href{#method-TableDataFile-new}{\code{TableDataFile$new()}}
+\item \href{#method-TableDataFile-read}{\code{TableDataFile$read()}}
+\item \href{#method-TableDataFile-addMetadata}{\code{TableDataFile$addMetadata()}}
+\item \href{#method-TableDataFile-clone}{\code{TableDataFile$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-TableDataFile-new"></a>}}
+\if{latex}{\out{\hypertarget{method-TableDataFile-new}{}}}
 \subsection{Method \code{new()}}{
 Constructs a new instance of the class
 \subsection{Usage}{
@@ -88,8 +88,8 @@ Defaults to NULL}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-read"></a>}}
-\if{latex}{\out{\hypertarget{method-read}{}}}
+\if{html}{\out{<a id="method-TableDataFile-read"></a>}}
+\if{latex}{\out{\hypertarget{method-TableDataFile-read}{}}}
 \subsection{Method \code{read()}}{
 Read the data file to populate the signal attribute
 \subsection{Usage}{
@@ -109,8 +109,8 @@ The signal object created by reading the file.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-addMetadata"></a>}}
-\if{latex}{\out{\hypertarget{method-addMetadata}{}}}
+\if{html}{\out{<a id="method-TableDataFile-addMetadata"></a>}}
+\if{latex}{\out{\hypertarget{method-TableDataFile-addMetadata}{}}}
 \subsection{Method \code{addMetadata()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TableDataFile$addMetadata(metadata, instrument)}\if{html}{\out{</div>}}
@@ -118,8 +118,8 @@ The signal object created by reading the file.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-TableDataFile-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-TableDataFile-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

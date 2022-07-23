@@ -22,6 +22,8 @@ TableDataFile <- R6Class(
    classname = "TableDataFile",
    public = list(
       
+      ## Attributes ####
+      
       #' @field instrument
       #'   Character string identifying the instrument used.
       instrument = NULL,
@@ -63,7 +65,7 @@ TableDataFile <- R6Class(
       #'   Data frame with context for each column
       metadata = NULL,
       
-      # Method TableDataFile$new ####
+      ## Method: constructor ####
       #
       #' @description 
       #'   Constructs a new instance of the class
@@ -113,13 +115,16 @@ TableDataFile <- R6Class(
          self$metadata <- metadata;
       },
       
-      # Method TableDataFile$read ####
+      ## Method: read ####
       #
       #' @description 
       #'   Read the data file to populate the signal attribute
       #'   
+      #' @param dataLayer
+      #'   Optional: data layer
+      #'   Default value is "root".
       #' @param stringsAsFactors
-      #'   Optional logical value to turn strings as factors on or off.
+      #'   Optional: logical value to turn strings as factors on or off.
       #'   Default value is FALSE (do not interpret strings as categorical factors).
       #'   
       #' @return 
@@ -161,6 +166,16 @@ TableDataFile <- R6Class(
          return(self$signal);
       },
       
+      ## Method: addMetadata ####
+      #
+      #' @description 
+      #'   Must be implemented by extending classes
+      #'   
+      #' @param metadata
+      #'   Metadata
+      #' @param instrument
+      #'   Instrument
+      #'   
       addMetadata = function(metadata, instrument)
       {
          stop("Function TableDataFile$addMetadata has not been implemented by the subclass.");

@@ -48,7 +48,7 @@ window for analysis.}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-DielWindowedTransferFunction-new}{\code{DielWindowedTransferFunction$new()}}
-\item \href{#method-DielWindowedTransferFunction-generateWindowInputOffset}{\code{DielWindowedTransferFunction$generateWindowInputOffset()}}
+\item \href{#method-DielWindowedTransferFunction-createWindowsOffset}{\code{DielWindowedTransferFunction$createWindowsOffset()}}
 \item \href{#method-DielWindowedTransferFunction-analyze}{\code{DielWindowedTransferFunction$analyze()}}
 \item \href{#method-DielWindowedTransferFunction-summarizeWindows}{\code{DielWindowedTransferFunction$summarizeWindows()}}
 \item \href{#method-DielWindowedTransferFunction-clone}{\code{DielWindowedTransferFunction$clone()}}
@@ -58,7 +58,7 @@ window for analysis.}
 \if{html}{\out{<a id="method-DielWindowedTransferFunction-new"></a>}}
 \if{latex}{\out{\hypertarget{method-DielWindowedTransferFunction-new}{}}}
 \subsection{Method \code{new()}}{
-Constructs a new instance of the class DielWindowedTransferFunction
+Constructs a new instance of the class
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DielWindowedTransferFunction$new(
   signalIn,
@@ -103,42 +103,83 @@ Defaults to 1.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DielWindowedTransferFunction-generateWindowInputOffset"></a>}}
-\if{latex}{\out{\hypertarget{method-DielWindowedTransferFunction-generateWindowInputOffset}{}}}
-\subsection{Method \code{generateWindowInputOffset()}}{
+\if{html}{\out{<a id="method-DielWindowedTransferFunction-createWindowsOffset"></a>}}
+\if{latex}{\out{\hypertarget{method-DielWindowedTransferFunction-createWindowsOffset}{}}}
+\subsection{Method \code{createWindowsOffset()}}{
 Parses the signal into windows based on the window definitions
   and a temporal offset between the output signal and the input signal.
   The input signal is interpolated to be a constant offset time from
   the output signal.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DielWindowedTransferFunction$generateWindowInputOffset(
+\if{html}{\out{<div class="r">}}\preformatted{DielWindowedTransferFunction$createWindowsOffset(
   offsetTime,
   headersIn,
   outerDir = "dates",
-  innerDir = "input"
+  innerDir = "input",
+  fileName = "signal",
+  minimumRecords = 1,
+  isValid = NULL,
+  validFunction = NULL
 )}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{offsetTime}}{The offset time between the input signal and output signal in seconds}
+\item{\code{offsetTime}}{The offset time (in seconds) between the input signal and output 
+signal.
+Expected data type is a numeric vector with a single element.}
 
-\item{\code{headersIn}}{Vector of character strings indicating the headers of variables from signalIn that need
-to be considered the input signal}
+\item{\code{headersIn}}{Vector of character strings indicating the headers of variables 
+from signalIn that need to be considered the input signal.
+Expected data type is a character vector.}
 
-\item{\code{outerDir}}{Optional directory structure from the base path where the folders corresponding
-to analysis windows should be placed.
-Default value is "dates".}
+\item{\code{outerDir}}{Optional directory structure from the base path where the folders 
+corresponding to analysis windows should be placed.
+Default value is "dates".
+Expected data type is a character vector with a single element.}
 
 \item{\code{innerDir}}{Optional name of the directory within each window folder where the 
 input data for that window should be placed.
-Default value is "input".}
+Default value is "input".
+Expected data type is a character vector with a single element.}
+
+\item{\code{fileName}}{Optional: file name to use for the signal within a given window.
+Default value is "signal".
+Expected data type is a character vector with a single element.}
+
+\item{\code{minimumRecords}}{Optional: a signal for a window needs at least this number of 
+records for the window to be created. A null value indicates that 
+the number of signal records should not be used to determine
+valid windows.
+Default value is 1 (windows with 0 records will not be created).
+Expected data type is an atomic vector with a single numeric 
+or integer element.}
+
+\item{\code{isValid}}{Optional: logical flags to determine if a window should (TRUE) or 
+should not (FALSE) be created. A null value indicates all windows
+should initially be considered valid, pending further evaluation
+based on criteria defined by other arguments.
+Default value is NULL.
+Expected data type is an atomic vector of logical values with the 
+same length as the number of potential windows.}
+
+\item{\code{validFunction}}{Optional: function to call to determine if a signal for a given
+day should be considered valid (function returns TRUE) or invalid
+(function returns FALSE). Providing a null value disables 
+this feature.
+Default value is NULL.
+Expected data type is a function with two required arguments
+called "signalOut" and "signalIn", to which the output and input
+signals for a given window will be passed. 
+The function should return a logical vector with
+a single element.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-No defined return value.
+Invisibly returns the character vector representing the valid
+  windows.
 }
 }
 \if{html}{\out{<hr>}}
@@ -198,7 +239,7 @@ window}
 Default value is "summary".}
 
 \item{\code{useResults}}{Optional switch to turn of summarization of results.
-Default value is TRUE (results will be sumarized).}
+Default value is TRUE (results will be summarized).}
 }
 \if{html}{\out{</div>}}
 }

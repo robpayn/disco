@@ -1,0 +1,80 @@
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE)
+
+library(disco)
+
+rm(list = ls())
+
+```
+
+# Generate test input
+
+Last compiled on `r format(x = Sys.time(), format = "%Y %b %d, %H:%M")`
+
+Generates artificial data for use in a test of the generation of windows with discontinuous data.
+
+```{r fig.width = 6, fig.height = 5}
+
+dfOut <- data.frame(
+  time = seq.POSIXt(
+    from = as.POSIXct("2022-07-13 00:00:00"),
+    to = as.POSIXct("2022-07-22 23:55:00"),
+    by = "15 min"
+  )
+)
+dfOut$var <- 0
+
+include <- 
+  dfOut$time < as.POSIXct("2022-07-14 00:00:00") |
+  (
+    dfOut$time > as.POSIXct("2022-07-15 06:00:00") &
+    dfOut$time < as.POSIXct("2022-07-15 23:55:00")
+  ) |
+  (
+    dfOut$time > as.POSIXct("2022-07-16 12:00:00") &
+    dfOut$time < as.POSIXct("2022-07-16 14:00:00")
+  ) |
+  dfOut$time > as.POSIXct("2022-07-17 00:00:00")
+
+dfOutDiscon <- dfOut[include,]
+
+tau_t <- 1.5 # hours
+dfInDiscon <- data.frame(
+  time = dfOutDiscon$time - tau_t * 3600
+)
+dfInDiscon$var <- 0
+
+inputSignal <- Signal$new(
+  x = dfInDiscon,
+  metaColumns = data.frame(
+    time = "Gregorian US Mountain",
+    var = "blah",
+
+    row.names = c(
+      "units"
+    )
+  )
+)
+outputSignal <- Signal$new(
+  x = dfOutDiscon,
+  metaColumns = data.frame(
+    time = "Gregorian US Mountain",
+    par = "blah",
+
+    row.names = c(
+      "units"
+    )
+  )
+)
+
+dir.create(
+  path = "./01_input", 
+  recursive = TRUE,
+  showWarnings = FALSE
+)
+
+saveRDS(object = inputSignal, file = "./01_input/inputSignal.RData")
+saveRDS(object = outputSignal, file = "./01_input/outputSignal.RData")
+
+```

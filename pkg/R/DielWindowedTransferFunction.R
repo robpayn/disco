@@ -6,7 +6,7 @@
 #'
 NULL
 
-# Class DielWindowedTransferFunction (R6) ####
+# R6 class DielWindowedTransferFunction ####
 
 #' @export
 #'
@@ -23,6 +23,8 @@ NULL
 DielWindowedTransferFunction <- R6Class(
    classname = "DielWindowedTransferFunction",
    public = list(
+      
+      ## Attributes ####
 
       #' @field signalIn
       #'   The input signal containing the data to be windowed
@@ -81,10 +83,10 @@ DielWindowedTransferFunction <- R6Class(
       #'   The vector of paths to the output directories for each window
       outputPaths = NULL,
       
-      # Method DielWindowedTransferFunction$new ####
+      ## Method: constructor ####
       #
       #' @description 
-      #'   Constructs a new instance of the class DielWindowedTransferFunction
+      #'   Constructs a new instance of the class
       #'   
       #' @param signalIn
       #'   The input signal object from which the windows are extracted
@@ -123,6 +125,8 @@ DielWindowedTransferFunction <- R6Class(
          slideDays = 1
       )
       {
+         # Populate the attributes
+         
          self$signalIn <- signalIn;
          self$signalOut <- signalOut;
          self$path <- path;
@@ -130,17 +134,21 @@ DielWindowedTransferFunction <- R6Class(
          self$dateEnd <- as.Date(dateEnd);
          self$windowDays <- windowDays;
          self$slideDays <- slideDays;
+         self$windowStart <- windowStart;
+         self$windowEnd <- windowEnd;
+         self$timeZone <- timeZone;
+         
+         # Determine the potential vector of windows based
+         # on arguments provided
+         
          self$windows <- seq(
             from = self$dateStart, 
             to = self$dateEnd - self$windowDays, 
             by = self$slideDays
          );
-         self$windowStart <- windowStart;
-         self$windowEnd <- windowEnd;
-         self$timeZone <- timeZone;
       },
       
-      # Method DielWindowedTransferFunction$generateWindowInputOffset ####
+      ## Method: createWindowsOffset ####
       #
       #' @description 
       #'   Parses the signal into windows based on the window definitions
@@ -149,57 +157,99 @@ DielWindowedTransferFunction <- R6Class(
       #'   the output signal.
       #'   
       #' @param offsetTime
-      #'   The offset time between the input signal and output signal in seconds
+      #'   The offset time (in seconds) between the input signal and output 
+      #'   signal.
+      #'   Expected data type is a numeric vector with a single element.
       #' @param headersIn
-      #'   Vector of character strings indicating the headers of variables from signalIn that need
-      #'   to be considered the input signal
+      #'   Vector of character strings indicating the headers of variables 
+      #'   from signalIn that need to be considered the input signal.
+      #'   Expected data type is a character vector.
       #' @param outerDir
-      #'   Optional directory structure from the base path where the folders corresponding
-      #'   to analysis windows should be placed.
+      #'   Optional directory structure from the base path where the folders 
+      #'   corresponding to analysis windows should be placed.
       #'   Default value is "dates".
+      #'   Expected data type is a character vector with a single element.
       #' @param innerDir
       #'   Optional name of the directory within each window folder where the 
       #'   input data for that window should be placed.
       #'   Default value is "input".
+      #'   Expected data type is a character vector with a single element.
+      #' @param fileName
+      #'   Optional: file name to use for the signal within a given window.
+      #'   Default value is "signal".
+      #'   Expected data type is a character vector with a single element.
+      #' @param minimumRecords
+      #'   Optional: a signal for a window needs at least this number of 
+      #'   records for the window to be created. A null value indicates that 
+      #'   the number of signal records should not be used to determine
+      #'   valid windows.
+      #'   Default value is 1 (windows with 0 records will not be created).
+      #'   Expected data type is an atomic vector with a single numeric 
+      #'   or integer element.
+      #' @param isValid
+      #'   Optional: logical flags to determine if a window should (TRUE) or 
+      #'   should not (FALSE) be created. A null value indicates all windows
+      #'   should initially be considered valid, pending further evaluation
+      #'   based on criteria defined by other arguments.
+      #'   Default value is NULL.
+      #'   Expected data type is an atomic vector of logical values with the 
+      #'   same length as the number of potential windows.
+      #' @param validFunction
+      #'   Optional: function to call to determine if a signal for a given
+      #'   day should be considered valid (function returns TRUE) or invalid
+      #'   (function returns FALSE). Providing a null value disables 
+      #'   this feature.
+      #'   Default value is NULL.
+      #'   Expected data type is a function with two required arguments
+      #'   called "signalOut" and "signalIn", to which the output and input
+      #'   signals for a given window will be passed. 
+      #'   The function should return a logical vector with
+      #'   a single element.
       #' 
       #' @return 
-      #'   No defined return value.
+      #'   Invisibly returns the character vector representing the valid
+      #'   windows.
       #' 
-      generateWindowInputOffset = function
+      createWindowsOffset = function
       (
          offsetTime,
          headersIn,
          outerDir = "dates",
-         innerDir = "input"
+         innerDir = "input",
+         fileName = "signal",
+         minimumRecords = 1,
+         isValid = NULL,
+         validFunction = NULL
       )
       {
-         # Create the input directories
-         
-         self$inputPaths <- sprintf(
-            fmt = "%s/%s/%s/%s", 
-            self$path, 
-            outerDir,
-            self$windows,
-            innerDir
-         );
-         self$inputFilePaths <- sprintf(
-            fmt = "%s/signal.RData",
-            self$inputPaths
-         );
-         
          dir.create(
             path = self$path, 
             recursive = TRUE, 
             showWarnings = FALSE
          );
-         sapply(
-            X = self$inputPaths,
-            FUN = dir.create,
-            recursive = TRUE,
-            showWarnings = FALSE
-         );
          
-         # Populate the input for each window
+         if (outerDir != "") {
+            outerDir <- paste0("/", outerDir)
+         }
+         if (innerDir != "") {
+            innerDir <- paste0("/", innerDir)
+         }
+         inputPaths <- sprintf(
+            fmt = "%s%s/%s%s", 
+            self$path, 
+            outerDir,
+            self$windows,
+            innerDir
+         );
+         inputFilePaths <- sprintf(
+            fmt = "%s/%s.RData",
+            inputPaths,
+            fileName
+         );
+
+         if (is.null(isValid)) {
+            isValid <- rep(TRUE, times = length(self$windows))
+         }
          
          for (index in 1:length(self$windows)) {
             
@@ -229,19 +279,52 @@ DielWindowedTransferFunction <- R6Class(
                minTime = minTime,
                maxTime = maxTime
             );
-            signalIn <- self$signalIn$interpolate(
-               headers = headersIn,
-               time = signalOut$getTime() - offsetTime
+            signalIn <- self$signalIn$getWindow(
+               minTime = minTime - offsetTime,
+               maxTime = maxTime - offsetTime
             );
-            saveRDS(
-               list(signalIn = signalIn, signalOut = signalOut), 
-               file = self$inputFilePaths[index]
-            );
+
+            if (!is.null(minimumRecords)) {
+               isValid[index] <- 
+                  isValid[index] &&
+                  signalOut$getLength() >= minimumRecords &&
+                  signalIn$getLength() >= minimumRecords 
+            }
+            
+            if (!is.null(validFunction)) {
+               isValid[index] <- 
+                  isValid[index] && 
+                  validFunction(signalOut = signalOut, signalIn = signalIn)
+            }
+            
+            if (isValid[index]) {
+               dir.create(
+                  path = inputPaths[index],
+                  recursive = TRUE,
+                  showWarnings = FALSE
+               )
+
+               signalIn <- self$signalIn$interpolate(
+                  headers = headersIn,
+                  time = signalOut$getTime() - offsetTime
+               );
+               
+               saveRDS(
+                  list(signalIn = signalIn, signalOut = signalOut), 
+                  file = inputFilePaths[index]
+               );
+            }
          }
+         
+         self$windows <- self$windows[isValid]
+         self$inputPaths <- inputPaths[isValid]
+         self$inputFilePaths <- inputFilePaths[isValid]
+         
+         invisible(self$windows)
       },
       
       
-      # Method DielWindowedTransferFunction$analyze ####
+      ## Method: analyze ####
       #
       #' @description 
       #'   Runs the provided analyzer object for all windows
@@ -301,7 +384,7 @@ DielWindowedTransferFunction <- R6Class(
          }
       },
       
-      # Method DielWindowedTransferFunction$summarizeWindows ####
+      ## Method: summarizeWindows ####
       #
       #' @description 
       #'   Uses the provided TransferFunctionSummarizer to generate a summary
@@ -315,7 +398,7 @@ DielWindowedTransferFunction <- R6Class(
       #'   Default value is "summary".
       #' @param useResults
       #'   Optional switch to turn of summarization of results.
-      #'   Default value is TRUE (results will be sumarized).
+      #'   Default value is TRUE (results will be summarized).
       #' 
       #' @return 
       #'   No defined return value.

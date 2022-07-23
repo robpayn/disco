@@ -11,7 +11,7 @@ NULL
 #' @export
 #' 
 #' @title 
-#'   R6 class defining a diel windowed signal
+#'   R6 class defining a diel windowed signal analysis
 #'   
 #' @description 
 #'   Manages a windowed signal analysis, where the windows are 
@@ -81,28 +81,50 @@ DielWindowedSignal <- R6Class(
       ## Method: constructor ####
       #
       #' @description 
-      #'   Create an instance of the class DielWindowedSignal
+      #'   Create an instance of the class.
       #'   
       #' @param signal
-      #'   The signal object from which the windows are extracted
+      #'   The signal object from which the windows are extracted.
+      #'   Expected data type is a disco::Signal object.
       #' @param path
-      #'   The path to the analysis input/output on the file system
+      #'   The path to the analysis input/output on the file system.
+      #'   Expected data type is a character vector with a single element.
       #' @param dateStart
-      #'   The date to start the first window
+      #'   The date to start the first window.
+      #'   Expected data type is either a Date object or a character vector
+      #'   with a single element that is coercible to a Date with as.Date 
+      #'   using a default format.
       #' @param dateEnd
-      #'   The date on which to end the last window
+      #'   The date on which to end the last window.
+      #'   Expected data type is either a Date object or a character vector
+      #'   with a single element that is coercible to a Date with as.Date 
+      #'   using a default format.
       #' @param windowStart
-      #'   The time of day to start a given window
+      #'   The time of day to start a given window.
+      #'   Expected data type is a character vector with a single element.
+      #'   Format should be interpretable by as.POSIXct by default.
       #' @param windowEnd
-      #'   The time of day to end a given window
+      #'   The time of day to end a given window.
+      #'   Expected data type is a character vector with a single element.
+      #'   Format should be interpretable by as.POSIXct by default.
       #' @param windowDays
-      #'   The number of days for a given window
+      #'   The number of days for a given window.
+      #'   Expected data type is an numeric or integer vector with a single
+      #'   element.
       #' @param timeZone
-      #'   Character string representing the time zone for the times
+      #'   The time zone for the other time related arguments.
+      #'   Expected data type is a character vector with a single element.
       #' @param slideDays
-      #'   The number of days to slide the window for generating each
+      #'   Optional: number of days to slide the window for generating each
       #'   window for analysis.
-      #'   Defaults to 1.
+      #'   Defaults value is 1.
+      #'   Expected data type is a numeric or integer vector with a 
+      #'   single element.
+      #'   
+      #' @returns
+      #'   This function is called by the constructor (new()) method of the 
+      #'   R6 class generator. The constructor returns a new instance of this
+      #'   class.
       #'   
       initialize = function
       (
@@ -117,68 +139,117 @@ DielWindowedSignal <- R6Class(
          slideDays = 1
       )
       {
+         # Populate attributes
+         
          self$signal <- signal;
          self$path <- path;
          self$dateStart <- as.Date(dateStart);
          self$dateEnd <- as.Date(dateEnd);
          self$windowDays <- windowDays;
          self$slideDays <- slideDays;
-         self$windows <- seq(
-            from = self$dateStart, 
-            to = self$dateEnd - self$windowDays, 
-            by = self$slideDays
-         );
          self$windowStart <- windowStart;
          self$windowEnd <- windowEnd;
          self$timeZone <- timeZone;
+         
+         # Determine the potential vector of windows based
+         # on arguments provided
+         
+         self$windows <- seq(
+            from = self$dateStart,
+            to = self$dateEnd - self$windowDays,
+            by = self$slideDays
+         )
       },
       
-      ## Method: generateWindowInput ####
+      ## Method: createWindows ####
       #
       #' @description 
       #'   Parses the signal into windows based on the window definitions
       #'   
       #' @param outerDir
-      #'   Optional directory structure from the base path where the folders corresponding
-      #'   to analysis windows should be placed.
+      #'   Optional: directory structure from the base path where the folders 
+      #'   corresponding to analysis windows should be placed.
       #'   Default value is "dates".
+      #'   Expected data type is a character vector with a single element.
       #' @param innerDir
-      #'   Optional name of the directory within each window folder where the 
-      #'   input data for that window should be placed.
+      #'   Optional: name of the directory within each window folder where the 
+      #'   signal file for that window should be placed.
       #'   Default value is "input".
+      #'   Expected data type is a character vector with a single element.
+      #' @param fileName
+      #'   Optional: file name to use for the signal within a given window.
+      #'   Default value is "signal".
+      #'   Expected data type is a character vector with a single element.
+      #' @param minimumRecords
+      #'   Optional: a signal for a window needs at least this number of 
+      #'   records for the window to be created. A null value indicates that 
+      #'   the number of signal records should not be used to determine
+      #'   valid windows.
+      #'   Default value is 1 (windows with 0 records will not be created).
+      #'   Expected data type is an atomic vector with a single numeric 
+      #'   or integer element.
+      #' @param isValid
+      #'   Optional: logical flags to determine if a window should (TRUE) or 
+      #'   should not (FALSE) be created. A null value indicates all windows
+      #'   should initially be considered valid, pending further evaluation
+      #'   based on criteria defined by other arguments.
+      #'   Default value is NULL.
+      #'   Expected data type is an atomic vector of logical values with the 
+      #'   same length as the number of potential windows.
+      #' @param validFunction
+      #'   Optional: function to call to determine if a signal for a given
+      #'   day should be considered valid (function returns TRUE) or invalid
+      #'   (function returns FALSE). Providing a null value disables 
+      #'   this feature.
+      #'   Default value is NULL.
+      #'   Expected data type is a function with a single required argument
+      #'   called "signal", to which the signal for a given window will be
+      #'   passed. The function should return a logical vector with
+      #'   a single element.
       #' 
       #' @return 
-      #'   No defined return value.
+      #'   Invisibly returns the character vector representing the valid
+      #'   windows.
       #'   
-      generateWindowInput = function
+      createWindows = function
       (
          outerDir = "dates",
-         innerDir = "input"
+         innerDir = "input",
+         fileName = "signal",
+         minimumRecords = 1,
+         isValid = NULL,
+         validFunction = NULL
       )
       {
-         self$inputPaths <- sprintf(
-            fmt = "%s/%s/%s/%s", 
-            self$path, 
-            outerDir,
-            self$windows,
-            innerDir
-         );
-         self$inputFilePaths <- sprintf(
-            fmt = "%s/signal.RData",
-            self$inputPaths
-         );
-         
          dir.create(
             path = self$path, 
             recursive = TRUE, 
             showWarnings = FALSE
-         );
-         sapply(
-            X = self$inputPaths,
-            FUN = dir.create,
-            recursive = TRUE,
-            showWarnings = FALSE
-         );
+         )
+         
+         if (outerDir != "") {
+            outerDir <- paste0("/", outerDir)
+         }
+         if (innerDir != "") {
+            innerDir <- paste0("/", innerDir)
+         }
+         inputPaths <- sprintf(
+            fmt = "%s%s/%s%s",
+            self$path,
+            outerDir,
+            self$windows,
+            innerDir
+         )
+         inputFilePaths <- sprintf(
+            fmt = "%s/%s.RData",
+            inputPaths,
+            fileName
+         )
+         
+         if (is.null(isValid)) {
+            isValid <- rep(TRUE, times = length(self$windows))
+         }
+         
          for (index in 1:length(self$windows)) {
             minTime = as.POSIXct(
                sprintf(
@@ -200,11 +271,37 @@ DielWindowedSignal <- R6Class(
                minTime = minTime,
                maxTime = maxTime
             );
-            saveRDS(
-               signal, 
-               file = self$inputFilePaths[index]
-            );
+            
+            if (!is.null(minimumRecords)) {
+               isValid[index] <- 
+                  isValid[index] &&
+                  signal$getLength() >= minimumRecords
+            }
+            
+            if (!is.null(validFunction)) {
+               isValid[index] <- 
+                  isValid[index] && 
+                  validFunction(signal = signal)
+            }
+         
+            if (isValid[index]) {
+               dir.create(
+                  path = inputPaths[index],
+                  recursive = TRUE,
+                  showWarnings = FALSE
+               )
+               saveRDS(
+                  signal, 
+                  file = inputFilePaths[index]
+               );
+            }
          }
+         
+         self$windows <- self$windows[isValid]
+         self$inputPaths <- inputPaths[isValid]
+         self$inputFilePaths <- inputFilePaths[isValid]
+         
+         invisible(self$windows)
       },
       
       ## Method: analyze ####
@@ -216,16 +313,17 @@ DielWindowedSignal <- R6Class(
       #'   A SignalDerivation object that will perform the analysis
       #'   for each window
       #' @param outerDir
-      #'   Optional directory structure from the base path where the folders corresponding
-      #'   to analysis windows should be placed.
+      #'   Optional: directory structure from the base path where the folders 
+      #'   corresponding to analysis windows should be placed.
       #'   Default value is "dates".
       #' @param innerDir
-      #'   Optional name of the directory within each window folder where the 
+      #'   Optional: name of the directory within each window folder where the 
       #'   output data for that window should be placed.
       #'   Default value is "output".
       #' 
       #' @return 
-      #'   No defined return value.
+      #'   Invisibly returns a character vector with the paths to the 
+      #'   derivation outputs.
       #'   
       analyze = function
       (
@@ -264,6 +362,8 @@ DielWindowedSignal <- R6Class(
                index = index
             );
          }
+         
+         invisible(self$outputPaths)
       },
       
       ## Method: summarizeWindows ####
@@ -276,14 +376,15 @@ DielWindowedSignal <- R6Class(
       #'   A signal summarizer that will generate the summary output for each
       #'   window
       #' @param summaryDir
-      #'   Optional path from the base path where the summary output will be written.
+      #'   Optional: path from the base path where the summary output 
+      #'   will be written.
       #'   Default value is "summary".
       #' @param useResults
-      #'   Optional switch to turn of summarization of results.
+      #'   Optional: switch to turn of summarization of results.
       #'   Default value is TRUE (results will be sumarized).
       #' 
       #' @return 
-      #'   No defined return value.
+      #'   No return value.
       #' 
       summarizeWindows = function
       (
@@ -338,7 +439,9 @@ DielWindowedSignal <- R6Class(
          }
          
          # Close the summarizer
-         signalSummarizer$close();
+         signalSummarizer$close()
+         
+         invisible(NULL)
       }
    )
 )

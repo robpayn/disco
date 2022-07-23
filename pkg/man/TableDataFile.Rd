@@ -99,7 +99,10 @@ Read the data file to populate the signal attribute
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{stringsAsFactors}}{Optional logical value to turn strings as factors on or off.
+\item{\code{dataLayer}}{Optional: data layer
+Default value is "root".}
+
+\item{\code{stringsAsFactors}}{Optional: logical value to turn strings as factors on or off.
 Default value is FALSE (do not interpret strings as categorical factors).}
 }
 \if{html}{\out{</div>}}
@@ -112,10 +115,20 @@ The signal object created by reading the file.
 \if{html}{\out{<a id="method-TableDataFile-addMetadata"></a>}}
 \if{latex}{\out{\hypertarget{method-TableDataFile-addMetadata}{}}}
 \subsection{Method \code{addMetadata()}}{
+Must be implemented by extending classes
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TableDataFile$addMetadata(metadata, instrument)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{metadata}}{Metadata}
+
+\item{\code{instrument}}{Instrument}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TableDataFile-clone"></a>}}

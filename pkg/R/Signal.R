@@ -6,7 +6,7 @@
 #'
 NULL
 
-# Signal R6 Class ####
+# R6 Class Signal ####
 
 #' @export
 #'
@@ -22,6 +22,8 @@ Signal <- R6Class(
    inherit = DataTable,
    public = list(
       
+      ## Attributes ####
+      
       #' @field timeHeader
       #'   The name of the column in the data frame with the time data
       timeHeader = NULL,
@@ -30,7 +32,7 @@ Signal <- R6Class(
       #'   Charater string with the time format (strptime)
       timeFormat = NULL,
 
-      # Method Signal$initialize ####
+      ## Method: constructor ####
       #
       #' @description 
       #'   Create an instance of class Signal
@@ -59,7 +61,7 @@ Signal <- R6Class(
       #'   Optional system specific string for the time zone for the times column.
       #'   Defaults to "UTC"
       #' @param ...
-      #'   Optional additional arguments passed to as.POSIXct for coverting the time
+      #'   Optional additional arguments passed to as.POSIXct for converting the time
       #'   data to a POSIXct vector.
       #' 
       #' @return 
@@ -112,7 +114,7 @@ Signal <- R6Class(
                   
       },
       
-      # Method Signal$getTime ####
+      ## Method: getTime ####
       #
       #' @description 
       #'   Get the vector of values representing the times for the signal data
@@ -125,7 +127,7 @@ Signal <- R6Class(
          return(self$getVariable(self$timeHeader));
       },
       
-      # Method Signal$setTimeHeader ####
+      ## Method: setTimeHeader ####
       #
       #' @description 
       #'   Set the time header
@@ -145,7 +147,7 @@ Signal <- R6Class(
          return(oldHeader);
       },
       
-      # Method Signal$setTimeZone ####
+      ## Method: setTimeZone ####
       #
       #' @description 
       #'   Set the time zone
@@ -168,7 +170,7 @@ Signal <- R6Class(
          return(prevTimeZone);
       },
       
-      # Method Signal$getDataframe ####
+      ## Method: getDataframe ####
       #
       #' @description 
       #'   Get the signal in a data frame format
@@ -181,7 +183,7 @@ Signal <- R6Class(
          return(self$data);
       },
       
-      # Method Signal$getWindow ####
+      ## Method: getWindow ####
       #
       #' @description 
       #'   Get a subset of the signal based on a provided window of time
@@ -210,13 +212,27 @@ Signal <- R6Class(
          return(signal);
       },
       
-      # Method Signal$interpolate ####
+      ## Method: interpolate ####
       #      
       #' @description 
       #'   Interpolates a signal based on the provided time vector
       #' 
+      #' @param headers
+      #'   Headers for variables that should be included in the interpolated
+      #'   signal.
+      #'   Expected data type is a character vector.
       #' @param time
-      #'   Time vector providing the basis for the interpolation
+      #'   Time vector providing the basis for the interpolation.
+      #'   Expected data type is a vector of POSIXct values.
+      #' @param timeMeta
+      #'   Optional: the metadata for the time column in the interpolated
+      #'   signal. Providing a NULL value will result in the metadata for
+      #'   time in the current signal being used for the interpolated signal.
+      #'   Default value is NULL.
+      #'   Expected data type is a character vector.
+      #' @param ...
+      #'   Optional: any additional arguments are passed to the approx() 
+      #'   function used to perform the interpolations.
       #'   
       #' @return 
       #'   A new signal with values interpolated from the current
@@ -259,7 +275,7 @@ Signal <- R6Class(
          
       },
       
-      # Method Signal$trim ####
+      ## Method: trim ####
       #      
       #' @description 
       #'   Trims the signal based on indices provided
@@ -278,7 +294,7 @@ Signal <- R6Class(
          return(self$getLength());
       },
       
-      # Method Signal$trimEdges ####
+      ## Method: trimEdges ####
       #      
       #' @description 
       #'   Trims the signal based on skipped rows
@@ -304,7 +320,7 @@ Signal <- R6Class(
          );
       },
       
-      # Method Signal$filterVariables ####
+      ## Method: filterVariables ####
       #
       #' @description 
       #'   Filter the signal to the desired variables
@@ -325,7 +341,7 @@ Signal <- R6Class(
          return(super$filterVariables(headers = headers));
       },
       
-      # Method Signal$filterRows ####
+      ## Method: filterRows ####
       #      
       #' @description 
       #'   Removes the rows designated by the provided indices
@@ -366,7 +382,7 @@ Signal <- R6Class(
 
       }, 
       
-      # Method Signal$writeCSV ####
+      ## Method: writeCSV ####
       #
       #' @description 
       #'   Write the signal in csv format
@@ -450,7 +466,7 @@ Signal <- R6Class(
          
       }, 
       
-      # Method Signal$plotSummary ####
+      ## Method: plotSummary ####
       #
       #' @description 
       #'   Plot a summary of the multivariate signal
@@ -508,7 +524,7 @@ Signal <- R6Class(
          }
       },
       
-      # Method Signal$plot ####
+      ## Method: plot ####
       #
       #' @description 
       #'   Plots a single variable in the signal based on the provided header

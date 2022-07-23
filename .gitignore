@@ -6,3 +6,8 @@ pkg/.Rproj.user
 pkg/.Rhistory
 pkg/.RData
 pkg/.Ruserdata
+test/discon/01_input
+test/discon/02_protocol/.Rproj.user
+test/discon/02_protocol/.Rhistory
+test/discon/03_incremental
+test/discon/04_product

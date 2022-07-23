@@ -92,7 +92,7 @@ Defaults to <4 character year>:<2 character month of year>:<2 character day of m
 \item{\code{timeZone}}{Optional system specific string for the time zone for the times column.
 Defaults to "UTC"}
 
-\item{\code{...}}{Optional additional arguments passed to as.POSIXct for coverting the time
+\item{\code{...}}{Optional additional arguments passed to as.POSIXct for converting the time
 data to a POSIXct vector.}
 }
 \if{html}{\out{</div>}}
@@ -202,7 +202,21 @@ Interpolates a signal based on the provided time vector
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{time}}{Time vector providing the basis for the interpolation}
+\item{\code{headers}}{Headers for variables that should be included in the interpolated
+signal.
+Expected data type is a character vector.}
+
+\item{\code{time}}{Time vector providing the basis for the interpolation.
+Expected data type is a vector of POSIXct values.}
+
+\item{\code{timeMeta}}{Optional: the metadata for the time column in the interpolated
+signal. Providing a NULL value will result in the metadata for
+time in the current signal being used for the interpolated signal.
+Default value is NULL.
+Expected data type is a character vector.}
+
+\item{\code{...}}{Optional: any additional arguments are passed to the approx() 
+function used to perform the interpolations.}
 }
 \if{html}{\out{</div>}}
 }

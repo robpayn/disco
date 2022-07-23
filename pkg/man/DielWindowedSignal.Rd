@@ -2,7 +2,12 @@
 % Please edit documentation in R/DielWindowedSignal.R
 \name{DielWindowedSignal}
 \alias{DielWindowedSignal}
-\title{R6 class defining a diel windowed signal}
+\title{R6 class defining a diel windowed signal analysis}
+\value{
+This function is called by the constructor (new()) method of the 
+  R6 class generator. The constructor returns a new instance of this
+  class.
+}
 \description{
 Manages a windowed signal analysis, where the windows are 
   described by a shifting period of time starting at a given
@@ -45,7 +50,7 @@ window for analysis.}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-DielWindowedSignal-new}{\code{DielWindowedSignal$new()}}
-\item \href{#method-DielWindowedSignal-generateWindowInput}{\code{DielWindowedSignal$generateWindowInput()}}
+\item \href{#method-DielWindowedSignal-createWindows}{\code{DielWindowedSignal$createWindows()}}
 \item \href{#method-DielWindowedSignal-analyze}{\code{DielWindowedSignal$analyze()}}
 \item \href{#method-DielWindowedSignal-summarizeWindows}{\code{DielWindowedSignal$summarizeWindows()}}
 \item \href{#method-DielWindowedSignal-clone}{\code{DielWindowedSignal$clone()}}
@@ -55,7 +60,7 @@ window for analysis.}
 \if{html}{\out{<a id="method-DielWindowedSignal-new"></a>}}
 \if{latex}{\out{\hypertarget{method-DielWindowedSignal-new}{}}}
 \subsection{Method \code{new()}}{
-Create an instance of the class DielWindowedSignal
+Create an instance of the class.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DielWindowedSignal$new(
   signal,
@@ -73,53 +78,110 @@ Create an instance of the class DielWindowedSignal
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{signal}}{The signal object from which the windows are extracted}
+\item{\code{signal}}{The signal object from which the windows are extracted.
+Expected data type is a disco::Signal object.}
 
-\item{\code{path}}{The path to the analysis input/output on the file system}
+\item{\code{path}}{The path to the analysis input/output on the file system.
+Expected data type is a character vector with a single element.}
 
-\item{\code{dateStart}}{The date to start the first window}
+\item{\code{dateStart}}{The date to start the first window.
+Expected data type is either a Date object or a character vector
+with a single element that is coercible to a Date with as.Date 
+using a default format.}
 
-\item{\code{dateEnd}}{The date on which to end the last window}
+\item{\code{dateEnd}}{The date on which to end the last window.
+Expected data type is either a Date object or a character vector
+with a single element that is coercible to a Date with as.Date 
+using a default format.}
 
-\item{\code{windowStart}}{The time of day to start a given window}
+\item{\code{windowStart}}{The time of day to start a given window.
+Expected data type is a character vector with a single element.
+Format should be interpretable by as.POSIXct by default.}
 
-\item{\code{windowEnd}}{The time of day to end a given window}
+\item{\code{windowEnd}}{The time of day to end a given window.
+Expected data type is a character vector with a single element.
+Format should be interpretable by as.POSIXct by default.}
 
-\item{\code{windowDays}}{The number of days for a given window}
+\item{\code{windowDays}}{The number of days for a given window.
+Expected data type is an numeric or integer vector with a single
+element.}
 
-\item{\code{timeZone}}{Character string representing the time zone for the times}
+\item{\code{timeZone}}{The time zone for the other time related arguments.
+Expected data type is a character vector with a single element.}
 
-\item{\code{slideDays}}{The number of days to slide the window for generating each
+\item{\code{slideDays}}{Optional: number of days to slide the window for generating each
 window for analysis.
-Defaults to 1.}
+Defaults value is 1.
+Expected data type is a numeric or integer vector with a 
+single element.}
 }
 \if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DielWindowedSignal-generateWindowInput"></a>}}
-\if{latex}{\out{\hypertarget{method-DielWindowedSignal-generateWindowInput}{}}}
-\subsection{Method \code{generateWindowInput()}}{
+\if{html}{\out{<a id="method-DielWindowedSignal-createWindows"></a>}}
+\if{latex}{\out{\hypertarget{method-DielWindowedSignal-createWindows}{}}}
+\subsection{Method \code{createWindows()}}{
 Parses the signal into windows based on the window definitions
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DielWindowedSignal$generateWindowInput(outerDir = "dates", innerDir = "input")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DielWindowedSignal$createWindows(
+  outerDir = "dates",
+  innerDir = "input",
+  fileName = "signal",
+  minimumRecords = 1,
+  isValid = NULL,
+  validFunction = NULL
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{outerDir}}{Optional directory structure from the base path where the folders corresponding
-to analysis windows should be placed.
-Default value is "dates".}
+\item{\code{outerDir}}{Optional: directory structure from the base path where the folders 
+corresponding to analysis windows should be placed.
+Default value is "dates".
+Expected data type is a character vector with a single element.}
 
-\item{\code{innerDir}}{Optional name of the directory within each window folder where the 
-input data for that window should be placed.
-Default value is "input".}
+\item{\code{innerDir}}{Optional: name of the directory within each window folder where the 
+signal file for that window should be placed.
+Default value is "input".
+Expected data type is a character vector with a single element.}
+
+\item{\code{fileName}}{Optional: file name to use for the signal within a given window.
+Default value is "signal".
+Expected data type is a character vector with a single element.}
+
+\item{\code{minimumRecords}}{Optional: a signal for a window needs at least this number of 
+records for the window to be created. A null value indicates that 
+the number of signal records should not be used to determine
+valid windows.
+Default value is 1 (windows with 0 records will not be created).
+Expected data type is an atomic vector with a single numeric 
+or integer element.}
+
+\item{\code{isValid}}{Optional: logical flags to determine if a window should (TRUE) or 
+should not (FALSE) be created. A null value indicates all windows
+should initially be considered valid, pending further evaluation
+based on criteria defined by other arguments.
+Default value is NULL.
+Expected data type is an atomic vector of logical values with the 
+same length as the number of potential windows.}
+
+\item{\code{validFunction}}{Optional: function to call to determine if a signal for a given
+day should be considered valid (function returns TRUE) or invalid
+(function returns FALSE). Providing a null value disables 
+this feature.
+Default value is NULL.
+Expected data type is a function with a single required argument
+called "signal", to which the signal for a given window will be
+passed. The function should return a logical vector with
+a single element.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-No defined return value.
+Invisibly returns the character vector representing the valid
+  windows.
 }
 }
 \if{html}{\out{<hr>}}
@@ -141,18 +203,19 @@ Runs the provided analyzer object for all windows
 \item{\code{signalDerivation}}{A SignalDerivation object that will perform the analysis
 for each window}
 
-\item{\code{outerDir}}{Optional directory structure from the base path where the folders corresponding
-to analysis windows should be placed.
+\item{\code{outerDir}}{Optional: directory structure from the base path where the folders 
+corresponding to analysis windows should be placed.
 Default value is "dates".}
 
-\item{\code{innerDir}}{Optional name of the directory within each window folder where the 
+\item{\code{innerDir}}{Optional: name of the directory within each window folder where the 
 output data for that window should be placed.
 Default value is "output".}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-No defined return value.
+Invisibly returns a character vector with the paths to the 
+  derivation outputs.
 }
 }
 \if{html}{\out{<hr>}}
@@ -175,16 +238,17 @@ Uses the provided SignalSummarizer to generate a summary
 \item{\code{signalSummarizer}}{A signal summarizer that will generate the summary output for each
 window}
 
-\item{\code{summaryDir}}{Optional path from the base path where the summary output will be written.
+\item{\code{summaryDir}}{Optional: path from the base path where the summary output 
+will be written.
 Default value is "summary".}
 
-\item{\code{useResults}}{Optional switch to turn of summarization of results.
+\item{\code{useResults}}{Optional: switch to turn of summarization of results.
 Default value is TRUE (results will be sumarized).}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-No defined return value.
+No return value.
 }
 }
 \if{html}{\out{<hr>}}

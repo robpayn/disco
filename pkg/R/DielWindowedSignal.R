@@ -6,7 +6,7 @@
 #'
 NULL
 
-# Class DielWindowedSignal (R6) ####
+# R6 Class DielWindowedSignal ####
 
 #' @export
 #' 
@@ -22,6 +22,8 @@ NULL
 DielWindowedSignal <- R6Class(
    classname = "DielWindowedSignal",
    public = list(
+      
+      ## Attributes ####
       
       #' @field signal
       #'   The signal containing the data to be windowed
@@ -76,7 +78,7 @@ DielWindowedSignal <- R6Class(
       #'   The vector of paths to the output directories for each window
       outputPaths = NULL,
       
-      # Method DielWindowedSignal$new ####
+      ## Method: constructor ####
       #
       #' @description 
       #'   Create an instance of the class DielWindowedSignal
@@ -131,7 +133,7 @@ DielWindowedSignal <- R6Class(
          self$timeZone <- timeZone;
       },
       
-      # Method DielWindowedSignal$generateWindowInput ####
+      ## Method: generateWindowInput ####
       #
       #' @description 
       #'   Parses the signal into windows based on the window definitions
@@ -205,7 +207,7 @@ DielWindowedSignal <- R6Class(
          }
       },
       
-      # Method DielWindowedSignal$analyze ####
+      ## Method: analyze ####
       #
       #' @description 
       #'   Runs the provided analyzer object for all windows
@@ -264,7 +266,7 @@ DielWindowedSignal <- R6Class(
          }
       },
       
-      # Method DielWindowedSignal$summarizeWindows ####
+      ## Method: summarizeWindows ####
       #
       #' @description 
       #'   Uses the provided SignalSummarizer to generate a summary

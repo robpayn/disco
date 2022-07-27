@@ -157,9 +157,16 @@ DielWindowedTransferFunction <- R6Class(
       #'   the output signal.
       #'   
       #' @param offsetTime
-      #'   The offset time (in seconds) between the input signal and output 
-      #'   signal.
-      #'   Expected data type is a numeric vector with a single element.
+      #'   If a single element character vector, offsetTime should represent
+      #'   the variable name providing values for the offset time 
+      #'   (in seconds) between corresponding elements of the input signal 
+      #'   and output signals.
+      #'   If a numerical vector, offsetTime should represent the offset time 
+      #'   (in seconds) between corresponding elements of the input signal 
+      #'   and output signals. A vector with a single element implies a 
+      #'   offset time.
+      #'   Expected data type is a character vector with a single element
+      #'   or a numeric vector.
       #' @param headersIn
       #'   Vector of character strings indicating the headers of variables 
       #'   from signalIn that need to be considered the input signal.
@@ -279,9 +286,24 @@ DielWindowedTransferFunction <- R6Class(
                minTime = minTime,
                maxTime = maxTime
             );
+
+            if (!is.numeric(offsetTime)) {
+               if ( is.character(offsetTime) && (length(offsetTime) == 1) ) {
+                  offset <- signalOut$getVariable(offsetTime)
+               } else {
+                  stop(paste(
+                     "The argument offsetTime must be a header name for a",
+                     "variable in the output signal or a numeric vector",
+                     "of offset values (can be a single value)."
+                  ))
+               }
+            } else {
+               offset <- offsetTime
+            }
+
             signalIn <- self$signalIn$getWindow(
-               minTime = minTime - offsetTime,
-               maxTime = maxTime - offsetTime
+               minTime = minTime - offset[1],
+               maxTime = maxTime - offset[length(offsetTime)]
             );
 
             if (!is.null(minimumRecords)) {
@@ -306,7 +328,7 @@ DielWindowedTransferFunction <- R6Class(
 
                signalIn <- self$signalIn$interpolate(
                   headers = headersIn,
-                  time = signalOut$getTime() - offsetTime
+                  time = signalOut$getTime() - offset
                );
                
                saveRDS(

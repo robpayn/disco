@@ -11,3 +11,8 @@ test/discon/02_protocol/.Rproj.user
 test/discon/02_protocol/.Rhistory
 test/discon/03_incremental
 test/discon/04_product
+test/offset/01_input
+test/offset/02_protocol/.Rproj.user
+test/offset/02_protocol/.Rhistory
+test/offset/03_incremental
+test/offset/04_product

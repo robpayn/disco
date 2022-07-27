@@ -126,9 +126,16 @@ Parses the signal into windows based on the window definitions
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{offsetTime}}{The offset time (in seconds) between the input signal and output 
-signal.
-Expected data type is a numeric vector with a single element.}
+\item{\code{offsetTime}}{If a single element character vector, offsetTime should represent
+the variable name providing values for the offset time 
+(in seconds) between corresponding elements of the input signal 
+and output signals.
+If a numerical vector, offsetTime should represent the offset time 
+(in seconds) between corresponding elements of the input signal 
+and output signals. A vector with a single element implies a 
+offset time.
+Expected data type is a character vector with a single element
+or a numeric vector.}
 
 \item{\code{headersIn}}{Vector of character strings indicating the headers of variables 
 from signalIn that need to be considered the input signal.
